@@ -1,0 +1,311 @@
+<!-- AUTOMATICALLY GENERATED FILE - DO NOT EDIT -->
+
+<def tag="form" for="Chain">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="idstring, name, description, from, to, cleavages, cterm, inverse_cleavages, isoform, nterm, protein" param/>
+    <div param="actions">
+      <submit label="#{ht 'chains.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Cleavage">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="idstring, pos, cleavagesite, cterm, import, nterm, protease, proteasechain, proteaseisoform, substrate, substratechain, substrateisoform" param/>
+    <div param="actions">
+      <submit label="#{ht 'cleavages.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Cleavagesite">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="idstring, p10, p9, p8, p7, p6, p5, p4, p3, p2, p1, p1p, p2p, p3p, p4p, p5p, p6p, p7p, p8p, p9p, p10p, import" param/>
+    <div param="actions">
+      <submit label="#{ht 'cleavagesites.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Cterm">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="pos, idstring, import, isoform, protein, terminusmodification" param/>
+    <div param="actions">
+      <submit label="#{ht 'cterms.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Documentation">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="name, title, long, short, category, position, show" param/>
+    <div param="actions">
+      <submit label="#{ht 'documentations.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Evidencecode">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="code, name, definition" param/>
+    <div param="actions">
+      <submit label="#{ht 'evidencecodes.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Evidence">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="idstring, name, method, description, repository, lab, phys_relevance, directness, evidencefile_file_name, evidencefile_content_type, evidencefile_file_size, evidencefile_updated_at, evidencecodes, evidencesource, gocomponents, owner, publications, tissues" param/>
+    <div param="actions">
+      <submit label="#{ht 'evidences.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Gocomponent">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="acc, name, description, is_obsolete" param/>
+    <div param="actions">
+      <submit label="#{ht 'gocomponents.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Gofunctionlink">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="direct, count, ancestor, descendant" param/>
+    <div param="actions">
+      <submit label="#{ht 'gofunctionlinks.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Gofunction">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="acc, name, description, is_obsolete" param/>
+    <div param="actions">
+      <submit label="#{ht 'gofunctions.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Golink">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="ancestor_type, descendant_type, direct, count, ancestor, descendant" param/>
+    <div param="actions">
+      <submit label="#{ht 'golinks.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Goprocess">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="acc, name, description, is_obsolete" param/>
+    <div param="actions">
+      <submit label="#{ht 'goprocesses.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Import">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="name, description, datatype, inhibitions_listed, inhibitions_imported, cleavages_listed, cleavages_imported, cleavagesites_listed, cleavagesites_imported, cterms_listed, cterms_imported, nterms_listed, nterms_imported, csvfile_file_name, csvfile_content_type, csvfile_file_size, csvfile_updated_at, evidence, owner" param/>
+    <div param="actions">
+      <submit label="#{ht 'imports.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Inhibition">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="idstring, import, inhibited_protease, inhibited_proteasechain, inhibited_proteaseisoform, inhibitor, inhibitorchain, inhibitorisoform, inhibitory_molecule, molecule" param/>
+    <div param="actions">
+      <submit label="#{ht 'inhibitions.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Isoform">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="ac, name, sequence, status, protein" param/>
+    <div param="actions">
+      <submit label="#{ht 'isoforms.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Moleculename">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="name, molecule" param/>
+    <div param="actions">
+      <submit label="#{ht 'moleculenames.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Molecule">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="name, description, formula, source, proteases" param/>
+    <div param="actions">
+      <submit label="#{ht 'molecules.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Nterm">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="pos, idstring, import, isoform, protein, terminusmodification" param/>
+    <div param="actions">
+      <submit label="#{ht 'nterms.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Protein">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="ac, name, data_class, molecular_type, entry_type, dt_create, dt_sequence, dt_annotation, definition, sequence, mw, crc64, aalen, chromosome, band, status, cleavages, inverse_cleavages, publications" param/>
+    <div param="actions">
+      <submit label="#{ht 'proteins.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Publication">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="pmid, title, authors, abstract, ref, doi, url" param/>
+    <div param="actions">
+      <submit label="#{ht 'publications.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Terminusmodification">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="ac, name, description, nterm, cterm, subcell, psimodid, display, kw" param/>
+    <div param="actions">
+      <submit label="#{ht 'terminusmodifications.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Tissue">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="tsid, ac" param/>
+    <div param="actions">
+      <submit label="#{ht 'tissues.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="Tissuesynonyme">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="sy, tissue" param/>
+    <div param="actions">
+      <submit label="#{ht 'tissuesynonymes.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+
+
+<def tag="form" for="User">
+  <form merge param="default">
+    <error-messages param/>
+    <field-list fields="name, email_address, affiliation, administrator, state" param/>
+    <div param="actions">
+      <submit label="#{ht 'users.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+<def tag="signup-form" polymorphic/>
+<def tag="signup-form" for="User">
+  <form lifecycle="signup" merge param="default">
+    <error-messages param/>
+    <field-list fields="name, email_address, password, password_confirmation" param/>
+    <div param="actions">
+      <submit label="#{ht 'users.actions.signup', :default=>['Signup']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+
+<def tag="reset-password-form" polymorphic/>
+<def tag="reset-password-form" for="User">
+  <form lifecycle="reset_password" merge param="default">
+    <error-messages param/>
+    <input type="hidden" name="key" value="&this.lifecycle.provided_key" if="&this.lifecycle.provided_key"/>
+    <field-list fields="password, password_confirmation" param/>
+    <div param="actions">
+      <submit label="#{ht 'users.actions.reset_password', :default=>['Reset Password']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>
+

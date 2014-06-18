@@ -1,0 +1,2 @@
+module TissuesynonymesHelper
+end

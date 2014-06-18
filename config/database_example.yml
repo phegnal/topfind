@@ -1,0 +1,59 @@
+# MySQL.  Versions 4.1 and 5.0 are recommended.
+
+
+development:
+  adapter: mysql
+  database: topfind_development
+  username: xxx
+  password: xxx
+  socket: /var/mysql/mysql.sock
+
+production:
+  adapter: mysql
+  database: topfind_production_130522
+  username: xxx
+  password: xxx
+  socket: /var/mysql/mysql.sock
+
+production_130522:
+  adapter: mysql
+  database: topfind_production_130522
+  username: xxx
+  password: xxx
+  socket: /var/mysql/mysql.sock
+  
+production_labinternal:
+  adapter: mysql
+  database: topfind_production_labinternal
+  username: xxx
+  password: xxx
+  socket: /var/mysql/mysql.sock
+
+meropsweb95:
+  adapter: mysql
+  database: topfind_meropsweb95
+  username: xxx
+  password: xxx
+  socket: /var/mysql/mysql.sock
+
+meropsweb:
+  adapter: mysql
+  database: topfind_meropsweb98
+  username: xxx
+  password: xxx
+  socket: /var/mysql/mysql.sock
+
+ols:
+  adapter: mysql
+  database: ols
+  username: xxx
+  password: xxx
+  socket: /var/mysql/mysql.sock
+
+go:
+  adapter: mysql
+  database: topcat_go
+  username: xxx
+  password: xxx
+  socket: /var/mysql/mysql.sock
+ 

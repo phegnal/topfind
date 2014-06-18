@@ -1,0 +1,13 @@
+<index-page>
+    <collection: replace>
+      <table-plus with="&@documentations" fields="name, category, position, show, title,  short, long" >
+                      <controls:>
+                        <a action="show">Details</a>
+                        <a action="edit">Edit</a>
+                </controls:>
+                <position-view:><editor/></position-view>
+                <show-view:><editor/></show-view>
+      
+      	</table-plus>
+    </collection:>
+</index-page>

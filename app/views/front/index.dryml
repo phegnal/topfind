@@ -1,0 +1,160 @@
+<page>
+    
+    <title:>
+    	TopFIND - A knowledgebase combining protein termini, protein processing, cleavage site specificity and functional annotation in the protease web
+    </title:>
+    <after-title:>
+		<meta name="description" content="TopFIND (Terminus Oriented Protein Function INferred Database) is a knowledgebase for protein termini, protease processing and protein function."/>
+		<meta name="keywords" content="terminus,termini,protein terminus,amino terminus,amino termini,carboxy terminus,carboxy termini,c-terminus,n-terminus,protease,protein,cleavage,specificity,proteolyisis,protease web,protein database,termini database,protein termini database,protein terminus database,protein cleavage database,protease database,human,h. sapiens,homo sapiens,mus musculus,mouse,e-coli,yeast,arabidopsis,a. thaliana,arabidopsis thaliana,protease substrate,substrate identification,protease inhibition,inhibitor,Philipp F. Lange,Philipp Lange,UBC,Nature Methods,terminus database,Terminus Oriented Protein Function INferred Database,HPP,Human Proteome Project,Chromosme,UniProt,UniProtKB,NextProt,Merops,CutDB,ProeaseDB,protease cleavage site,protease specificity,Overall Lab,Overall Laboratory,systems biology,knowledgebase,protein function,portein knowledgebase,function,heatmap,protease web,protease cleavage database,protease substrate,protease substrate database,protease specificity,cleavage site specificity"/>
+  	</after-title:>
+  <aside1: ></aside1:>
+  <content:>
+
+
+	<section class="content-body">
+		<section id="frontsearch">
+			<form action="/topfind/proteins" method="GET">
+			   <div id="normalsearch">
+			   	<input type="text" name="query" class="large"/><submit label="search"/>	 
+			    <a href="#" onclick="jQuery('.frontsearch').toggle();; return false;">advanced</a> <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s_advanced'].first.short}"/> |  <a href="#" onclick="jQuery('#searchexample').toggle();; return false;">example input</a>
+			    <script>jQuery('.large').watermark('name, UniProt ID, MEROPS family ID, ...'), {className: 'watermark'};</script>
+			   </div>
+				   <div id="searchexample" class="hide">
+				   	    
+				    
+				    <div class="solidbox">
+					   	<div class="category"><b>Normal search:</b></div>
+						  <p> 
+						   	<ul>
+							   	<li>Search by UniProt accession: <a href="http://clipserve.clip.ubc.ca/topfind/proteins?query=P41245">P41245</a></li>
+								<li>Search by protein name: <a href="http://clipserve.clip.ubc.ca/topfind/proteins?query=CTGF">CTGF</a></li>
+								<li>Search by part of a protein name: <a href="http://clipserve.clip.ubc.ca/topfind/proteins?query=Chloride+channel">Chloride channel</a></li>
+								<li>Search by MEROPS protease code: <a href="http://clipserve.clip.ubc.ca/topfind/proteins?query=M10.004">M10.004</a> (<a href="http://clipserve.clip.ubc.ca/topfind/proteins?query=M10.004&function=protease"> limit to proteases by selecting function 'protease' from the advanced options)</a></li>
+								<li>Search by MEROPS protease family ID: <a href="http://clipserve.clip.ubc.ca/topfind/proteins?query=M10">M10</a> (<a href="http://clipserve.clip.ubc.ca/topfind/proteins?query=M10&function=protease">limit to proteases by selecting function 'protease' from the advanced options)</a></li>
+						   	</ul>
+						</p>   
+						<div class="category"><b>Advanced search</b></div>
+						   <p>
+						   	<ul>
+							   	<li><a href="http://clipserve.clip.ubc.ca/topfind/proteins?query=&species=Homo+sapiens&modification=&function=&chromosome=6&chromosomeposition=&minntermini=&minctermini=">Select 'Homo sapiens' from the species list, 'protease' from the function list and enter '6' into the filed for chromosome to list all human proteases encoded on chromsome 6.</a></li>
+								<li><a href="http://clipserve.clip.ubc.ca/topfind/proteins?query=&species=&modification=Acetylation&function=&chromosome=&chromosomeposition=&minntermini=5&minctermini=">Enter '5' into the field form minimum number of N termini and select 'acetylated' from the modification list to list all proteins that have at least 5 N termini annotated and have been shown to be acetylated at at least one of their termini.</a></li>
+						   	</ul>
+						</p>   	
+					   	<div class="category"><b>Protein names and identifiers</b></div>
+						<p>You can find protein names and identifiers at:
+						   	<ul>
+							   	<li><a href="http://www.uniprot.org" target="_blank">UniProt</a></li>
+							   	<li><a href="http://merops.sanger.ac.uk/" target="_blank">MEROPS</a></li>
+						   	</ul>
+						</p>
+				   </div>
+				   </div>
+			   
+				   <div id="advancedsearch" class="hide frontsearch">
+				   	<table><tr>
+				   	<td id="leftsearchcol">
+				   		<ul>
+				   			<li>Species</li>
+				   			<ul><li>
+				   				<select name="species" id="osselect">
+							      <option></option>
+							      <% Os.all.each do |f| %>
+							        <%= "<option #{'selected' if params.key?(:species) && params[:species] == (f.name)}>#{f.name}</option>" %>
+							      <%end%>
+								</select>
+							</li></ul>
+							<li>Modification <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-modification'].first.short}"/></li>
+						    <ul><li>
+								<select name="modification" id="modselect">
+							        <option></option>
+							      <% Terminusmodification.kwgroup.each do |f| %>
+							        <%= "<option #{'selected' if params.key?(:modification) && params[:modification] == (f.name)}>#{f.name}</option>" %>
+							      <%end%>
+							    </select>
+						    </li></ul>
+						    <li>Function <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-function'].first.short}"/></li>
+						    <ul><li>
+								<select name="function">
+						            <option></option>
+						          <% ['protease','inhibitor'].each do |f| %>
+						            <%= "<option #{'selected' if params.key?(:function) && params[:function] == (f)}>#{f}</option>" %>
+						          <%end%>
+						        </select>
+						    </li></ul>
+					    </ul>
+				    </td>
+					<td id="middlesearchcol">
+				   		<ul>
+				   			<li>Genomic location<img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-genomiclocation'].first.short}"/></li>
+				   			<ul>
+								<li><input type="text" name="chromosome" id="chromosome" size="4"/>
+									Chromosome <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-chromosome'].first.short}"/>
+								</li>
+								<li><input type="text" name="chromosomeposition" id="chromosomeposition" size="4"/>
+									Position on chromosome <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-chromosomeposition'].first.short}"/>
+								</li>
+							</ul>
+						</ul>
+				    </td>	
+					<td id="rightsearchcol">
+				   		<ul>
+				   			<li>Minum number of  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-numtermini'].first.short}"/></li>
+				   			<ul>
+								<li><input type="text" name="minntermini" id="minntermini" size="4"/>
+									N termini
+								</li>
+								<li><input type="text" name="minctermini" id="minctermini" size="4"/>
+									C termini
+								</li>
+							</ul>
+							<li></li>
+							<li id="advancedsubmit"><submit label="search"/></li>
+					    </ul>
+				    </td>
+				    </tr>
+				    </table>				    
+				</div>   
+			</form>
+		</section>
+		<section id="intro">
+			<section class="cols">
+				<section id="intro1" class="intros">
+					<h3>WELCOME</h3>
+					<ul>
+						<li>TopFIND is the first public knowledgebase for protein termini and protease processing</li>
+						<li><hr/></li>
+						<li>More than 170,000 N- and C-termini and more than 16,000 cleavages listed</li>
+						<li><hr/></li>
+						<li>Covers <i>H. sapiens</i>, <i>M. musculus</i>, <i>S. cerevisiae</i>, <i>A. thaliana</i> and <i>E. coli</i></li>
+					</ul>
+				</section>
+			</section>
+			<section class="cols">
+				<section id="intro2" class="intros">
+					<h3>WHAT TopFIND PROVIDES</h3>
+					<ul>
+						<li>Integration of protein termini with proteolytic processing and protein features</li>
+						<li><hr/></li>
+						<li>Displays proteases and substrates within their protease web including detailed evidence information</li>
+						<li><hr/></li>
+						<li>Fully supports the Human Proteome Project through search by chromosome location</li>
+					</ul>			
+				</section>
+			</section>
+			<section class="cols">
+				<section id="intro3" class="intros">
+					<h3>CONTRIBUTE</h3>
+					<ul>
+						<li>Submit your N- or C-termini datasets</li>
+						<li><hr/></li>
+						<li>Contribute information on protein cleavages</li>
+						<li><hr/></li>
+						<li>Provide detailed experimental description, sample information and raw data</li>
+					</ul>			
+				</section>
+			</section>
+		</section>
+	</section>
+  </content:>
+  
+</page>

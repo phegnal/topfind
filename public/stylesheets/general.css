@@ -1,0 +1,99 @@
+#header {
+height: 50px;
+
+padding: 7px 12px;
+border-bottom: solid 1px #aaa;
+background-image: ../images/bg-menu.gif; 
+}
+
+#lablogo {
+margin-right:10px;
+}
+
+#iclip {
+font-weight: bold;
+font-size: 2em;
+margin-bottom: 2px;
+text-shadow: 2px 2px 2px #aaa;
+} 
+
+
+#navigation {
+height: 20px;
+background-color:#ddd;
+margin: 10px -10px;
+padding: 1px 0px;
+border-bottom: solid 2px #777;
+}
+
+#navigation ul {
+ list-style:none;
+ margin: 0px 20px;
+}
+
+#navigation li {
+ display:inline;
+}
+
+
+.login {
+#float:right;
+color:#888;
+font-size: .7em;
+}
+
+
+#searchlogic_search_submit {
+margin-top:20px;
+}
+
+
+.rotate {
+width:20px;
+/* for firefox, safari, chrome, etc. */
+-webkit-transform: rotate(-45deg);
+-moz-transform: rotate(-45deg);
+/* for ie */
+filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+
+
+#matrix .pos {
+background-color:#a6d192;
+}
+#matrix .na {
+background-color:#eee;
+}
+#matrix .neg {
+background-color:red;
+}
+
+
+
+
+#matrix table {
+margin-top:80px;
+width:350px;
+border-collapse:collapse;
+} 
+
+#matrix tr {
+border-bottom: 1px solid #aaa;
+}
+
+#matrix table th {
+} 
+
+
+#matrix table .rh {
+width:111px;
+} 
+
+#matrix table .hc {
+width:6px;
+text-align:center;
+}
+
+.maxfullwidth {
+	max-width:100%;
+}

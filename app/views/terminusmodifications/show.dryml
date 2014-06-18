@@ -1,0 +1,23 @@
+<inline-page>
+  <body:>
+  	<section class="inline-content">
+	<h2><a><name/></a></h2> 
+      <p class="modcountreport">reported at <this.nterms.count/> N-termini and <this.cterms.count/> C-Termini.</p>
+      <field-list fields="ac, subcell, psimodlink, kw, kw.description, ols_definition,publications" class="evidencetable">
+	  	<psimodlink-view:>
+	  		<%="#{this} <img src='/topcat/images/external-link.png'/>" if this.present?%>
+	  	</psimodlink-view:>
+	  	<publications-view:>
+	  		<div repeat="&this" class="publication">
+		    <% this.url.present? ? link = this.url : link = "http://www.ncbi.nlm.nih.gov/pubmed/#{this.pmid}"%>
+	  		  <h4 class="pub-title"><a href="#{link}" target="blank"><name/></a> <img src="/topcat/images/external-link.png"/></h4>
+		      <p class="pub-author"><view:authors/></p>
+		      <p class="pub-ref"><view:ref/></p>
+		      <p class="pub-abstract"><view:abstract/></p>
+		      <p class="pub-link">PubMed: <a href="http://www.ncbi.nlm.nih.gov/pubmed/#{this.pmid}" target="blank"><view:pmid/></a> <img src="/topcat/images/external-link.png"/> | Doi: <a href="#{this.url}" target="blank"><view:doi.strip/></a> <img src="/topcat/images/external-link.png" if="&this.url.present?"/></p>
+	  		</div>
+	  	</publications-view>	  	
+	  </field-list>
+    </section>
+  </body:>
+</inline-page>

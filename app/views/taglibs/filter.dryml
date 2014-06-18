@@ -1,0 +1,473 @@
+<def tag="evidence-filter" >
+  <div class="filter box">
+    <div class="box-header">
+      Filter by evidence: <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['f-protein'].first.short}"/>
+    </div>
+    <div class="box-content">
+      <% checked= 'checked="checked"'; unchecked='' %>
+      <form action="/topfind/protein/#{this.ac}/filter" method="get">
+        <div>
+    	    <p class="filterlabel">Directness <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_directness'].first.short}"/></p>
+    	    <ul>
+    	      	<% @filter_directness.each do |f| %>
+    	      		<%= "<li><input type='checkbox' name='directness[]' value=#{f} #{checked if @params.key?(:directness) && @params[:directness].include?(f)} /> #{f}</li>" %>
+    			<%end%>	      
+    	    </ul>
+        </div>
+        <div>
+    	    <p class="filterlabel">Physiological relevance <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_physrel'].first.short}"/></p>
+    	    <ul>
+    	      	<% @filter_physrel.each do |f| %>
+    	      		<%= "<li><input type='checkbox' name='phys_rel[]' value=#{f} #{checked if @params.key?(:phys_rel) && @params[:phys_rel].include?(f)} /> #{f}</li>" %>
+    			<%end%>	      
+    	    </ul>
+        </div>
+        
+        <div>
+    	    <p class="filterlabel">Evidencecode <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_code'].first.short}"/></p>
+    		<select name="evidencecodes[]" multiple="multiple" size="<%= @filter_evidencecodes.count+1%>">
+		        <option></option>
+    		<% @filter_evidencecodes.each do |f| %>
+    			<%= "<option #{'selected' if @params.key?(:evidencecodes) && @params[:evidencecodes].include?(f)} >#{f}</option>" %>
+    		<%end%>
+    		</select>
+    	</div>
+        
+        <div>
+    	    <p class="filterlabel">Method <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_method'].first.short}"/></p>
+    		<select name="methodologies[]" multiple="multiple" size="<%= @filter_methodologies.count+1%>">
+		        <option></option>
+    		<% @filter_methodologies.each do |f| %>
+    			<%= "<option #{'selected' if @params.key?(:methodologies) && @params[:methodologies].include?(f)} >#{f}</option>" %>
+    		<%end%>
+    		</select>
+    	</div>
+        
+        <div>
+    	    <p class="filterlabel">Perturbation <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_perturbation'].first.short}"/></p>
+    		<select name="perturbations[]" multiple="multiple" size="<%= @filter_perturbations.count+1%>">
+		        <option></option>
+    		<% @filter_perturbations.each do |f| %>
+    			<%= "<option #{'selected' if @params.key?(:pertrubations) && @params[:perturbations].include?(f)} >#{f}</option>" %>
+    		<%end%>
+    		</select>
+    	</div>
+    	
+        <div>
+    	    <p class="filterlabel">Confidence greater than<img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_confidence'].first.short}"/></p>
+    	    <%="<input type='text' name='confidence' value='#{params[:confidence]}'/>"%>
+    	    <ul>
+    	      	<% @filter_confidence_type.each do |f| %>
+    	      		<%= "<li><input type='checkbox' name='confidence_type[]' value=#{f} #{checked if @params.key?(:confidence_type) && @params[:confidence_type].include?(f)} /> #{f}</li>" %>
+    			<%end%>	      
+    	    </ul>
+        </div>
+        
+        <div>
+    	    <p class="filterlabel">Experimental system <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_method_system'].first.short}"/></p>
+    		<select name="methodsystems[]" multiple="multiple" size="<%= @filter_methodsystems.count+1%>">
+		        <option></option>
+    		<% @filter_methodsystems.each do |f| %>
+    			<%= "<option #{'selected' if @params.key?(:methodsystems) && @params[:methodsystems].include?(f)} >#{f}</option>" %>
+    		<%end%>
+    		</select>
+    	</div>
+    	
+        <div>
+    	    <p class="filterlabel">Certainty of Protease assignment <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_proteaseassignment'].first.short}"/></p>
+    	    <ul>
+    	      	<% @filter_proteaseassignmentconfidence.each do |f| %>
+    	      		<%= "<li><input type='checkbox' name='proteaseassignmentconfidences[]' value=#{f} #{checked if @params.key?(:proteaseassignmentconfidences) && @params[:proteaseassignemntconfidences].include?(f)} /> #{f}</li>" %>
+    			<%end%>	      
+    	    </ul>
+        </div>
+        
+        <div>
+    	    <p class="filterlabel">Evidencecode <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_code'].first.short}"/></p>
+    		<select name="methodproteasesources[]" multiple="multiple" size="<%= @filter_methodproteasesources.count+1%>">
+		        <option></option>
+    		<% @filter_methodproteasesources.each do |f| %>
+    			<%= "<option #{'selected' if @params.key?(:methodproteasesources) && @params[:methodproteasesources].include?(f)} >#{f}</option>" %>
+    		<%end%>
+    		</select>
+    	</div>
+    	
+    		   
+    	<div>
+    		<p class="filterlabel">Tissue distribution <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_tissue'].first.short}"/></p>
+    		<select name="tissues[]" multiple="multiple" size="<%= @filter_tissues.count+1%>">
+		        <option></option>
+    		<% @filter_tissues.each do |f| %>
+    			<%= "<option #{'selected' if @params.key?(:tissues) && @params[:tissues].include?(f)}>#{f}</option>" %>
+    		<%end%>
+    		</select>
+    	</div>
+      <!--    	
+      <div>
+        <p class="filterlabel">Cellular distribution</p>
+        <select name="gocomponents[]" multiple="multiple" size="<%= @filter_gocomponents.count+1%>">
+		  <option></option>
+        <% @filter_gocomponents.each do |f| %>
+          <%= "<option #{'selected' if @params.key?(:gocomponents) && @params[:gocomponents].include?(f)}>#{f}</option>" %>
+        <%end%>
+        </select>
+      </div>
+      -->
+      <div>
+        <p class="filterlabel">Specific evidence <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_name'].first.short}"/></p>
+        <select name="evidences[]" multiple="multiple" size="<%= @filter_evidences.count+1%>">
+		  <option></option>
+        <% @filter_evidences.each do |f| %>
+          <%= "<option #{'selected' if @params.key?(:evidences) && @params[:evidences].include?(f)}>#{f}</option>" %>
+        <%end%>
+        </select>
+      </div>
+      <div>
+        <p class="filterlabel">Derived from database<img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_source'].first.short}"/></p>
+        <select name="sources[]" multiple="multiple"  size="<%= @filter_sources.count+1%>">
+		  <option></option>
+        <% @filter_sources.each do |f| %>
+          <%= "<option #{'selected' if @params.key?(:sources) && @params[:sources].include?(f)}>#{f}</option>" %>
+        <%end%>
+        </select>
+      </div>
+      <div>
+        <p class="filterlabel">Laboratory <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_lab'].first.short}"/></p>
+		  <option></option>
+        <select name="labs[]" multiple="multiple" size="<%= @filter_labs.count+1%>">
+        <% @filter_labs.each do |f| %>
+          <%= "<option #{'selected' if @params.key?(:sources) && @params[:sources].include?(f)}>#{f}</option>" %>
+        <%end%>
+        </select>
+      </div>                    	
+     <p><submit label="filter"/></p> 
+	 <div class="button reset"><a with="&@protein">reset</a></div>
+      </form>       
+    </div>   
+  </div>
+</def> 
+
+
+
+
+<def tag="protein-filter">
+  <div class="filter box">
+    <div class="box-header">
+      Filter:
+    </div>   
+    <div class="box-content">    
+  			<form action="/topfind/proteins" method="GET"> 			   
+				<input type="text" name="query" value="#{params[:query]}"/>
+				<p class="filterlabel">Species</p>
+			    <select name="species" id="osselect">
+			      <option></option>
+			      <% Os.all.each do |f| %>
+			        <%= "<option #{'selected' if params.key?(:species) && params[:species] == (f.name)}>#{f.name}</option>" %>
+			      <%end%>
+				</select>
+				
+			    <p class="filterlabel">Modification <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-modification'].first.short}"/></p>
+			    <select name="modification" id="modselect">
+			        <option></option>
+			      <% Terminusmodification.kwgroup.each do |f| %>
+			        <%= "<option #{'selected' if params.key?(:modification) && params[:modification] == (f.name)}>#{f.name}</option>" %>
+			      <%end%>
+			    </select>
+			    
+			   	<p class="filterlabel">Function <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-function'].first.short}"/></p>
+			   	<select name="function">
+		            <option></option>
+		          <% ['protease','inhibitor'].each do |f| %>
+		            <%= "<option #{'selected' if params.key?(:function) && params[:function] == (f)}>#{f}</option>" %>
+		          <%end%>
+		        </select>
+		        
+		        <p class="filterlabel">Chromosome <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-chromosome'].first.short}"/></p><input type="text" name="chromosome" id="chromosome" size="3" value="#{params[:chromosome]}"/>	
+			    <p class="filterlabel">Position on chromosome <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-chromosomeposition'].first.short}"/></p><input type="text" name="chromosomeposition" id="chromosomeposition" size="3" value="#{params[:chromosomeposition]}"/>    
+				<p><submit label="filter"/></p> 
+				<div class="button reset"><a href="/topfind/proteins">reset</a></div>
+			</form>
+        
+    </div>   
+  </div>
+</def> 
+
+<def tag="mod-filter">
+  <div class="filter box">
+    <div class="box-header">
+      Filter:  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['f-modification'].first.short}"/>
+    </div> 
+    <div class="box-content">
+      <form action="/topfind/terminusmodifications" method="get">
+        <div>
+          <p class="filterlabel">Type:</p>
+			    <select name="kw" id="kw">
+			        <option></option>
+			      <% Kw.with_terminusmodifications.*.name.each do |f| %>
+			        <%= "<option #{'selected' if params.key?(:kw) && params[:kw] == (f)}>#{f}</option>" %>
+			      <%end%>
+			    </select>	
+        </div>
+        <div>
+          <p class="filterlabel">Terminus:</p>
+          <select name="pos">
+            <option></option>
+          <% ['N-terminus','C-terminus'].each do |f| %>
+            <%= "<option #{'selected' if params.key?(:pos) && params[:pos] == (f)}>#{f}</option>" %>
+          <%end%>
+          </select>
+        </div>
+		<p><submit label="filter"/></p> 
+	    <div class="button reset"><a href="/topfind/terminusmodifications">reset</a></div>
+        </form>
+    </div>   
+  </div>
+</def> 
+
+<def tag="ntermini-filter">
+  <div class="filter box">
+    <div class="box-header">
+      Filter:  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['f-modification'].first.short}"/>
+    </div> 
+    <div class="box-content">
+      <form action="/topfind/ntermini" method="get">
+        <div>
+          <p class="filterlabel">Sequence start  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['ts-sequencestart'].first.short}"/></p>
+		    <%="<input type='text' name='seqstart' value='#{params[:seqstart]}'/>"%>	
+        </div>
+        <div>
+          <p class="filterlabel">Sequence matches (regular expression)  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['ts-regexp'].first.short}"/></p>
+		    <%="<input type='text' name='seqregexp' value='#{params[:seqregexp]}'/>"%>	
+        </div>
+        <div>
+          <p class="filterlabel">Terminus starts  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['ts-pos'].first.short}"/></p>
+          <select name="postype">
+            <option></option>
+          <% ['before','at','after'].each do |f| %>
+            <%= "<option #{'selected' if params.key?(:postype) && params[:postype] == (f)}>#{f}</option>" %>
+          <%end%>
+          </select>
+		    <%="<input type='text' name='pos' size=4 value='#{params[:pos]}'/>"%>	
+        </div>
+        <div>
+          <p class="filterlabel">Modification <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-modification'].first.short}"/></p>
+          	<select name="modification" id="modselect">
+		        <option></option>
+		      <% Terminusmodification.kwgroup.each do |f| %>
+		        <%= "<option #{'selected' if params.key?(:modification) && params[:modification] == (f.name)}>#{f.name}</option>" %>
+		      <%end%>
+		    </select>
+        </div>
+        <div>
+          <p class="filterlabel">Protein (<a href="http://www.uniprot.org" target="_blank">UniProt Accession</a>):</p>
+		    <%="<input type='text' name='protein' value='#{params[:protein]}'/>"%>	
+        </div>
+        <div>
+          <p class="filterlabel">Species</p>
+          	<select name="species" id="osselect">
+		      <option></option>
+		      <% Os.all.each do |f| %>
+		        <%= "<option #{'selected' if params.key?(:species) && params[:species] == (f.name)}>#{f.name}</option>" %>
+		      <%end%>
+			</select>
+        </div>
+		<p><submit label="filter"/></p> 
+	    <div class="button reset"><a href="/topfind/ntermini">reset</a></div>
+        </form>
+    </div>   
+  </div>
+  
+  <div class="filter box">
+    <div class="box-header">
+      Regular expression quick reference>
+    </div> 
+    <div class="box-content">
+		    <table>
+		      <tbody><tr>
+		        <td><code>[MRK]</code></td>
+		        <td>A single amino acid: M, R or K</td>
+		      </tr>
+		
+		      <tr>
+		        <td><code>[^MRK]</code></td>
+		        <td>Any single amino acid <em>but</em> M, R, or K</td>
+		      </tr>
+		      <tr>
+		        <td><code>[A-Y]</code></td>
+		
+		        <td>Any single amino acid in the range a-y (alphabetically)</td>
+		      </tr>
+		      <tr>
+		
+		        <td><code>^</code></td>
+		        <td>Start of sequence</td>
+		      </tr>
+		      <tr>
+		        <td><code>$</code></td>
+		        <td>End of sequence</td>
+		      </tr>
+		      <tr>
+		        <td><code>.</code></td>
+		        <td>Any single amino acid</td>
+		
+		      </tr>
+		  <tr>
+		    <td><code>(L|I)</code></td>
+		    <td>L or I</td>
+		  </tr>
+		  <tr>
+		    <td><code>A?</code></td>
+		    <td>Zero or one of A</td>
+		
+		  </tr>
+		  <tr>
+		    <td><code>A*</code></td>
+		    <td>Zero or more of A</td>
+		  </tr>
+		  <tr>
+		    <td><code>A+</code></td>
+		
+		    <td>One or more of A</td>
+		  </tr>
+		  <tr>
+		    <td><code>A{3}</code></td>
+		    <td>Exactly 3 of A</td>
+		  </tr>
+		  <tr>
+		
+		    <td><code>A{3,}</code></td>
+		    <td>3 or more of A</td>
+		  </tr>
+		  <tr>
+		    <td><code>A{3,6}</code></td>
+		    <td>Between 3 and 6 of A</td>
+		  </tr>        
+		
+		</tbody></table>
+	</div>
+	</div>
+</def> 
+
+<def tag="ctermini-filter">
+  <div class="filter box">
+    <div class="box-header">
+      Filter:  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['f-modification'].first.short}"/>
+    </div> 
+    <div class="box-content">
+      <form action="/topfind/ctermini" method="get">
+        <div>
+          <p class="filterlabel">Sequence ends  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['ts-sequenceend'].first.short}"/></p>
+		    <%="<input type='text' name='seqend' value='#{params[:seqend]}'/>"%>	
+        </div>
+        <div>
+          <p class="filterlabel">Sequence matches (regular expression)  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['ts-regexp'].first.short}"/></p>
+		    <%="<input type='text' name='seqregexp' value='#{params[:seqregexp]}'/>"%>	
+        </div>
+        <div>
+          <p class="filterlabel">Terminus ends  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['ts-pos'].first.short}"/></p>
+          <select name="postype">
+            <option></option>
+          <% ['before','at','after'].each do |f| %>
+            <%= "<option #{'selected' if params.key?(:postype) && params[:postype] == (f)}>#{f}</option>" %>
+          <%end%>
+          </select>
+		    <%="<input type='text' name='pos' size=4 value='#{params[:pos]}'/>"%>	
+        </div>
+        <div>
+          <p class="filterlabel">Modification <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-modification'].first.short}"/></p>
+          	<select name="modification" id="modselect">
+		        <option></option>
+		      <% Terminusmodification.kwgroup.each do |f| %>
+		        <%= "<option #{'selected' if params.key?(:modification) && params[:modification] == (f.name)}>#{f.name}</option>" %>
+		      <%end%>
+		    </select>
+        </div>
+        <div>
+          <p class="filterlabel">Protein (<a href="http://www.uniprot.org" target="_blank">UniProt Accession</a>):</p>
+		    <%="<input type='text' name='protein' value='#{params[:protein]}'/>"%>	
+        </div>
+        <div>
+          <p class="filterlabel">Species</p>
+          	<select name="species" id="osselect">
+		      <option></option>
+		      <% Os.all.each do |f| %>
+		        <%= "<option #{'selected' if params.key?(:species) && params[:species] == (f.name)}>#{f.name}</option>" %>
+		      <%end%>
+			</select>
+        </div>
+		<p><submit label="filter"/></p> 
+	    <div class="button reset"><a href="/topfind/ctermini">reset</a></div>
+        </form>
+    </div>   
+  </div>
+    
+  <div class="filter box">
+    <div class="box-header">
+      Regular expression quick reference>
+    </div> 
+    <div class="box-content">
+		    <table>
+		      <tbody><tr>
+		        <td><code>[MRK]</code></td>
+		        <td>A single amino acid: M, R or K</td>
+		      </tr>
+		
+		      <tr>
+		        <td><code>[^MRK]</code></td>
+		        <td>Any single amino acid <em>but</em> M, R, or K</td>
+		      </tr>
+		      <tr>
+		        <td><code>[A-Y]</code></td>
+		
+		        <td>Any single amino acid in the range a-y (alphabetically)</td>
+		      </tr>
+		      <tr>
+		
+		        <td><code>^</code></td>
+		        <td>Start of sequence</td>
+		      </tr>
+		      <tr>
+		        <td><code>$</code></td>
+		        <td>End of sequence</td>
+		      </tr>
+		      <tr>
+		        <td><code>.</code></td>
+		        <td>Any single amino acid</td>
+		
+		      </tr>
+		  <tr>
+		    <td><code>(L|I)</code></td>
+		    <td>L or I</td>
+		  </tr>
+		  <tr>
+		    <td><code>A?</code></td>
+		    <td>Zero or one of A</td>
+		
+		  </tr>
+		  <tr>
+		    <td><code>A*</code></td>
+		    <td>Zero or more of A</td>
+		  </tr>
+		  <tr>
+		    <td><code>A+</code></td>
+		
+		    <td>One or more of A</td>
+		  </tr>
+		  <tr>
+		    <td><code>A{3}</code></td>
+		    <td>Exactly 3 of A</td>
+		  </tr>
+		  <tr>
+		
+		    <td><code>A{3,}</code></td>
+		    <td>3 or more of A</td>
+		  </tr>
+		  <tr>
+		    <td><code>A{3,6}</code></td>
+		    <td>Between 3 and 6 of A</td>
+		  </tr>        
+		
+		</tbody></table>
+	</div>
+	</div>
+</def> 

@@ -1,0 +1,375 @@
+<!-- ====== Protein Pages ====== -->
+
+
+
+<def tag="show-page" for="Protein">
+
+  <page merge>
+    
+    <title:>
+    	<%="#{@protein.recname} (#{@protein.ac}) : TopFIND"%>
+    </title:>
+    <after-title:>
+    	<% metafts = '' %>
+		<meta name="description" content="#{@protein.recname}: #{metafts}"/>
+		<% @protein.proteasefamily ? proteasekw =  ",#{@protein.proteasefamily},#{@protein.merid}" : proteasekw = '' %>
+		<meta name="keywords" content="#{@protein.ac},#{@protein.recname},#{@protein.proteinnames.*.full.join(',')},#{@protein.proteinnames.*.short.uniq.join(',')}#{proteasekw},termini,#{@protein.recname} termini,#{@protein.recname} substrates,#{@protein.recname} cleavages,#{@protein.recname} processing,#{@protein.recname} protease web,Overall Lab, knowledgebase"/>
+  	</after-title:>
+
+    <body: class="show-page protein" param/>
+    <aside1: param><evidence-filter/></aside1:>
+    <content: param>
+          
+    
+          <header param="content-header">
+            <h2 param="heading">
+              <view:ac/>: <view:recname/> <%=this.species.common_name%>
+            </h2>
+
+            <record-flags fields="" param/>
+
+          </header>
+
+          <section param="content-body">
+          
+            
+
+            <section class="full category general">
+              <pagenav />            
+              <a name="top"/><h2>General information <a class="uniprotlink" target="_blank" href="http://www.uniprot.org/uniprot/#{this.ac}">(UniProtKB)</a> <%= "<a class='uniprotlink' target='_blank' href='http://www.nextprot.org/db/entry/NX_#{this.ac}'>(nextprot)</a>" if this.species == 'Homo sapiens' %></h2>
+            </section>            
+
+<!-- ==== General proteotypic protein information === -->	
+            <general-protein-information/>
+            <isoform-information with="&@iso" if="&@iso"/>
+            <chain-information with="&@chain" if="&@chain"/>            
+              
+
+            <section class="full category">
+              <pagenav/>
+              <a name="neigbourhood"/><h2>Neigbourhood <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-cytoscape'].first.short}"/> </h2>  
+            </section>
+            
+            
+            <section class="full">
+              <cytoscape/> 
+              <a class='uniprotlink' href='/topfind/protein/#{@protein.ac}/filter?ppi=true'>[show protein-protein interactions]</a> 
+            </section>
+
+            <section class="full category">
+              <pagenav/>
+              <a name="features"/><h2>Domains &amp; Features</h2>
+            </section><section class="full">
+              <%=@simplepanel%>
+            </section>          
+                        
+
+<!-- ===== Processing ==== -->
+  			
+  	
+            <section class="full category" if="&this.proteases">
+              <pagenav/>
+              <%ids = @inverse_cleavages.*.id.join(','); name= "Processing-of-#{@protein.ac}";  exporturl = "/topfind/cleavages/export?ids=#{ids}&name=#{name}"%>
+              <a name="processing"/><h2>Proteolytic processing <a href="#{exporturl}" class="exportlink" target="_blank">[export]</a></h2> 
+            </section>         
+            <section param="inverse-cleavages" if="&this.proteases">
+               <section class="block processing">
+                  <repeat with="&@inverse_cleavages.group_by(&:pos)">
+                    <% pos=this_key %>
+                    <div class="solidbox"> 
+                      <div class="position"><span class='boxlabel'> <%="<span class='pos'>#{pos}</span> <span class='shortseq'>(#{@protein.sequence[pos-5..pos-1]}.|.#{@protein.sequence[pos..pos+4]})</span>"%> </span><br/><span class='bulletgraph' ><%=pos%>,<%=@protein.aalen%></span></div> 
+  					  <section class="rightinfo">
+	                      <div class="details">
+	                        <repeat><inverse-cleavage/></repeat>
+	                        <section with="&this.first" if="&this.first.targeted_features">
+		                      <h4>Targeted features:  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-features'].first.short}"/></h4>  
+		                      <table class='featurelist targeted_features'>
+	  	                      <repeat:targeted-features>
+	  	                        <tr class='targeted_feature'>
+	    	                        <td class="graph">
+	    	                         <span class='bulletgraph' ><pos/>,<%=@protein.aalen%>,<this.to/>,<this.from/></span>  
+	    	                        </td>
+	                              <td class="label">
+	                               <view:name/> - <view:description/> (<view:from/>|<view:to/>) 
+	                              </td>    	                        
+	  	                        </tr>
+	  	                      </repeat>
+	                        </table>
+	                        </section>
+	  
+	                        <section with="&this.first"  if="&this.first.targeted_boundaries">  
+		                      <h4>Affected feature boundaries: <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-boundaries'].first.short}"/></h4>
+	                        <table class='featurelist targeted_boundaries'>
+	                          <repeat:targeted-boundaries>
+	                            <tr class='targeted_boundary'>
+	                              <td class="graph">
+	                               <span class='bulletgraph' ><pos/>,<%=@protein.aalen%>,<this.to/>,<this.from/></span>  
+	                              </td>
+	                              <td class="label">
+	                               <view:name/> - <view:description/> (<view:from/>|<view:to/>) 
+	                              </td>                             
+	                            </tr>
+	                          </repeat>	
+	                        </table>                          
+	                        </section>
+	                      </div>
+	                  </section>    
+                      <div class="clear">&nbsp;</div>     
+                    </div>
+                  </repeat>
+              </section> 
+            </section>
+
+<!-- ===== Termini ==== -->
+            <section class="full category" if="&this.nterms">
+              <pagenav/>
+              <%ids = @nterms.*.id.join(','); name= "N-termini-of-#{@protein.ac}";  exporturl = "/topfind/nterms/export?ids=#{ids}&name=#{name}"%>
+              <a name="termini"/><h2>Protein N-Termini <a href="#{exporturl}" class="exportlink" target="_blank">[export]</a></h2> 
+            </section>         
+            <section param="N-termini" if="&@nterms">
+              <repeat with="&@nterms">
+                  <div class="solidbox">  
+                    <div class="terminus">
+                        <nterminus/>
+                    </div>
+                  </div>                
+              </repeat>
+            </section>
+            <section class="full category" if="&this.cterms">
+              <%ids = @cterms.*.id.join(','); name= "C-termini-of-#{@protein.ac}";  exporturl = "/topfind/cterms/export?ids=#{ids}&name=#{name}"%>
+              <a name="termini"/><h2>Protein C-Termini <a href="#{exporturl}" class="exportlink" target="_blank">[export]</a></h2> 
+            </section>                      
+            <section param="C-termini" if="&@cterms"> 
+              <repeat with="&@cterms">
+                  <div class="solidbox">  
+                    <div class="terminus">
+                        <cterminus/>
+                    </div>
+                  </div>                
+              </repeat>            
+            </section>             
+            
+<!-- ===== Substrates ==== -->
+            <section class="full category" if="&this.substrates">
+              <pagenav/>
+              <%ids = @cleavages.*.id.join(','); name= "Cleavages-for-#{@protein.ac}";  exporturl = "/topfind/cleavages/export?ids=#{ids}&name=#{name}"%>
+              <a name="substrates"/><h2>Substrates <a href="#{exporturl}" class="exportlink" target="_blank">[export]</a></h2> 
+            </section>         
+            <section param="cleavages" if="&this.substrates">
+               <section class="substrates">
+                <repeat with="&@cleavages.group_by(&:substrate)">
+                  <div class="solidbox"> 
+                    <div class="boxlabel"><a with="&this.first.substrate"><view:recname/></a></div> 
+                    <div class="substrate">
+                      <repeat><cleavage/></repeat>
+                    </div>
+                  </div>
+                </repeat>
+              </section> 
+            </section>                                
+
+
+<!-- ===== heatmap ==== -->
+            <section class="full category" if="&this.isprotease">
+              <pagenav/>
+              <a name="heatmap"/><h2>Cleavage site preference</h2> 
+            </section>   
+            <section if="&@heatmap"  id="heatmap">
+				<div id="tablecontainer"> 
+	                 <table id="heatmaptable">
+	                    <tr><repeat with="&@heatmap.positions"><th class="<%=this%>"><%=this%></th></repeat></tr>        
+	                  <% row = 0%>
+	                  <repeat with="&@heatmap.matrix">
+	                    <%row+=1%>        
+	                    <tr>
+	                      <%col = 0%>
+	                      <repeat with="&this">
+	                        <%col+=1%>
+	                        <%title = "#{@heatmap.as[row-1]} at #{@heatmap.positions[col-1]}: #{this.to_f.round(2)}% total occurence"%>
+	                        <td class="c<%=col%>" style="background:<%=@heatmap.color(this)%>;" title="#{title}"></td>
+	                      </repeat>
+	                        <th> <%= @heatmap.as[row-1]%></th>
+	                    </tr>
+	                  </repeat>
+	                 </table>  
+	               	 <div class="legend">
+	              		<strong>Heatmap</strong> representation of the cleavage site preference showing relative abundance of each amino acid at positions P5 to P5' on a color scale from blue (0%) to red (100%). Not corrected for the natural abundance of aminiacids. (n=<%= @cleavagesites.count%>) 
+	                 </div> 
+	             </div>
+	                 <table id="heatmaplegend">
+	                   <% row = 0%>
+	                  <repeat with="&@heatmap.colors.reverse">
+	                    <%row+=1%>
+	                    <tr><td style="background:<%=this%>;"></td><th> <%= [1,21].include?(row) ? "#{@heatmap.colorvalue(this)}%" : ''%></th></tr>
+	                  </repeat>
+	                 </table> 
+              	 	 <script>jQuery(document).ready(function() {jQuery("#heatmap td").tooltip({offset:[-15,0],position: "top center"});}).dynamic({ bottom: { direction: 'down', bounce: true } });</script> 
+               
+            </section> <!-- end heatmap-->
+            
+            <section if="&this.isprotease" id="icelogo">
+             <div class="icelogoimage">
+             	<object if="&this.isprotease" data="/topfind/images/dynamic/#{@icelogopath}" width="450" height="450" type="image/svg+xml">
+             		<br/>
+             		<strong>Your browser has no SVG support.</strong> Please install <a href="http://www.adobe.com/svg/viewer/install/">Adobe SVG Viewer</a> plugin (for Internet Explorer) or use <a href="http://www.getfirefox.com/">Firefox</a>, <a href="http://www.opera.com/">Opera</a> or <a href="http://www.apple.com/safari/download/">Safari</a> instead.
+					<br/>
+				</object>
+   			 </div>
+   			 <div class="icelogolegend">
+              	<strong>IceLogo</strong> representation of amino acids showing statistically significant (p &lt; 0.05) over- or underrepresentation compared to their natural abundance. Generated by the <a href="http://iomics.ugent.be/icelogoserver/logo.html">iceLogo Server</a> at the University of Ghent.(n=<%= @cleavagesites.count%>) 
+              </div>  
+            </section>
+  
+       
+      </section>
+    </content:>
+
+  </page>
+</def>
+
+
+<def tag='general-protein-information'>
+	<section class="left">
+	  <section class="block">
+	    <h3></h3>
+	    <table class="protein-summary annotation">
+	      <tr> 
+	        <th>Protein names</th> 
+	        <td><collection:proteinnames><view field="full"/> <if test="&this.short">(<view:short/>)</if></collection></td>
+	      </tr><tr> 
+	        <th>Gene names</th> 
+	        <td><%= @protein.gn.name if @protein.gn.present?%>  <%="(#{@protein.gn.synonyms.*.synonym.join(', ')})" if @protein.gn.present? && @protein.gn.synonyms.present? %></td>
+	      </tr><tr>
+	        <th>Organism</th>
+	        <td><view:species/></td>
+	      </tr><tr>
+	        <th>Protease Family</th>
+	        <td><view:proteasefamily/> <span if="&@protein.proteasefamily">(<a href="http://merops.sanger.ac.uk/cgi-bin/famsum?family=#{@protein.proteasefamily}" target="_blank">MEROPS</a>)</span></td>
+	      </tr><tr>
+	        <th>Protease ID</th>
+	        <td><view:merid/> <span if="&@protein.meropslink">(<a href="#{@protein.meropslink}" target="_blank">MEROPS</a>)</span></td>
+	      </tr><tr if="&this.chromosome.present?">
+	        <th>Chromosome location</th>
+	        <% @protein.band.present? ? @band = @protein.band : @band= '';%>
+	        <td><a href="/topfind/proteins?query=&chromosome=#{@protein.chromosome}"><view:chromosome/></a> <a href="/topfind/proteins?query=&chromosome=#{@protein.chromosome}&arm=#{@band.first}&band=#{@band.delete 'pq'}"><%=@band%></a></td>
+	      </tr>
+	    </table>
+	  </section>             
+	</section>
+	<section class="right">
+	  <section class="block" if="&this.isoforms.present?">
+	    <h3>Isoforms</h3>
+	    <collection:isoforms>
+	      <% jqac = "\'##{this.ac}\'"%>
+	      <a href="#" onclick="jQuery(#{jqac}).toggle();; return false;"><view:name/> (<view:ac/>)</a>
+	      <div class="hidden solidbox" id="#{this.ac}"><view:htmlsequence /></div>
+	    </collection>
+	  </section>            	
+	
+	  <section class="block">
+	    <h3>Sequence</h3>
+	    	<view:htmlsequence />
+	  </section>
+	</section> 	  
+	<section class="full">
+	    <h3>Annotation  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-annotation'].first.short}"/></h3>            
+	    <section class="left">
+		    <table class="annotation">
+		      <repeat with="&@annotations_main.group_by(&:topic)"> 
+			      <tr> 
+			        <th><%= h this_key.downcase %></th> 
+			        <td><ul repeat="&this"><li><%=this.contents%></li></ul></td>
+			      </tr>	    
+	          </repeat>
+	        </table>  
+	    </section>
+	    <section class="right">
+		    <table class="annotation">
+		      <repeat with="&@annotations_additional.group_by(&:topic)"> 
+			      <tr> 
+			        <th><%= h this_key.downcase %></th> 
+			        <td><ul repeat="&this"><li><%=this.contents%></li></ul></td>
+			      </tr>	    
+	          </repeat>
+	        </table>  
+	    </section>   
+	</section>
+	
+	
+</def>
+
+<def tag='isoform-information'>
+  <section class="block">
+  
+  <%= debug this%>
+    <h3>Sequence</h3>
+    	<view:htmlsequence />
+  </section>
+</def>
+
+<def tag='chain-information'>
+  <section class="block">
+    <h3>Sequence</h3>
+    	<view:htmlsequence />
+  </section>
+</def>
+
+
+<def tag="index-page" for="Protein">
+  <page merge title="#{ht 'proteins.index.title', :default=>['Proteins'] }">
+    <body: class="index-page protein" param/>
+
+    <content: param>
+      <header param="content-header">
+        <h2 param="heading">
+          <ht key="proteins.index.heading">
+            Proteins
+          </ht>
+        </h2>
+        
+        <flash-messages/>
+        
+
+        <p param="count" if>
+          <ht key="proteins.collection.count" count="&this.size">
+            Your search matches <count/>
+          </ht>
+        </p>
+      </header>
+
+      <section param="content-body">
+        <a action="new" to="&model" param="new-link">
+          <ht key="proteins.actions.new">New Protein</ht>
+        </a>
+		<if test="&@meropslimited">
+			<div class="left">
+		        <page-nav param="top-page-nav"/>
+		        <collection param/>
+		        <page-nav param="bottom-page-nav"/>
+	        </div>
+	        <div class="right familysubstratelist"> 
+	        	<h3><view with="proteins.substrates.count"/> proteins are cleaved by MEROPS<view with="&@meropsquery"/> proteases <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-familysubstrates'].first.short}"/></h3> 
+		        <div class="solidbox">
+		        <ul repeat with="proteins.substrates">
+		        	<li><a><strong><view:recname/></strong></a> (<view:ac/>), <view:species/></li>
+		        </ul>
+		        </div>
+		        
+		        
+		    </div>
+		
+		</if>
+		<unless test="&@meropssubstrates">
+	        <page-nav param="top-page-nav"/>
+	        <collection param/>
+	        <page-nav param="bottom-page-nav"/>
+	    </unless>
+
+
+      </section>
+    </content:>
+    <aside1:>
+      <protein-filter/>
+    </aside1:>    
+  </page>
+</def>

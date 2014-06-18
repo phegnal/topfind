@@ -1,0 +1,23 @@
+<table>
+	<tr>
+		<th>Substrates:</th>
+		<%@proteases.each do |p|%>
+			<th><div class="th rotate"><%= p.protease.name%></div></th>
+		<%end%>
+	</tr>
+	<% sym = ''%>	
+	<% @substrates.each do |s|%>
+	<% if sym != s.substrate.name%>
+	<% sym = s.substrate.name%> 
+		<tr>
+			<td class="rh"><%=s.substrate.name%></td>
+			<% @proteases.each do |p|%>
+			<% count = @cleavages.count(:all, :conditions => ["protease_id = ? AND substrate_id = ?", p.protease_id, s.substrate_id])%>
+				<td class="hc <%= count == 0 ? "na" : "pos"%>">
+				<%= count%>
+				</td>
+			<% end%>						
+		</tr>
+	<%end%>
+<% end%>
+</table>	

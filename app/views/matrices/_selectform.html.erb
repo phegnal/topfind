@@ -1,0 +1,27 @@
+<script type="text/javascript">
+jQuery(document).ready(function () {
+  jQuery("#searchlogic_search_protease_id_equals_any").tokenInput("matrices.js?species=@params['species']&function=protease",{
+            hintText: "Type in Uniprot ID, Protein Names or Merops IDs",
+            noResultsText: "No results",
+            searchingText: "Searching..."
+        });
+});
+jQuery(document).ready(function () {
+  jQuery("#searchlogic_search_substrate_id_equals_any").tokenInput("matrices.js?updatefilter=no&function=substrate",{
+            hintText: "Type in Uniprot ID, Protein Names or Merops IDs",
+            noResultsText: "No results",
+            searchingText: "Searching..."
+        });
+});
+</script>
+
+<% form_remote_for @search, :url => new_matrix_path do |f|%>
+		<%= f.label :protease, "Proteases by Name or Uniprot ID" %> </br>
+		<%= f.text_field :protease_id_equals_any%>
+		<br><br><br><br>
+		<%= f.label :protease, "Substrates by Name or Uniprot ID" %> </br>	
+		<%= f.text_field :substrate_id_equals_any%>
+		<%= f.submit "Generate matrix", :name =>nil%>
+		
+		
+<% end %>

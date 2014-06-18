@@ -1,0 +1,10 @@
+<show-page>
+  <collection: replace>
+    <collection with="&@features"/> 
+    
+    <h3>Absent Features</h3>
+    <table-plus with="&@absent_features">
+      <fields 'name'>
+    </table-plus>      
+  </collection:>
+</show-page>

@@ -1,0 +1,11 @@
+<inline-page>
+  <body:>
+  	<section class="inline-content">
+  	<%ids = this.evidences.*.id.join(','); name= "Evidences-for-#{this.externalid}";  exporturl = "/topfind/evidences/export?ids=#{ids}&name=#{name}"%>
+  	<h1>Evidences supporting C-terminus-<view:pos/> of <view:protein.recname/> <a href="#{exporturl}" class="exportlink">[export]</a></h1>
+	    <collection:evidences>
+	      <detailedevidence/>
+	    </collection>
+    </section>
+  </body:>
+</inline-page>

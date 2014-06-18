@@ -1,0 +1,8 @@
+<inline-page>
+  <body:>
+  	<section class="inline-content">
+  	<h2><view:name/></h2>
+	      <view:evidencecode/>
+    </section>
+  </body:>
+</inline-page>

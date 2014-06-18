@@ -1,0 +1,21 @@
+<page title="Protein-Protein (Enzyme-Substrate) Interactions">
+    
+    <title:>
+    	Protein-Protein (Enzyme-Substrate) Interactions : TopFIND 
+    </title:>
+    <after-title:>
+		<meta name="description" content="Online documentation for TopFIND (Terminus Oriented Protein Function INferred Database)"/>
+		<meta name="keywords" content="data submission,evidence,evidence-codes,pubmed,contribute,howto,help,filter,search,advance search"/>
+  	</after-title:>
+  <aside1: ></aside1:>
+  <content:>
+  	<section class="inline-content">
+  	<%ids = this.evidences.*.id.join(','); name= "Evidences-for-#{this.externalid}";  exporturl = "/topfind/evidences/export?ids=#{ids}&name=#{name}"%>
+  	<h1>Evidences supporting the interaction during cleavage of <view:substrate.recname/> by <view:protease.recname/> at AS <view:pos/> <a href="#{exporturl}" class="exportlink">[export]</a></h1>
+	    <collection:evidences>
+	      <detailedevidence/>
+	    </collection>
+    </section>
+  </content:>
+  
+</page>

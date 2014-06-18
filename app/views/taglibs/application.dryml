@@ -1,0 +1,823 @@
+<include src="rapid" plugin="hobo"/>
+<include src="hobo-jquery" plugin="hobo-jquery" />
+<include src="paperclip" plugin="paperclip_with_hobo"/>
+
+<include src="taglibs/auto/rapid/cards"/>
+<include src="taglibs/auto/rapid/pages"/>
+<include src="taglibs/auto/rapid/forms"/>
+<include src="taglibs/cards"/>
+<include src="taglibs/forms"/>
+<include src="taglibs/protein-pages"/>
+<include src="taglibs/filter"/>
+
+<set-theme name="edge1"/>
+
+
+<extend tag="page">
+  <old-page merge>
+    <custom-scripts:>
+	  <script src="http://cdn.jquerytools.org/1.2.5/full/jquery.tools.min.js"></script>
+      
+      <javascript name='jquery.sparkline.min'/> 
+      <javascript name='custom-sparklines'/>
+      <javascript name="jquery.watermark.min"/>
+      <javascript name="jquery.activity-indicator-1.0.0.min"/>
+      <javascript name='cytoscapeweb/js/min/json2.min'/>
+      <javascript name='cytoscapeweb/js/min/AC_OETags.min'/>
+      <javascript name='cytoscapeweb/js/min/cytoscapeweb.min'/>
+		<script type="text/javascript">
+		
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-22592708-1']);
+		  _gaq.push(['_trackPageview']);
+		
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+		
+		</script>  
+    </custom-scripts>
+
+  
+    	
+  
+    <content: replace>
+		
+      <section-group class="page-content">
+      <section param="content"/> 
+      <aside param="aside1"></aside>
+      </section-group>
+    </content:>  
+    <append-footer:>
+    	<div id="ubclogo">
+    		<a href="http://www.ubc.ca" target="_blank"><img src="/topfind/images/ubclogo.png"/></a>
+    	</div>
+    	<div id="lablogo">
+    		<a href="http://clip.ubc.ca" target="_blank"><img src="/topfind/images/lablogo.png"/></a>
+    	</div>	
+    	<div id="publication">
+        &copy; 2010-<%= Time.now.year.to_s%> | <a href="/topfind/about">About</a> |
+          <a href="/topfind/license">License &amp; Disclaimer</a> |
+          <a href="mailto:philipp.lange@ubc.ca">Contact</a> |
+          <a href="/topfind/download">Downloads</a><br/>
+    		<a href="http://www.nature.com/nmeth/journal/v8/n9/full/nmeth.1669.html" target="_blank">Philipp F. Lange &amp; Christopher M. Overall, <b>Nature Methods</b> 8, 703&minus;704 (2011)</a> <a href="/topfind/downloads/2011-NMeth-Lange_and_Overall.pdf" target="_blank">[pdf]</a> <br/>
+        <a href="http://nar.oxfordjournals.org/content/40/D1/D351.short" target="_blank">Philipp F. Lange, Pitter F. Huesgen, Christopher M. Overall, <b>Nucleic Acids Research</b> 40 (D1), D351-D361 (2012)</a> <a href="http://nar.oxfordjournals.org/content/40/D1/D351.full-text-lowres.pdf" target="_blank">[pdf]</a>
+    	</div> 
+    	<div class="bottom">&nbsp;</div>
+<!-- overlayed element -->
+<div class="apple_overlay" id="overlay">
+
+	<!-- the external content is loaded inside this tag -->
+	<div class="contentWrap"></div>
+
+</div>    	
+	<script>
+    jQuery(document).ready(function() {
+		jQuery("a.popup[rel]").overlay({
+		    mask: 'white',
+			//effect: 'apple',
+			onBeforeLoad: function() {
+				// grab wrapper element inside content
+				var wrap = this.getOverlay().find(".contentWrap");
+				// load the page specified in the trigger
+				wrap.load(this.getTrigger().attr("href"));
+			}
+		});});
+	</script>
+	
+	<!-- loadindicator overlay element -->
+	<div class="load_overlay" id="overlay">
+	
+		<div id="pagespinner2"></div>
+	
+	</div>   
+	<script>
+		jQuery(document).ready(function() {  jQuery('#pagespinner2').activity({segments: 12, width: 4, space: 4, length: 20, color: 'orange', speed: 1.0});} );
+	</script>
+	<script>
+    jQuery(window).bind('beforeunload', function() { 
+		jQuery(".load_overlay").overlay({
+			// custom top position
+			top: 150,
+		
+			// some mask tweaks suitable for facebox-looking dialogs
+			mask: {
+		
+				// you might also consider a "transparent" color for the mask
+				color: '#fefefe',
+		
+				// load mask a little faster
+				loadSpeed: 200,
+		
+				// very transparent
+				opacity: 0.7
+			},
+		
+			// disable this for modal dialog-type of overlays
+			closeOnClick: false,
+		
+			// load it immediately after the construction
+			load: true
+		});});
+	</script>
+		
+	<script>jQuery(document).ready(function() {jQuery("img[title]").tooltip({offset:[-15,0],position: "top center"}).dynamic({ bottom: { direction: "down", bounce: true } });})</script>   		            		
+	<script>
+		//jQuery(window).bind('beforeunload', function() {  jQuery('#pagespinner').activity({segments: 12, width: 4, space: 4, length: 20, color: 'black', speed: 1.0});} );
+	</script>
+	<!-- extra styling for labinternal pages -->
+	<% if Rails.env.production_labinternal? %>
+		<style type="text/css">
+			body {boder:solid 5px red;}
+		</style>	
+	<%end%>
+    
+    </append-footer:>
+          
+
+  </old-page>
+</extend>
+
+  
+ 
+
+<def tag="inline-page">
+	<page: merge-attrs>
+	  <custom-scripts:></custom-scripts:>
+      <body: class="inline-page" param/>	  
+	</page:>
+</def>
+
+<def tag="app-name">TopFIND</def>
+
+<def tag="footer-nav">
+  <section class="top-search">
+
+  </section> 
+  <navigation class="main-nav" merge-attrs param="default">
+    <nav-item href="#{base_url}/">Home</nav-item>
+    <% models = Hobo::Model.all_models.select { |m| linkable?(m, :index) }.sort_by &:name -%>
+    <repeat with="&models">
+      <nav-item><ht key="#{this.name.tableize}.nav_item"><%= this.view_hints.model_name_plural %></ht></nav-item>
+    </repeat>
+  </navigation> 
+  
+</def> 
+
+<def tag="main-nav">
+  <section class="logo">
+  	<!--<div id="logo"><a href="#{base_url}/"><img src="/topfind/images/logo.png"/></a></div>-->
+	<div id="textlogo"><a href="#{base_url}/">TopFIND<sup><span style="font-size:0.5em;">2.0</span></sup></a></div>
+  </section>
+  
+  <navigation class="main-nav" merge-attrs param="default">
+    <nav-item href="" style="border-left:0px;">&nbsp;</nav-item>
+    <nav-item href="#{base_url}/">Home</nav-item>
+    <nav-item with="&Protein">Proteins</nav-item>
+    <nav-item href="#{base_url}/ntermini">N termini</nav-item>
+    <nav-item href="#{base_url}/ctermini">C termini</nav-item>
+    <nav-item with="&Terminusmodification">Modifications</nav-item>
+    <nav-item href="#{base_url}/api">API</nav-item>
+    <nav-item href="#{base_url}/contribute">Contribute</nav-item>
+    <nav-item href="#{base_url}/documentation">Help</nav-item>
+    <li class="top-search" href="" style="border-right:0px;">    
+      <form action="#{base_url}/proteins" method="GET">
+        <input type="text" name="query" /><button for="search">Search</button>
+      </form>
+    </li>  
+  </navigation> 
+  
+
+  	<div id="pagespinner"></div>
+
+    
+</def> 
+
+
+<def tag="chain" attrs="var">
+  Chain: <%= h this.name %> - <%= var%>
+    <cleavages  />   
+</def>
+
+<def tag="isoform" attrs="var">
+  Isoform: <%= h this.name %> - <%= var%>
+    <cleavages  />   
+</def>
+
+<def tag="evidences" attrs="species">
+  <repeat with="&this.evidences">
+    <evidence />
+  </repeat>
+</def>
+
+<def tag="evidence" attrs="species">
+  <p>evidence: </p>
+  <p><%=h this.name %> - <%=h this.description %> </p>
+</def>
+
+<def tag="inverse-cleavages" attrs="species">
+  <table class="featurelist">
+    <collection:>
+      <inverse-cleavage/>
+    </collection>
+  </table>
+</def>
+
+<def tag="inverse-cleavage">
+  <% c=this %>
+  <h4><a href="#{url_for this.protease}"><view:protease.recname/></a> <span class="morelink">(<a this class="popup" rel="#overlay">more...</a>)</span></h4>
+  <table:evidences fields="evidencecodes,evidencesource,lab,name,directness,phys_relevance" class="evidencetable" /> 
+</def>
+
+<def tag="cleavages" attrs="species">
+  <table class="featurelist">
+    <repeat:this>
+      <cleavage/>
+    </repeat>
+  </table>
+</def>
+
+<def tag="cleavage">
+  <% c=this %>
+  <if test="&c.substrate">
+	  <div class='position'>
+	    <span class="boxlabel"><%="#{c.pos} <span class='shortseq'>(#{c.cleavagesite.try(:short_seq)})</span>"%></span>
+	    <br/><span class='bulletgraph' ><c.pos/>,<%=c.substrate.aalen%></span>
+	  </div>
+  	  <section class="rightinfo">
+		  <div class='details'>  
+	  		<h4>Evidence: <span class="morelink">(<a this class="popup" rel="#overlay">more...</a>)</span></h4>
+		    <table:evidences fields="evidencecodes,evidencesource,lab,name,directness,phys_relevance" class="evidencetable" />
+		  </div>
+	  </section>	  
+	  <div class="clear">&nbsp;</div> 
+	</if>	   
+</def>
+
+<def tag="nterminus">
+  <% t=this %>
+  <% t.terminusmodification.kw.to_s == 'unknown' ? mod = '' : mod = link_to("#{t.terminusmodification.kw.to_s.downcase}-", t.terminusmodification, :class=>"popup", :rel=> "#overlay")%>  
+  <div class='position'>
+    <span class="boxlabel"><%="<sup>#{mod}#{t.pos}</sup>#{@protein.sequence[t.pos-1,1]}#{@protein.sequence[t.pos..t.pos+4]}..."%></span>
+    <br/><span class='bulletgraph' ><t.pos/>,<%=@protein.aalen%></span>
+  </div>
+  <section class="rightinfo">
+	  <div class='details'>  
+	  	<h4>Evidence: <span class="morelink">(<a this class="popup" rel="#overlay">more...</a>)</span></h4> 
+	    <table:evidences fields="evidencecodes,evidencesource,lab,name,directness,phys_relevance,confidence" class="evidencetable">
+	    	<evidencecodes-view:>
+	    		<%= this.*.name.join(', ')%>
+	    	</evidencecodes-view:>
+	    	<confidence-view:>
+	    		<% e = this_parent %>
+	    		<%= e.confidence.to_s %> (<%= e.confidence_type.to_s %>)
+	    	</confidence-view:>
+	    </table:evidences>
+	  </div>
+	  <section with="&t"  if="&t.targeted_boundaries">  
+	    <h4>Affected feature boundaries:  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-boundaries'].first.short}"/></h4>
+	    <table class='featurelist targeted_boundaries'>
+	      <repeat:targeted-boundaries>
+	        <tr class='targeted_boundary'>
+	          <td class="graph">
+	           <span class='bulletgraph' ><t.pos/>,<%=@protein.aalen%>,<this.to/>,<this.from/></span>  
+	          </td>
+	          <td class="label">
+	           <view:name/> - <view:description/> (<view:from/>|<view:to/>) 
+	          </td>                             
+	        </tr>
+	      </repeat>	
+	    </table>                          
+	  </section>
+  </section>  
+  <div class="clear">&nbsp;</div>  
+</def>
+  
+<def tag="cterminus">
+  <% t=this %>
+  <% t.terminusmodification.kw.to_s == 'unknown' ? mod = '' : mod = link_to("-#{t.terminusmodification.kw.to_s.downcase}", t.terminusmodification, :class=>"popup", :rel=> "#overlay")%>
+  <div class='position'>
+    <span class="boxlabel"><%="...#{@protein.sequence[t.pos-5..t.pos-1]}<sup>#{t.pos}#{mod}</sup>"%></span> 
+    <br/><span class='bulletgraph' ><t.pos/>,<%=@protein.aalen%></span>
+  </div>
+  <section class="rightinfo">
+	  <div class='details'>
+	  	<h4>Evidence: <span class="morelink">(<a this class="popup" rel="#overlay">more...</a>)</span></h4>  
+	    <table:evidences fields="evidencecodes,evidencesource,lab,name,directness,phys_relevance,confidence" class="evidencetable">
+	    	<evidencecodes-view:>
+	    		<%= this.*.name.join(', ')%>
+	    	</evidencecodes-view:>
+	    	<confidence-view:>
+	    		<% e = this_parent %>
+	    		<%= e.confidence.to_s %> (<%= e.confidence_type.to_s %>)
+	    	</confidence-view:>
+	    </table:evidences>
+	  </div>
+	  <section with="&t"  if="&t.targeted_boundaries">  
+	    <h4>Affected feature boundaries:  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-boundaries'].first.short}"/></h4>
+	    <table class='featurelist targeted_boundaries'>
+	      <repeat:targeted-boundaries>
+	        <tr class='targeted_boundary'>
+	          <td class="graph">
+	           <span class='bulletgraph' ><t.pos/>,<%=@protein.aalen%>,<this.to/>,<this.from/></span>  
+	          </td>
+	          <td class="label">
+	           <view:name/> - <view:description/> (<view:from/>|<view:to/>) 
+	          </td>                             
+	        </tr>
+	      </repeat>	
+	    </table>                          
+	  </section>
+  </section>	  
+  <div class="clear">&nbsp;</div>  
+</def>
+
+<def tag="detailedevidence">
+      <h4 param="heading"><a><name/></a></h4>
+      
+      <table class="evidencetable">
+        <tr>
+          <th>Description</th>
+          <td><view:description/></td>
+        </tr>
+        <tr>
+          <th>Method</th>
+          <td><view:method/></td>
+        </tr>
+        <tr>
+          <th>Experimental system</th>
+          <td><view:method_system/></td>
+        </tr>
+        <tr>
+          <th>Perturbation</th>
+          <td><view:method_perturbation/></td>
+        </tr>
+        <tr>
+          <th>Protease inhibitors used</th>
+          <td><view:protease_inhibitors_used/></td>
+        </tr>
+        <tr>
+          <th>Directness</th>
+          <td><view:directness/></td>
+        </tr>
+        <tr>
+          <th>Physiological relevance</th>
+          <td><view:phys_relevance/></td>
+        </tr>      
+        <tr>
+          <th>Tissues</th>
+          <td><ul><repeat:tissues><li><ac/></li></repeat></ul></td>
+        </tr>
+        <tr>
+          <th>Evidencecodes</th>
+          <td><ul><repeat:evidencecodes><li><%= this.name%></li></repeat></ul></td>
+        </tr>
+        <tr>
+          <th>Database / Laboratory</th>
+          <td><ul>
+            <li if="&this.lab"><view:lab/></li>
+          	<li if="&this.evidencesource"><a href='#{this.evidencesource.dburl}' target='_blank'><view:evidencesource.dbname/></a></li>
+          </ul></td>
+        </tr>
+        <tr>
+          <th>Raw data repository</th>
+          <td><a href='#{this.repository}' target='_blank'><view:repository/></a></td>
+        </tr>
+        <tr>
+          <th>Publications</th>
+          <td><collection:publications param if="&this.publications"/></td>
+        </tr>
+        <tr>
+          <th>Details (pdf)</th>
+          <td><a if="&this.evidencefile_file_name" href="#{this.evidencefile.url(:original)}" target="_blank">download</a></td>
+        </tr>
+      </table>
+</def>
+
+<def tag="briefdevidence" for="Evidence">
+  <card class="evidence" param="default" merge>
+    <header: param>
+      <h4 param="heading"><a><name/></a></h4>
+      
+    </header:>
+  </card>
+</def>
+
+<def tag="pagenav">
+  <ul class="navbar">
+    <li><a href="#top">General</a></li>  
+    <li><a href="#neigbourhood">Neighbourhood</a><img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-network'].first.short}"/></li>
+    <li if="&this.substrates"><a href="#substrates">Substrates</a><img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-substrates'].first.short}"/></li>
+    <li if="&this.cleavages"><a href="#heatmap">Cleavage site preferences</a><img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-pref'].first.short}"/></li>
+    <li><a href="#features">Domains &amp; Features</a><img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-domains'].first.short}"/></li>
+    <li if="&this.proteases"><a href="#processing">Processing</a><img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-processing'].first.short}"/></li>
+    <li if="&(this.nterms || this.cterms)"><a href="#termini">Termini</a><img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-termini'].first.short}"/></li>
+  </ul>
+</def>
+
+
+<def tag="cytoscape">
+  <script type="text/javascript">
+      window.onload=function() {
+          // id of Cytoscape Web container div
+          var div_id = "cytoscapeweb";
+          
+		  var xml = "<%=escape_javascript(@network)%>"
+          // initialization options
+          var options = {
+              // where you have the Cytoscape Web SWF
+              swfPath: "/topfind/javascripts/cytoscapeweb/swf/CytoscapeWeb",
+              // where you have the Flash installer SWF
+              flashInstallerPath: "/topfind/javascripts/cytoscapeweb/swf/playerProductInstall"
+          };
+          
+          
+          
+          // init and draw
+          var vis = new org.cytoscapeweb.Visualization(div_id, options);
+          vis.addListener("dblclick", "nodes", function(evt) {
+			var nodes = evt.target;
+			window.open(nodes.data.link,'_blank');
+		  });
+          
+          var shapeMapper = {
+          		attrName: "nodetype",
+          		entries: [ {attrValue: "protein", value: "ELLIPSE"},
+          				   {attrValue: "protease", value: "VEE"},
+          				   {attrValue: "additional", value: "ROUNDRECT"} ]
+          }; 
+          
+          var colorMapper = {
+            	attrName: "id",
+            	entries: [ { attrValue: "<%=this.shortname%>", value: "red"} ]
+            	};
+          var edgearrowMapper = {
+              attrName: "edgetype",
+              entries: [ {attrValue: "cleavage", value: "DELTA"},
+                         {attrValue: "inhibition", value: "t"},
+                         {attrValue: "interaction", value: "NONE" } ]
+          };  	
+          var edgecolorMapper = {
+              attrName: "edgetype",
+              entries: [ {attrValue: "cleavage", value: "blue"},
+                         {attrValue: "inhibition", value: "red"},
+                         {attrValue: "interaction", value: "#333333"} ]
+          };  	
+          
+          var style = {
+            global: {
+                backgroundColor: "#fff",
+                tooltipDelay: 1000
+            },
+            nodes: {
+                shape: { defaultValue: "ELLIPSE",
+                         discreteMapper: shapeMapper },
+                color: { defaultValue: "#fff",
+                         discreteMapper: colorMapper },  
+                opacity: 1,
+                size: { defaultValue: 36 },
+                label: { passthroughMapper: { attrName: "id" } },
+                tooltipText: { passthroughMapper: { attrName: "label" } },
+                borderColor: "#333",
+                labelFontSize: 15,
+                tooltipFontSize: 20,
+                tooltipText: "<b>${label}</b>"
+            },
+            edges: {
+                color: { defaultValue: "#aaa",
+                         discreteMapper: edgecolorMapper},
+                width: 2,
+                mergeWidth: 2,
+                opacity: 1,
+                label: { passthroughMapper: { attrName: "label" } },
+                labelFontSize: 10,
+                labelFontWeight: "bold",
+                targetArrowShape: { defaultValue: 'NONE',
+                                    discreteMapper: edgearrowMapper}
+             }
+           };
+          
+          var draw_options = {
+              // your data goes here
+              network: xml ,
+              
+              // show edge labels too
+              edgeLabelsVisible: false,
+              nodeTooltipsEnabled: true,     
+              
+              // let's try another layout
+              layout: "Radial",
+              options: { angleWidth: 180, radius: 10 },
+              
+              //layout: "ForceDirected"
+              
+              // set the style at initialisation
+              visualStyle: style,
+              
+              // hide pan zoom
+              panZoomControlVisible: true 
+          };
+          
+          
+          
+          vis.draw(draw_options);         
+      };
+
+  </script> 
+
+
+  <div id="cytoscapeweb">
+      Network neighborhood
+  </div>
+</def>
+
+<extend tag="index-page" for="Terminusmodification">
+  <old-index-page merge>
+    <append-aside1:>
+      <mod-filter/>
+    </append-aside1:>
+  </old-index-page>
+</extend>
+
+
+
+<!-- ====== Import Pages ====== -->
+
+<def tag="index-page" for="Import">
+  <page merge title="#{ht 'imports.index.title', :default=>['Contribute'] }">
+    <body: class="index-page import" param/>
+
+    <content: param>
+      <header param="content-header">
+        <h2 param="heading">
+          <ht key="imports.index.heading">
+            Contribute to TopFIND
+          </ht>
+        </h2>
+      </header>
+
+      <section param="content-body">
+        <page-nav param="top-page-nav"/>
+        
+        <if test="&!logged_in?"><p><strong>You have to sign up and log in to be able to contribute data.</strong></p></if>
+              
+		<section id="contribute" class="left">
+			<section class="importstep solidbox">
+				<h3>Intdroduction</h3>
+				<p class="help">Your data submission is highly valuable to us. We have assembled a <a href="/topfind/downloads/TopFIND – HowTo contribute your data.pdf" target="_blank">short picture guide</a> on how to enter your experimental information and batch upload your protein termini, cleavages, cleavage sites or inhibition. Please contact us if there are any questions or you want to enquire about other options for batch data import (e.g. when you already have your data in a structured form, or for example in a database). Even though the 3 step process below is very straight forward we are always happy to find even more efficient ways.</p> 			
+			</section>
+			<section class="importstep solidbox">
+				<h3>Step 1: Login/Signup</h3>
+				<if test='&logged_in?'>
+					<p class="help">You are logged in as <%=@current_user.name%></p><br/>
+					<div class="linkbox">
+						<a href='&logout_url'><ht key='hobo.actions.logout'>Log out</ht></a>
+	        		</div>
+	        	</if>
+	        	<else>	
+					<p class="help">Please login:</p><br/>
+					<div class="linkbox">
+						<a href='&login_url'><ht key='hobo.actions.login'>Log in</ht></a>
+	        		</div>
+	        		<p class="help">or signup:</p><br/>
+					<div class="linkbox">
+						<a href='&signup_url'><ht key='hobo.actions.signup'>Sign up</ht></a>
+	        		</div>
+	        	</else>	
+				
+			</section>
+			<section class="importstep solidbox">
+				<h3>Step 2: Create Evidence</h3>
+				<p class="help">Please create an evidence entry describing the source of the contributed information
+				</p><br/>
+				<div class="linkbox">
+				<a action="new" to="&Evidence" param="new-link">
+          			<ht key="evidences.actions.new">New Evidence</ht>
+        		</a>
+        		</div>
+				
+			</section>
+			<section class="importstep solidbox">
+				<h3>Step 3: Import excel file</h3>
+				<p class="help">Please upload a comma seperated (csv) or excel file including a header line. You can contribute five kinds of data:
+				<ol>
+					<li><strong>proteases cleaving a native protein</strong><br/>
+						please provide the data in the follwoing order using the headerline: <i>protease,position,substrate</i><br/>
+						<ul>
+						<li><strong>protease: </strong>UniProt ID: <i>Q9BYF1</i></li>
+						<li><strong>position: </strong>cleavage site position in the form: <i>222-223</i></li>
+						<li><strong>substrate: </strong>UniProt ID: <i>Q9BYF1</i></li>
+						</ul>
+					</li>
+					<li><strong>proteases cleaving a peptide</strong><br/>
+						please provide the data in the folloing order using the headerline: <i>protease,peptide</i><br/>
+						<ul>
+						<li><strong>protease: </strong>UniProt ID: <i>Q9BYF1</i></li>
+						<li><strong>peptide: </strong>peptide sequence with the cleavage site indicated by a colon: <i>GA:GQCVFA</i></li>
+						</ul>
+					</li>
+					<li><strong>proteases inhibited by protein inhibitors</strong><br/>
+						please provide the data in the folloing order using the headerline: <i>protease,inhibitor</i><br/>
+						<ul>
+						<li><strong>protease: </strong>UniProt ID: <i>Q9BYF1</i></li>
+						<li><strong>peptide: </strong>UniProt ID: <i>Q9BYF1</i></li>
+						</ul>
+					</li>
+					<li><strong>protein N-termini</strong><br/>
+						please provide the data in the folloing order using the headerline: <i>protein,position,modification,confidence,confidence_type</i><br/>
+						<ul>
+						<li><strong>protein: </strong>UniProt ID: <i>Q9BYF1</i></li>
+						<li><strong>position: </strong>first amino acid relative to UniProt full length protein sequence: <i>222</i></li>
+						<li><strong>modification: </strong>name of the modification of the first amino acid according to TopFIND <a href="/modifications">modifications</a>: <i>acteylation</i> or <i>N-acetylaspartate</i> </li>
+						<li><strong>confidence: </strong>a confidence measurement if applicable  (e.g. when based on peptide identification by mass spectrometry)</li>
+						<li><strong>confidence type: </strong>The type of the confidence value given (any of: 'unknown','probability','MASCOT score','X! Tandem score','PeptideProphet probability')</li>
+						</ul>
+					</li>
+					<li><strong>protein C-termini</strong><br/>
+						please provide the data in the folloing order using the headerline: <i>protein,position,modification,confidence,confidence_type</i><br/>
+						<ul>
+						<li><strong>protein: </strong>UniProt ID: <i>Q9BYF1</i></li>
+						<li><strong>position: </strong>last amino acid relative to UniProt full length protein sequence: <i>221</i></li>
+						<li><strong>modification: </strong>name of the modification of the last amino acid according to TopFIND <a href="/modifications">modifications</a>: <i>acteylation</i> or <i>N-acetylaspartate</i></li>
+						<li><strong>confidence: </strong>a confidence measurement if applicable (e.g. when based on peptide identification by mass spectrometry)</li>
+						<li><strong>confidence type: </strong>The type of the confidence value given (any of: 'unknown','probability','MASCOT score','X! Tandem score','PeptideProphet probability')</li>
+						</ul>
+					</li>
+				</ol>	
+					
+				</p><br/>
+				<div class="linkbox">
+				<a action="new" to="&model" param="new-link">
+          			<ht key="imports.actions.new">New Import</ht>
+        		</a>
+        		</div>
+			</section>
+			<section class="importstep solidbox">
+				<p>
+				Please contact 'philipp.lange@ubc.ca' in case of problems or further questions.
+				</p>
+			</section>
+		</section>    
+		<section id="listing" if="&logged_in?" class="right">
+        	<div id="evidencelist" class="solidbox">
+        		<h4>Your evidence</h4>
+        		<ul>
+        		<repeat with="&@evidences">
+        			<li><a this target="_blank"><view:name/></a></li>
+        		</repeat>
+        		</ul>
+    		</div>
+        	<div id="importlist" class="solidbox">
+        		<h4>Your imports</h4>
+        		<ul>
+        		<repeat with="&@imports">
+        			<li><view:name/></li>
+        		</repeat>
+        		</ul>
+    		</div>
+		</section>
+    			
+
+        <page-nav param="bottom-page-nav"/>
+
+
+      </section>
+    </content:>
+  </page>
+</def>
+
+
+<!-- Termini index pages -->
+
+<def tag="index-page" for="Nterm">
+  <page merge title="#{ht 'nterms.index.title', :default=>['N termini'] }">
+    <body: class="index-page nterm" param/>
+
+    <content: param>
+      <header param="content-header">
+        <h2 param="heading">
+          <ht key="nterms.index.heading">
+            N termini
+          </ht>
+        </h2>
+
+		<p>
+        <% if @count.present? %>
+            Your search returned <%=@count%> N termini
+        <% else%>
+            Please specify filter parameters to list matching N termini
+        <%end%>
+        </p>  
+      </header>
+      
+      <%ids = @nterms.*.id.join(','); name= "N-termini-searchresult";  exporturl = "/topfind/nterms/export?ids=#{ids}&name=#{name}"%>
+      <a name="termini"/><a href="#{exporturl}" class="exportbutton" target="_blank">Export spreadsheat</a>
+            
+      <section param="content-body">
+      
+      			   <a href="#" onclick="jQuery('#searchexample').toggle();; return false;">example input</a>
+				   <div id="searchexample" class="hide">
+				   	<b>Example searches:</b>
+				   	<ul>
+					   	<li><a href="http://clipserve.clip.ubc.ca/topfind/ntermini?seqstart=M&seqregexp=&postype=at&pos=1&modification=Acetylation&protein=&species=">Enter 'M' into the start sequence field, select 'at' and enter '1' into the position field and select 'acetylation' from the modification dropdown to list all acetylated N termini with their initiator methionine still intact.</a></li>
+						<li><a href="http://clipserve.clip.ubc.ca/topfind/ntermini?seqregexp=^M[QS]%2BR[GY]">Search for N termini with the sequence patter: <b>start - M - Q or S - any amino acid - R - G or Y</b> by entering '^M[QS]+R[GY]' into the sequence matche field</a> </li>
+				   	</ul>
+				 </div>
+			<br/>   
+
+        <page-nav param="top-page-nav"/>
+        
+        
+		<table class="modificationtable">
+			<tr><th>Position</th><th>Sequence</th><th>Modification</th><th>Protein</th><th>Evidence</th></tr>
+        	<% @nterms.each do |t| %>
+		    	<tr class='terminusindexitem'> 	
+		  			<% t.terminusmodification.kw.to_s == 'unknown' ? mod = '' : mod = link_to("#{t.terminusmodification.kw.to_s.downcase}-", t.terminusmodification, :class=>"popup", :rel=> "#overlay")%>  
+		      		<td><b><%=t.pos%></b></td>
+		      		<td class="sequence"><%=t.seqexcerpt%></td>
+		      		<td><%=mod%></td>
+		      		<td><a with="&t.protein"><view:recname/> (<view:ac/>)</a></td>
+		      		<td><span class="morelink">(<a with="&t" class="popup" rel="#overlay">more ...</a>)</span></td>
+		      	</tr>
+		    <% end%>
+        </table>
+
+        <page-nav param="bottom-page-nav"/>
+        
+        
+
+
+      </section>
+    </content:>
+    <aside1:>
+    	<ntermini-filter/>
+    </aside1:>  
+  </page>
+</def>
+
+<def tag="index-page" for="Cterm">
+  <page merge title="#{ht 'cterms.index.title', :default=>['C termini'] }">
+    <body: class="index-page cterm" param/>
+
+    <content: param>
+      <header param="content-header">
+        <h2 param="heading">
+          <ht key="cterms.index.heading">
+            C termini
+          </ht>
+        </h2>
+		<p>
+        <% if @count.present? %>
+            Your search returned <%=@count%> C termini
+        <% else%>
+            Please specify filter parameters to list matching C termini
+        <%end%>
+        </p>        
+      </header>
+      
+      <%ids = @cterms.*.id.join(','); name= "C-termini-searchresult";  exporturl = "/topfind/cterms/export?ids=#{ids}&name=#{name}"%>
+      <a name="termini"/><a href="#{exporturl}" class="exportbutton" target="_blank">Export spreadsheat</a> 
+            
+      <section param="content-body">
+      
+      			   <a href="#" onclick="jQuery('#searchexample').toggle();; return false;">example input</a>
+				   <div id="searchexample" class="hide">
+				   	<b>Example searches:</b>
+				   	<ul>
+					   	<li><a href="http://clipserve.clip.ubc.ca/topfind/ctermini?protein=P60710">Enter 'P60710' into the protein field to list all C termini of murine beta actin.</a></li>
+						<li><a href="http://clipserve.clip.ubc.ca/topfind/ctermini?seqend=D&seqregexp=&postype=&pos=&modification=&protein=&species=">Search for C termini that end on D by adding 'D' to the sequence ends field.</a> </li>
+						<li><a href="http://clipserve.clip.ubc.ca/topfind/ctermini?seqend=&seqregexp=[^S]S{3}[^S]{1%2C3}%24&postype=&pos=&modification=&protein=&species=Homo+sapiens">Search for human C termini that have a stretch of 3 'S' 1-3 amino acids before the end by selecting 'Homo sapiens' from the species list and adding '[^S]S{3}[^S]{1,3}$' to the sequece match field.</a> </li>
+				   	</ul>
+				 </div> 
+			<br/>
+
+        <page-nav param="top-page-nav"/>
+        
+		<table class="modificationtable">
+			<tr><th>Position</th><th>Sequence</th><th>Modification</th><th>Protein</th><th>Evidence</th></tr>
+        	<% @cterms.each do |t| %>
+		    	<tr class='terminusindexitem'> 	
+		  			<% t.terminusmodification.kw.to_s == 'unknown' ? mod = '' : mod = link_to("#{t.terminusmodification.kw.to_s.downcase}-", t.terminusmodification, :class=>"popup", :rel=> "#overlay")%>  
+		      		<td><b><%=t.pos%></b></td>
+		      		<td class="sequence"><%=t.seqexcerpt%></td>
+		      		<td><%=mod%></td>
+		      		<td><a with="&t.protein"><view:recname/> (<view:ac/>)</a></td>
+		      		<td><span class="morelink">(<a with="&t" class="popup" rel="#overlay">more ...</a>)</span></td>
+		      	</tr>
+		    <% end%>
+        </table>
+
+        <page-nav param="bottom-page-nav"/>
+
+
+      </section>
+    </content:>
+    <aside1:>
+    	<ctermini-filter/>
+    </aside1:>  
+  </page>
+</def>
+
+

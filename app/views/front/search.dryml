@@ -1,0 +1,23 @@
+<page title="Search Results">
+    <body: class="search-page protein" />
+    <aside1: ><protein-filter/></aside1:>
+    <content: >  
+
+    <div class="content-body">
+    <h2>Search Results</h2>
+    <h3 if="&@family">MEROPS protease family <%=@family%></h3> 
+    <section class="full">
+	      <ul>
+	        <repeat with="&@proteins">
+	          <li><a><view:recname/></a> (<view:species/>)<br/><view:nterms.count/> N-termini | <view:cterms.count/> C-termini | <view:substrates.count/> Substrates | processed by <view:proteases.count/> proteases</li>
+	          </repeat>
+	      </ul>
+    
+    </section>    
+   
+    </div> 
+    
+  </content:>
+  <bottom-pagination-nav:/>
+  
+</page>

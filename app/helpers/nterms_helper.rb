@@ -1,0 +1,2 @@
+module NtermsHelper
+end

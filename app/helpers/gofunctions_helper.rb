@@ -1,0 +1,2 @@
+module GofunctionsHelper
+end

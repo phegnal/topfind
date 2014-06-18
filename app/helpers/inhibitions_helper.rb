@@ -1,0 +1,2 @@
+module InhibitionsHelper
+end

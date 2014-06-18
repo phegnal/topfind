@@ -1,0 +1,12 @@
+<page titel="Protease-Substrate Matrix">
+  <content:>
+    <aside>
+      <div id="selectform">
+        <%= render :partial => "matrices/selectform", :object => @search%>
+      </div>
+    </aside>
+    <div id="matrix">
+    </div>  
+  </content:>
+
+</page>

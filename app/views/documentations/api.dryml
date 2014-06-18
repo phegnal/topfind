@@ -1,0 +1,30 @@
+<page>    
+    <title:>
+    	API : TopFIND - A knowledgebase combining protein termini, protein processing, cleavage site specificity and functional annotation in the protease web
+    </title:>
+  <content:>
+	<section class="content-body">  
+    <h2 >TopFIND Application Programming Interfaces</h2>
+    <div class="category"><h3>PSICQUIC API</h3></div>
+	<div class="solidbox">
+    	<p class="help">This API is based on the popular PSI common query interface (PSICQUIC) for standardized querying of molecular interaction data across multiple sources. Proteolytic cleavage processes, as well as the inhibition thereof are a specific form of protein – protein interaction.  All TopFIND cleavage events and inhibitions are exposed to PSICQUIC using the reference implementation. The query interface is available at <b><a href="http://clipserve.clip.ubc.ca/topfind-psicquic-search">clipserve.clip.ubc.ca/topfind-psicquic-search</a></b> and the SOAP interface can be accessed at <b><a href="http://clipserve.clip.ubc.ca/topfind-psicquic-ws">clipserve.clip.ubc.ca/topfind-psicquic-ws</a></b>. An example search query retrieving the first 10 entries is <b><a href="http://clipserve.clip.ubc.ca/topfind-psicquic-search/query/*:*?firstResult=0&maxResults=10">clipserve.clip.ubc.ca/topfind-psicquic-search/query/*:*?firstResult=0&maxResults=10</a></b>.</p>
+    	<p class="help">This not only allows users to retrieve TopFIND information using PSIQUIC-enabled software (e.g. in Cytoscape) but also to query information on protein cleavage events in parallel to general protein – protein interaction data from all other PSICQUIC-enabled resources (e.g. DrugBank, IntAct, STRING) using the PSICQUIC View provided by the European Bioinformatics Institute at <a href="http://www.ebi.ac.uk/Tools/webservices/psicquic/view">www.ebi.ac.uk/Tools/webservices/psicquic/view</a>.</p>
+	</div>
+	
+	<div class="category"><h3>XML API</h3></div>
+	<div class="solidbox">
+		<p class="help">The XML-based API to make the extensive additional information found in TopFIND accessible to automated retrieval. In particular, the positional cross-correlation analysis is made accessible to external analysis and annotation systems. A simple query notation [<a href="/topfind/downloads/TopFIND API reference.pdf" target="_blank">download pdf</a>], allows retrieval of lists with matching proteins, cleavage events, N- or C-termini. If the first query was not aimed directly at proteins, detailed information on the corresponding proteins including all termini, proteolytic processing, and substrates can then be retrieved in a second query using the protein accession numbers delivered by the first query. The returned information is XML-encoded for automated post-processing using standard computational procedures.</p>
+    	<br/>
+	    <div>
+	    	<img src='/topfind/images/documentation/api-table.png'/>
+	    	<p>XML API reference [<a href="/topfind/downloads/TopFIND API reference.pdf" target="_blank">download pdf</a>]</p>
+	    </div>
+	    <br/>
+	    <div>
+	    	<img src='/topfind/images/documentation/xml-api.png'/>		
+	    	<p>XML API example search</p>
+	    </div>
+    </div>
+	</section>   
+  </content:>
+</page>

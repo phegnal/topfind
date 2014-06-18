@@ -1,0 +1,230 @@
+--- !ruby/object:Gem::Specification 
+name: bioruby
+version: !ruby/object:Gem::Version 
+  hash: 15
+  prerelease: false
+  segments: 
+  - 0
+  - 6
+  - 4
+  version: 0.6.4
+platform: ruby
+authors: 
+- BioRuby project
+autorequire: bio
+bindir: bin
+cert_chain: 
+date: 2005-08-31 00:00:00 -07:00
+default_executable: 
+dependencies: []
+
+description: 
+email: staff@bioruby.org
+executables: []
+
+extensions: []
+
+extra_rdoc_files: []
+
+files: 
+- bin/br_biofetch.rb
+- bin/br_bioflat.rb
+- bin/br_biogetseq.rb
+- bin/br_pmfetch.rb
+- doc/BioRuby.rd.ja
+- doc/Design.rd.ja
+- doc/KEGG_API.rd
+- doc/KEGG_API.rd.ja
+- doc/TODO.rd.ja
+- doc/Tutorial.rd
+- doc/Tutorial.rd.ja
+- etc/bioinformatics
+- etc/bioinformatics/seqdatabase.ini
+- lib/bio
+- lib/bio.rb
+- lib/bio/alignment.rb
+- lib/bio/appl
+- lib/bio/command.rb
+- lib/bio/data
+- lib/bio/db
+- lib/bio/db.rb
+- lib/bio/extend.rb
+- lib/bio/feature.rb
+- lib/bio/io
+- lib/bio/location.rb
+- lib/bio/pathway.rb
+- lib/bio/reference.rb
+- lib/bio/sequence.rb
+- lib/bio/util
+- lib/bio/appl/bl2seq
+- lib/bio/appl/blast
+- lib/bio/appl/blast.rb
+- lib/bio/appl/blat
+- lib/bio/appl/clustalw
+- lib/bio/appl/clustalw.rb
+- lib/bio/appl/emboss.rb
+- lib/bio/appl/fasta
+- lib/bio/appl/fasta.rb
+- lib/bio/appl/genscan
+- lib/bio/appl/hmmer
+- lib/bio/appl/hmmer.rb
+- lib/bio/appl/mafft
+- lib/bio/appl/mafft.rb
+- lib/bio/appl/psort
+- lib/bio/appl/psort.rb
+- lib/bio/appl/sim4
+- lib/bio/appl/sim4.rb
+- lib/bio/appl/sosui
+- lib/bio/appl/spidey
+- lib/bio/appl/targetp
+- lib/bio/appl/tmhmm
+- lib/bio/appl/bl2seq/report.rb
+- lib/bio/appl/blast/format0.rb
+- lib/bio/appl/blast/format8.rb
+- lib/bio/appl/blast/report.rb
+- lib/bio/appl/blast/rexml.rb
+- lib/bio/appl/blast/wublast.rb
+- lib/bio/appl/blast/xmlparser.rb
+- lib/bio/appl/blat/report.rb
+- lib/bio/appl/clustalw/report.rb
+- lib/bio/appl/fasta/format10.rb
+- lib/bio/appl/fasta/format6.rb
+- lib/bio/appl/genscan/report.rb
+- lib/bio/appl/hmmer/report.rb
+- lib/bio/appl/mafft/report.rb
+- lib/bio/appl/psort/report.rb
+- lib/bio/appl/sim4/report.rb
+- lib/bio/appl/sosui/report.rb
+- lib/bio/appl/spidey/report.rb
+- lib/bio/appl/targetp/report.rb
+- lib/bio/appl/tmhmm/report.rb
+- lib/bio/data/aa.rb
+- lib/bio/data/codontable.rb
+- lib/bio/data/na.rb
+- lib/bio/db/aaindex.rb
+- lib/bio/db/embl
+- lib/bio/db/embl.rb
+- lib/bio/db/fantom.rb
+- lib/bio/db/fasta.rb
+- lib/bio/db/genbank
+- lib/bio/db/genbank.rb
+- lib/bio/db/gff.rb
+- lib/bio/db/go.rb
+- lib/bio/db/kegg
+- lib/bio/db/litdb.rb
+- lib/bio/db/medline.rb
+- lib/bio/db/nbrf.rb
+- lib/bio/db/pdb
+- lib/bio/db/pdb.rb
+- lib/bio/db/prosite.rb
+- lib/bio/db/transfac.rb
+- lib/bio/db/embl/common.rb
+- lib/bio/db/embl/embl.rb
+- lib/bio/db/embl/sptr.rb
+- lib/bio/db/embl/swissprot.rb
+- lib/bio/db/embl/trembl.rb
+- lib/bio/db/genbank/common.rb
+- lib/bio/db/genbank/ddbj.rb
+- lib/bio/db/genbank/genbank.rb
+- lib/bio/db/genbank/genpept.rb
+- lib/bio/db/genbank/refseq.rb
+- lib/bio/db/kegg/brite.rb
+- lib/bio/db/kegg/cell.rb
+- lib/bio/db/kegg/compound.rb
+- lib/bio/db/kegg/enzyme.rb
+- lib/bio/db/kegg/genes.rb
+- lib/bio/db/kegg/genome.rb
+- lib/bio/db/kegg/glycan.rb
+- lib/bio/db/kegg/keggtab.rb
+- lib/bio/db/kegg/ko.rb
+- lib/bio/db/kegg/microarray.rb
+- lib/bio/db/kegg/reaction.rb
+- lib/bio/db/pdb/atom.rb
+- lib/bio/db/pdb/chain.rb
+- lib/bio/db/pdb/model.rb
+- lib/bio/db/pdb/pdb.rb
+- lib/bio/db/pdb/residue.rb
+- lib/bio/db/pdb/utils.rb
+- lib/bio/io/brdb.rb
+- lib/bio/io/das.rb
+- lib/bio/io/dbget.rb
+- lib/bio/io/ddbjxml.rb
+- lib/bio/io/fastacmd.rb
+- lib/bio/io/fetch.rb
+- lib/bio/io/flatfile
+- lib/bio/io/flatfile.rb
+- lib/bio/io/higet.rb
+- lib/bio/io/keggapi.rb
+- lib/bio/io/pubmed.rb
+- lib/bio/io/registry.rb
+- lib/bio/io/soapwsdl.rb
+- lib/bio/io/sql.rb
+- lib/bio/io/flatfile/bdb.rb
+- lib/bio/io/flatfile/index.rb
+- lib/bio/io/flatfile/indexer.rb
+- lib/bio/util/sirna.rb
+- sample/biofetch.rb
+- sample/dbget
+- sample/fasta2tab.rb
+- sample/fsplit.rb
+- sample/gb2fasta.rb
+- sample/gb2tab.rb
+- sample/gbtab2mysql.rb
+- sample/genes2nuc.rb
+- sample/genes2pep.rb
+- sample/genes2tab.rb
+- sample/genome2rb.rb
+- sample/genome2tab.rb
+- sample/goslim.rb
+- sample/gt2fasta.rb
+- sample/pmfetch.rb
+- sample/pmsearch.rb
+- sample/ssearch2tab.rb
+- sample/tdiary.rb
+- sample/tfastx2tab.rb
+- sample/vs-genes.rb
+- test/all_tests.rb
+- test/bio
+- test/bio/suite_bio.rb
+- test/bio/test_alignment.rb
+- test/bio/test_location.rb
+- test/bio/test_pathway.rb
+- test/bio/test_sequence.rb
+has_rdoc: true
+homepage: http://bioruby.org/
+licenses: []
+
+post_install_message: 
+rdoc_options: []
+
+require_paths: 
+- lib
+required_ruby_version: !ruby/object:Gem::Requirement 
+  none: false
+  requirements: 
+  - - ">"
+    - !ruby/object:Gem::Version 
+      hash: 31
+      segments: 
+      - 0
+      - 0
+      - 0
+      version: 0.0.0
+required_rubygems_version: !ruby/object:Gem::Requirement 
+  none: false
+  requirements: 
+  - - ">="
+    - !ruby/object:Gem::Version 
+      hash: 3
+      segments: 
+      - 0
+      version: "0"
+requirements: []
+
+rubyforge_project: 
+rubygems_version: 1.3.7
+signing_key: 
+specification_version: 1
+summary: BioRuby is a library for bioinformatics (biology + information science).
+test_files: []
+

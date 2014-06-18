@@ -1,0 +1,5 @@
+if @cleavages 
+  page.replace_html :matrix, :partial => 'matrix', :object => @cleavages
+else
+  page.replace_html :matrix, 'No cleavages reported'
+end

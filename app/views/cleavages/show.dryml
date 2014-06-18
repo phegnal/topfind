@@ -1,0 +1,11 @@
+<inline-page>
+  <body:>
+  	<section class="inline-content">
+  	<%ids = this.evidences.*.id.join(','); name= "Evidences-for-#{this.externalid}";  exporturl = "/topfind/evidences/export?ids=#{ids}&name=#{name}"%>
+  	<h1>Evidences supporting a cleavage of <view:substrate.recname/> by <view:protease.recname/> at AS <view:pos/> <a href="#{exporturl}" class="exportlink">[export]</a></h1>
+	    <collection:evidences>
+	      <detailedevidence/>
+	    </collection>
+    </section>
+  </body:>
+</inline-page>

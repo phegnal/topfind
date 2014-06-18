@@ -1,0 +1,79 @@
+
+
+<def tag="card" for="Import">
+  <card class="import" param="default" merge>
+    <header: param>
+      <h4 param="heading"><a><name/></a></h4>
+    </header:>
+  </card>
+</def>
+
+<def tag="card" for="Publication">
+  <card class="publication" param="default" merge>
+    <header: param>
+		<% this.url.present? ? link = this.url : link = "http://www.ncbi.nlm.nih.gov/pubmed/#{this.pmid}"%> 		
+      <h4 param="heading" class="pub-title"><a href="#{this.url}" target="blank"><name/></a> <img src="/topfind/images/external-link.png"/></h4>
+      <p class="pub-author"><view:authors/></p>
+      <p class="pub-ref"><view:ref/></p>
+      <p class="pub-abstract"><view:abstract/></p>
+      <p class="pub-link">PubMed: <a href="http://www.ncbi.nlm.nih.gov/pubmed/#{this.pmid}" target="blank"><view:pmid/></a> <img src="/topfind/images/external-link.png"/> | Doi: <a href="#{this.url}" target="blank"><view:doi.strip/></a> <img src="/topfind/images/external-link.png" if="&this.url.present?"/></p>
+	 </header:>
+  </card>
+</def>
+
+<def tag="card" for="Protein">
+  <card class="solidbox protein" param="default" merge>
+    <header: param>
+      <h4 param="heading"><a><view:name/>: <view:recname/> (<view:ac/>)</a> </h4>
+	  <%= this.gn.name if this.gn.present? %> <%="(#{this.gn.synonyms.*.synonym.join(', ')})" if this.gn.present? && this.gn.synonyms.present? %> <br/>
+      <view:species.name/> <span if="&this.isprotease"> | Merops family: <view:proteasefamily/></span> 
+      <ul>
+        <li if="&this.isprotease">Processes <view:substrates.count/> substrates at <view:cleavages.count/> sites.</li>
+        <li if="&this.issubstrate">Processed by <view:proteases.count/> proteases at <view:inverse_cleavages.count/> sites.</li>
+        <li if="&this.isinhibitor">Inhibits <view:inhibited-proteases.count/> proteases</li>
+        <li if="&this.isinhibited">Inhibited by <view:inhibitors.count/> inhibitors</li>
+        <% nmods = this.nterms.*.modificationclass.uniq; nmods.delete('unknown')%>
+        <li if="&this.nterms"><view:nterms.count/> N-termini <if test="&nmods">(modifications: <%=nmods.join(' | ')%>)</if></li>
+        <% cmods = this.cterms.*.modificationclass.uniq; cmods.delete('unknown')%>
+        <li if="&this.cterms"><view:cterms.count/> C-termini <if test="&cmods">(modifications: <%=cmods.join(' | ')%>)</if></li>
+      </ul>
+    </header:>
+  </card>
+</def> 
+
+<def tag="card" for="Evidence">
+  <card class="evidence" param="default" merge>
+    <header: param>
+      <h4 param="heading" class="evidence-title"><name/></h4>
+      
+      <p class="ev-description"><view:description/></p>
+    </header:>
+  </card>
+</def> 
+
+
+<def tag="card" for="Terminusmodification">
+  <card class="terminusmodification" param="default" merge>
+    <header: param>
+      <h4 param="heading"><name/></h4> 
+      <p class="modcountreport">reported at <this.nterms.count/> N-termini and <this.cterms.count/> C-Termini.</p>
+	  <field-list fields="ac, psimodlink, kw, subcell,  kw.description,  ols_definition,publications" param class="modificationtable">
+	  	<psimodlink-view:>
+	  		<%="#{this} <img src='/topfind/images/external-link.png'/>" if this.present?%>
+	  	</psimodlink-view:>
+	  	<publications-view:>
+	  		<div repeat="&this" class="publication">
+		    <% this.url.present? ? link = this.url : link = "http://www.ncbi.nlm.nih.gov/pubmed/#{this.pmid}"%>
+	  		<h4 param="heading" class="pub-title"><a href="#{link}" target="blank"><name/></a> <img src="/topfind/images/external-link.png"/></h4>
+		      <p class="pub-author"><view:authors/></p>
+		      <p class="pub-ref"><view:ref/></p>
+		      <p class="pub-abstract"><view:abstract/></p>
+		      <p class="pub-link">PubMed: <a href="http://www.ncbi.nlm.nih.gov/pubmed/#{this.pmid}" target="blank"><view:pmid/></a> <img src="/topfind/images/external-link.png"/> | Doi: <a href="#{this.url}" target="blank"><view:doi.strip/></a> <img src="/topfind/images/external-link.png" if="&this.url.present?"/></p>
+	  		</div>
+	  	</publications-view>
+	  </field-list>
+    </header:>
+  </card>
+</def>
+
+

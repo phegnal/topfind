@@ -1,0 +1,71 @@
+<page title="Documentation">
+    
+    <title:>
+    	Documentation : TopFIND 
+    </title:>
+    <after-title:>
+		<meta name="description" content="Online documentation for TopFIND (Terminus Oriented Protein Function INferred Database)"/>
+		<meta name="keywords" content="data submission,evidence,evidence-codes,pubmed,contribute,howto,help,filter,search,advance search"/>
+  	</after-title:>
+  <aside1: ></aside1:>
+  <content:>
+
+	<section class="content-body documentation">
+		<div class="docsection">	    
+		    <div class="category"><h2>Search</h2></div>
+		    <div class="solidbox">
+				<section repeat="&@documentations.group_by(&:category)['Search']">				
+					<h3><view:title/></h3>
+					<p><%= this.long%>  </p>
+				</section>
+			</div>		   
+		</div>
+		<div class="docsection">	    
+		    <div class="category"><h2>Filter</h2></div>
+		    <div class="solidbox">
+				<section repeat="&@documentations.group_by(&:category)['Filter']">				
+					<h3><view:title/></h3>
+					<p><%= this.long%>  </p>
+				</section>
+			</div>		   
+		</div>
+		<div class="docsection clear">	    
+		    <div class="category"><h2>Evidences</h2></div>
+		    <div class="solidbox">
+				<section repeat="&@documentations.group_by(&:category)['Evidence']">				
+					<h3><view:title/></h3>
+					<p> <%= this.long%> </p>
+				</section>
+			</div>	   
+		</div>
+		<div class="docsection">	    
+		    <div class="category"><h2>Protein information</h2></div>
+		    <div class="solidbox">
+				<section repeat="&@documentations.group_by(&:category)['Protein information']">				
+					<h3><view:title/></h3>
+					<p> <%= this.long%> </p>
+				</section>	
+			</div>   
+		</div>
+		<div class="docsection">	    
+		    <div class="category"><h2>Termini search</h2></div>
+		    <div class="solidbox">
+				<section repeat="&@documentations.group_by(&:category)['Termini']">				
+					<h3><view:title/></h3>
+					<p><%= this.long%>  </p>
+				</section>
+			</div>		   
+		</div>		
+		<div class="docsection clear">	    
+		    <div class="category"><h2>Contribute</h2></div>
+		    <div class="solidbox">
+				<section repeat="&@documentations.group_by(&:category)['Contribute']">				
+					<h3><view:title/></h3>
+					<p> <%= this.long%>  </p>
+				</section>
+			</div>
+		</div>	
+	</section>
+  </content:>
+  
+</page>

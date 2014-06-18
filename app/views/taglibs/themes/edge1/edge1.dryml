@@ -1,0 +1,12 @@
+<extend tag="page">
+  <old-page merge without-live-search>
+    <stylesheets: param>
+      <stylesheet name="reset"/>
+      <theme-stylesheet/>
+      <theme-stylesheet name="rapid-ui"/>
+    </stylesheets:> 
+
+      
+  </old-page>
+</extend>  
+

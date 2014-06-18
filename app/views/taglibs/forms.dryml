@@ -1,0 +1,115 @@
+<extend tag="form" for="Cleavage">
+  <old-form merge>
+    <error-messages param/>
+    <field-list fields="protease, proteaseisoform, proteasechain, substrate, substrateisoform, substratechain, pos, evidences" param>
+
+      
+      <protease-view:>
+        <name-one/>
+      </protease-view>  
+      
+      <proteaseisoform-view:>
+        <do part="proteaseisoform-menu">
+          <if test="&@this.protease">
+            <select-one options="&@this.protease.isoforms"/>
+          </if>
+          <else>
+            <select disabled><option>First choose a protease</option></select>
+          </else>
+        </do>
+      </proteaseisoform-view:>
+
+      <proteasechain-view:>
+        <do part="proteasechain-menu">
+          <if test="&@cleavage.protease">
+            <select-one options="&@cleavage.protease.chains"/>
+          </if>
+          <else>
+            <select disabled><option>First choose a protease</option></select>
+          </else>
+        </do> 
+      </proteasechain-view:>   
+      
+      <substrate-view:>
+        <name-one />
+      </substrate-view>        
+      
+      <substrateisoform-view:>
+        <do part="substrateisoform-menu">
+          <if test="&@this.substrate">
+            <select-one options="&@this.substrate.isoforms"/>
+          </if>
+          <else>
+            <select disabled><option>First choose a substrate</option></select>
+          </else>
+        </do>
+      </substrateisoform-view:>
+
+      <substratechain-view:>
+        <do part="substratechain-menu">
+          <if test="&@cleavage.substrate">
+            <select-one options="&@cleavage.substrate.chains"/>
+          </if>
+          <else>
+            <select disabled><option>First choose a substrate</option></select>
+          </else>
+        </do> 
+      </substratechain-view> 
+      
+      <evidences-view:>
+          <select-many options="&current_user.evidences" blank-message="Please select"/>
+      </evidences-view>           
+    </field-list>
+    <div param="actions">
+      <submit label="#{ht 'cleavages.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </old-form>
+</extend>
+
+<extend tag="form" for="Import">
+  <old-form merge multipart>
+    <error-messages param/>
+    <field-list fields="datatype,name, description, evidence, csvfile" param>
+      <evidence-view:>
+      	<if test="&current_user.administrator?">
+      	  <select-one options="&Evidence.owner_id_not_nil" blank-message="Please select"/>
+      	</if>
+      	<else>
+        	<select-one options="&current_user.evidences" blank-message="Please select"/>
+      	</else>
+      </evidence-view>
+    </field-list>
+    
+
+    <div param="actions">
+      <submit label="#{ht 'imports.actions.save', :default=>['Import']}" param/><or-cancel param="cancel"/>
+    </div> 
+  </old-form>       
+</extend>
+
+<def tag="search-form" polymorphic/>
+<def tag="search-form" for="Front">
+  <form merge action="search">
+    <error-messages param/>
+    <field-list>
+    <input type="text" name="search"/>
+    </field-list>
+    <div param="actions">
+      <submit label="#{ht 'front.actions.search', :default=>['Search']}" param/>
+    </div>
+  </form>
+</def>
+
+<def tag="form" for="Evidence">
+  <form merge multipart param="default">
+    <error-messages param/>
+    <field-list fields="name, methodology, method, method_system, method_perturbation, method_protease_source, proteaseassignment_confidence, protease_inhibitors_used,description, evidencecodes, phys_relevance, directness,confidence,confidence_type, tissues, lab, repository, publications" param>
+    	<publications-view:>
+    		<input-many><field-list fields="pmid"/></input-many>
+    	</publications-view>
+	</field-list>
+    <div param="actions">
+      <submit label="#{ht 'evidences.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
+    </div>
+  </form>
+</def>

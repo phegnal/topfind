@@ -1,0 +1,12 @@
+<% title "Matrix" %>
+
+<p>
+  <strong>Model:</strong>
+  <%=h @matrix.model %>
+</p>
+
+<p>
+  <%= link_to "Edit", edit_matrix_path(@matrix) %> |
+  <%= link_to "Destroy", @matrix, :confirm => 'Are you sure?', :method => :delete %> |
+  <%= link_to "View All", matrices_path %>
+</p>
