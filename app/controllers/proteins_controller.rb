@@ -1,5 +1,8 @@
 class ProteinsController < ApplicationController
 
+  require 'graph/path'
+  require 'graph/mapMouseHuman'
+
   hobo_model_controller
   
   caches_page :show
@@ -7,8 +10,6 @@ class ProteinsController < ApplicationController
   autocomplete :name, :query_scope => [:name_contains, :ac_contains]
   auto_actions :all
   show_actions :filter
-
-  
   
   def index
   	
@@ -26,7 +27,8 @@ class ProteinsController < ApplicationController
     orconditions = Array.new
     orqueries = Array.new
     conditionvars = Hash.new
-  	#take the shortcut when searching for a single existing accession
+    
+    #take the shortcut when searching for a single existing accession
   	if params[:query].present?
   	  # if it matches the accession number schema
   	  match = params[:query].match(/^[A-Za-z]\w{5}(-\d)?$/).present?
@@ -291,7 +293,6 @@ class ProteinsController < ApplicationController
     @filter_evidences = evidences.*.name.uniq
     @filter_gocomponents = evidences.*.gocomponents.flatten.uniq.*.name.uniq
     @filter_methodologies = evidences.*.methodology.uniq
-    @filter_perturbations = evidences.*.method_perturbation.uniq
     @filter_methodsystems = evidences.*.method_system.uniq
     @filter_methodproteasesources = evidences.*.method_protease_source.uniq
     @filter_proteaseassignmentconfidence = evidences.*.proteaseassignment_confidence.uniq
@@ -332,10 +333,6 @@ class ProteinsController < ApplicationController
     end
     if params[:methodologies].present?
   		paramids = Evidence.methodology_in(params[:methodologies]).*.id
-    	ids.present? ? ids = ids & paramids : ids = paramids
-    end
-    if params[:perturbations].present?
-  		paramids = Evidence.method_perturbation_in(params[:perturbations]).*.id
     	ids.present? ? ids = ids & paramids : ids = paramids
     end
     if params[:methodsystems].present?
@@ -433,7 +430,6 @@ class ProteinsController < ApplicationController
     @filter_evidences = evidences.*.name.sort
     @filter_gocomponents = evidences.*.gocomponents.flatten.uniq.*.name.sort
     @filter_methodologies = evidences.*.methodology.uniq
-    @filter_perturbations = evidences.*.method_perturbation.uniq
     @filter_methodsystems = evidences.*.method_system.uniq
     @filter_methodproteasesources = evidences.*.method_protease_source.uniq
     @filter_proteaseassignmentconfidence = evidences.*.proteaseassignment_confidence.uniq
@@ -629,6 +625,79 @@ class ProteinsController < ApplicationController
     respond_to do |format|
       format.xml
     end    
+  end
+    
+  def blabla
+    start = params["start"]
+    targets = params["targets"]
+    maxLength = params["maxLength"]
+    nwOrg = params["network_org"]
+    listOrg = params["list_org"]
+            
+    if(start != "" && 
+        targets != "" &&
+        maxLength != "")
+        
+        # clean up input
+        start = start.strip
+        targets = targets.split
+        maxLength = maxLength.to_i
+        if(nwOrg == "human") 
+          nwOrg = 1 
+          else 
+            nwOrg = 2 
+            end
+        if(listOrg == "human") 
+          listOrg = 1 
+          else 
+            listOrg = 2 
+            end
+        # map mouse human
+        mapper = MapMouseHuman.new()
+        map = []
+        if(nwOrg > listOrg) # nw is mouse and list is human
+          map = mapper.mouse4human(targets)
+          targets = map.collect{|x| x["m"]}
+          start = mapper.mouse4human([start])[0]["m"]
+        elsif(nwOrg < listOrg)  # nw is human and list is mouse
+          map = mapper.human4mouse(targets)
+          targets = map.collect{|x| x["h"]}
+          puts start
+          puts [start]
+          start = mapper.human4mouse([start])[0]["h"]
+        else 
+        end
+        
+        # path finding
+        finder = Path.new(maxLength)
+        finder.graph_from_sql(nwOrg)
+        @allPaths = Hash.new
+        targets.each{|target|
+          res = finder.find_paths(start, target)
+          @allPaths[target] = res.clone
+          }
+          
+        # get gene names
+        all_ps = []
+        @allPaths.each_value{|v| v.each{|l| all_ps += l}}
+        all_ps = all_ps.uniq + @allPaths.keys
+        @gnames = finder.get_gene_names(all_ps)
+        
+        # sort proteins
+        @sortet_subs = @allPaths.keys.sort{|x, y| @allPaths[y].size <=> @allPaths[x].size}
+        
+      else
+        puts 'else'
+        render :action => 'tryouts'
+      end
+  end
+  
+  def tryouts
+    hobo_index
+  end
+  
+  def tryouts2
+    query = ["P08246", "P01009", "P01023", "P09958"]
   end
 
     
