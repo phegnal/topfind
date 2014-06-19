@@ -1,0 +1,16 @@
+<table border="0">
+<% @sortet_subs.each do |target| -%>
+	<tr>
+	<td><b><%= @gnames[target]%></b></td>
+	<td><%= target %></td>
+	</tr>
+	<% @allPaths[target].each do |path| %>
+		<tr>
+		<% path.each do |path_node| %>
+			<td><%= '<a href="http://clipserve.clip.ubc.ca/topfind/proteins/' + path_node + '">' + @gnames[path_node] + '</a>' %></td>
+			<% end %>
+			</tr>
+			<% end %>
+			<tr><td> --- </td></tr>
+<% end %>
+</table>

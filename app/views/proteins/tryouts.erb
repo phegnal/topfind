@@ -1,0 +1,33 @@
+<page>
+	<%= @x %>
+
+	<% form_tag(:action => "blabla", :method => "get") do %>
+	<p>
+		<b> Network: </b><br>
+		<%= radio_button_tag "network_org", "human", true %> human <br>
+		<%= radio_button_tag "network_org", "mouse" %> mouse
+	</p>
+
+	<p>
+		<b> Protease's Uniprot Id: </b><br>
+		<%= text_field_tag(:start)  %> <br>
+		example: P22894
+	</p>
+	<p>
+		<b> Substrates' Uniprot Ids: </b> <br>
+		<%= radio_button_tag "list_org", "human", true %> human <br>
+		<%= radio_button_tag "list_org", "mouse" %> mouse <br>
+		<%= text_area_tag(:targets)  %> <br>
+		example: P08246
+		P01009
+		P01023
+		P09958    
+	</p>
+	<p>
+		<b> Maximum path length: </b><br>
+		<%= text_field_tag(:maxLength)  %> <br>
+		example: 4
+	</p>
+	<%= submit_tag("Process") %>
+<% end %>
+</page>
