@@ -332,6 +332,10 @@ class ProteinsController < ApplicationController
   		paramids = Evidence.methodology_in(params[:methodologies]).*.id
     	ids.present? ? ids = ids & paramids : ids = paramids
     end
+    if params[:perturbations].present?
+  		paramids = Evidence.method_perturbation_in(params[:perturbations]).*.id
+    	ids.present? ? ids = ids & paramids : ids = paramids
+    end
     if params[:methodsystems].present?
       paramids = Evidence.method_system_in(params[:methodsystems]).*.id
       ids.present? ? ids = ids & paramids : ids = paramids
@@ -427,6 +431,7 @@ class ProteinsController < ApplicationController
     @filter_evidences = evidences.*.name.sort
     @filter_gocomponents = evidences.*.gocomponents.flatten.uniq.*.name.sort
     @filter_methodologies = evidences.*.methodology.uniq
+    @filter_perturbations = ["abc", "dec", "efg", "TODO"] #evidences.*.method_perturbation.uniq
     @filter_methodsystems = evidences.*.method_system.uniq
     @filter_methodproteasesources = evidences.*.method_protease_source.uniq
     @filter_proteaseassignmentconfidence = evidences.*.proteaseassignment_confidence.uniq
