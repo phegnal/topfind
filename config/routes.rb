@@ -12,6 +12,11 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'proteins/blabla', :controller => 'proteins', :action => 'blabla'
   map.connect 'proteins/tryouts', :controller => 'proteins', :action => 'tryouts'
   map.connect 'proteins/tryouts2', :controller => 'proteins', :action => 'tryouts2'
+  map.connect 'proteins/peptide', :controller => 'proteins', :action => 'peptide_search'
+  map.connect 'proteins/peptide_search2', :controller => 'proteins', :action => 'peptide_search2'
+  map.connect 'proteins/multi_peptides', :controller => 'proteins', :action => 'multi_peptides'
+  map.connect 'proteins/multi_peptides2', :controller => 'proteins', :action => 'multi_peptides2'
+  map.connect 'proteins/multi_export', :controller => 'proteins', :action => 'multi_export'
   
   map.connect 'interactions/:id', :controller => 'cleavages', :action => 'psicquicshow'
 
