@@ -5,10 +5,14 @@ require(File.join(File.dirname(__FILE__), 'config', 'boot'))
 
 require 'rake'
 require 'rake/testtask'
-require 'rake/rdoctask'
+begin
+  require 'rake/rdoctask'
+rescue
+  require 'rdoc/task'
+end
 
 require 'tasks/rails'
 
 require 'hobo/tasks/rails'
 
-require 'delayed/tasks'
+#require 'delayed/tasks'
