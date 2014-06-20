@@ -20,7 +20,7 @@ class Mcleavage < ActiveRecord::Base
   establish_connection :meropsweb
   set_table_name "cleavage"
   
-  require 'nokogiri'
+  #require 'nokogiri'
   require 'open-uri'
   
   
