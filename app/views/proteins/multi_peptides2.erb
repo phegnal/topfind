@@ -1,0 +1,80 @@
+<body bgcolor="Azure"></body>
+
+<table border="1" style="width:1325px">
+	<thead>
+	 <tr>
+		<th>Accession</th>
+		<th>Name</th>
+		<%if @chromosome%>
+		<th>Chr</th>
+		<%end%>
+		<%if @band%>
+		<th>Band</th>
+		<%end%>
+		<%if @domain%>
+		<th>Domain</th>
+		<%end%>
+		<th>Sequence</th>
+		<th>Pos</th>
+		<%if @precede%>
+		<th>Preceding Sequence</th>
+		<%end%>
+		<th>Cleavages</th>	
+		<%if @isoform%>	
+		<th>Isoforms</th>
+		<%end%>
+		<th>Evidences</th>
+	</tr>
+	</thead>
+
+	<tbody>
+<% @accessions.each_index do |i|%>
+	<tr>	
+		<td><a href="http://clipserve.clip.ubc.ca/topfind/proteins/<%= @accessions.fetch(i)%>"><%= @accessions.fetch(i)%></a></td>
+		<td><%= @proteins.fetch(i)%></td>
+		<%if @chromosome%>
+			<td><%= @proteins.fetch(i).chromosome%></td>
+		<%end%>
+		<%if @band%>
+			<td><%= @proteins.fetch(i).band%></td>
+		<%end%>
+		<%if @domain%>
+			<td><%q = @domains.fetch(i)%>		
+				<%indexx = 0%>
+				<%while indexx < @accessions.size%>
+				<%q.each do |r|%>
+				<%if @locations.fetch(i) >= r.from.to_i && @locations.fetch(i) <= r.to.to_i %>
+				<%= r.name%><br>
+				<%end%>
+				<%indexx += 1%>
+				<%end end%>
+		<%end%>
+		<td><%= @peptides.fetch(i)%></td>
+		<td><%= @locations.fetch(i)%></td>
+		<%if @precede%>
+			<td><%= @upstreams.fetch(i)%></td>
+		<%end%>
+		<td><% @proteases.fetch(i).each do |s|%>
+			<%= s%><br>
+			<%end%></td>
+		<%if @isoform%>
+			<td><%q = @isoforms.fetch(i)%>
+				<%q.each do |s|%>
+				<%= s%><br>					
+				<%end %><br>
+			</td>
+		<%end%>
+		<td><%@evidences.fetch(i).each do |s|%>
+			<%= s%>
+			<%end%>
+
+			</td>
+
+
+
+	</tr><% end %>
+	</tbody>
+
+</table>
+
+

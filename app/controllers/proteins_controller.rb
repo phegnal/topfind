@@ -10,7 +10,7 @@ class ProteinsController < ApplicationController
   autocomplete :name, :query_scope => [:name_contains, :ac_contains]
   auto_actions :all
   show_actions :filter
-  
+   
   def index
   	
     @documentations = Documentation.all.group_by(&:name)
@@ -202,8 +202,6 @@ class ProteinsController < ApplicationController
       hobo_index Protein, :group => 'proteins.ac', :order => 'proteins.name'
     end
   end  		
-
-  
   
   def show
     
@@ -299,7 +297,6 @@ class ProteinsController < ApplicationController
     # @filter_proteaseassignment = ['I no other proteolytic activities present', 'II proteolytic system present but abolished', 'III proteolytic system present but impaired', 'IV proteolytic system present and active','unknown']
      
   end
-
 
   def filter
     @params = params
@@ -436,7 +433,6 @@ class ProteinsController < ApplicationController
     
   end 
   
- 
   def apiget
     @params = params
     #remove isofrom from ac
@@ -693,13 +689,76 @@ class ProteinsController < ApplicationController
   end
   
   def tryouts
-    hobo_index
   end
   
   def tryouts2
     query = ["P08246", "P01009", "P01023", "P09958"]
   end
+  
+  def peptide_search2
+    @accession = params["protein"]
+    @peptide = params["peptide"]
+    @protein = Protein.find(:first, :conditions => [ "ac = ?", params['protein']])
+    @id = @protein.id
+    @sequence = @protein.sequence   
+    @location = @sequence.index(@peptide)
+    @location_1 = @location + 1
+    @pep_nterm = Nterm.find(:all, :conditions => [ "protein_id = ? AND pos = ?", @id, @location_1])
+    @pep_cleavage = Cleavage.find(:all, :conditions => ["substrate_id = ? AND pos = ?", @id, @location])
+    @pep_cleaver = @pep_cleavage.collect {|c| Protein.find(:first, :conditions => ["id = ?", c.protease_id])}
+    @seq_vars = Ft.find(:all, :conditions => ["protein_id = ? AND name = ?", @id, "VARIANT"])
+    @seq_topo = Ft.find(:all, :conditions => ["protein_id = ? AND name = ?", @id, "TOPO_DOM"])
+    @seq_mods = Ft.find(:all, :conditions => ["protein_id = ? AND name = ?", @id, "MOD_RES"])
+    @evidence_nterms = Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", @pep_nterms])
+    @evidence_ids = @evidence_nterms.collect {|c| c.evidence_id}
+    @evidences_1 = @evidence_ids.collect {|f| Evidence.find(:first, :conditions => ["id = ?", f])}
+  end  
+  
+  def multi_peptides2
 
-    
+    @accessions_input = params["proteins"]
+    @peptides_input = params['peptides']
+    @accessions = @accessions_input.split
+    @peptides = @peptides_input.split
+=begin
+    @all_input = params['all']
+    @input = @all_input.split(/\r?\n|\r/)
+    @accessions = @input.delete_if { |e| e.index.even? }
+    @peptides = @input.delete_if { |e| e.index.odd? }
+=end
+    @proteins = @accessions.collect{|a| Protein.find(:first, :conditions => ["ac = ?", a])}   
+    @sequences = @proteins.collect {|p| p.sequence}
+    @sql_ids = @proteins.collect {|p| p.id}
+    @locations = Array.new(@accessions.size) {|s| if @sequences.fetch(s).index(@peptides.fetch(s)) != nil
+      @sequences.fetch(s).index(@peptides.fetch(s))
+    else 0
+      end}
+    @locations_1 = @locations.collect {|l| l + 1}
+    @upstreams = Array.new(@accessions.size) {|e| if @sequences.fetch(e)[@locations.fetch(e) - 7, 7] != nil
+      @sequences.fetch(e)[@locations.fetch(e) - 7, 7]
+      else "Not Available"
+       end}
+    @pep_nterms = Array.new(@accessions.size) {|a| if Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @sql_ids.fetch(a), @locations_1.fetch(a)]) != nil
+      Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @sql_ids.fetch(a), @locations_1.fetch(a)])
+      else "Not Available"
+        end}
+    @pep_cleavages = @pep_nterms.collect {|f| Cleavage.find(:all, :conditions => ["nterm_id = ?", f])}
+    @proteases = @pep_cleavages.collect {|g| g.each do |h|
+            Protein.find(:first, :conditions => ["id = ?", h])
+                end}
+    @domains = @sql_ids.collect {|i| Ft.find(:all, :conditions => ["protein_id = ?", i])}
+    @isoforms = @sql_ids.collect {|j| Isoform.find(:all, :conditions => ["protein_id = ?", j])}
+    @evidences_ids = @pep_nterms.collect {|k| Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", k.id])}
+    @evidences = @evidences_ids.collect {|m| m.each do |n|
+      Evidence.find(:first, :conditions => ["id = ?", n.evidence_id])
+    end}
+    @chromosome = params['chromosome']
+    @band = params['band']
+    @domain = params['domain']
+    @precede = params['precede']
+    @isoform = params['isoform']
+
+  end
+
 
 end

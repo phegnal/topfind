@@ -1,0 +1,21 @@
+<%= @x %>
+
+<% form_tag(:action => "peptide_search2", :method => "get") do %>
+<body bgcolor="greenyellow">
+  <h1>
+  	Peptide Search
+  </h1>
+  <p>
+	<b> Protein Uniprot Accession Number: </b><br>
+	<%= text_field_tag(:protein)%> <br>
+	example: P06870
+  </p>
+  <p>
+    <b> Peptide Sequence: </b> <br>
+    <%= text_area_tag(:peptide)  %> <br>
+	example: IVGGWECEQHS
+  </p>
+ 
+  <%= submit_tag("Process") %>
+<% end %>
+
