@@ -5,7 +5,7 @@
     </div>
     <div class="box-content">
       <% checked= 'checked="checked"'; unchecked='' %>
-      <form action="/topfind/protein/#{this.ac}/filter" method="get">
+      <form action="/topfind/protein/#{this.ac}/filter" method="get"><!-- in another version of this i have "proteins"" not "protein" TODO-->
         <div>
     	    <p class="filterlabel">Directness <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_directness'].first.short}"/></p>
     	    <ul>
@@ -42,8 +42,8 @@
     		<%end%>
     		</select>
     	</div>
-        
-        <div>
+		
+		<div>
     	    <p class="filterlabel">Perturbation <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_perturbation'].first.short}"/></p>
     		<select name="perturbations[]" multiple="multiple" size="<%= @filter_perturbations.count+1%>">
 		        <option></option>
@@ -52,7 +52,7 @@
     		<%end%>
     		</select>
     	</div>
-    	
+		
         <div>
     	    <p class="filterlabel">Confidence greater than<img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['e_confidence'].first.short}"/></p>
     	    <%="<input type='text' name='confidence' value='#{params[:confidence]}'/>"%>
