@@ -271,8 +271,9 @@
 	    	<view:htmlsequence />
 	  </section>
 	</section> 	  
+	
 	<section class="full">
-	    <h3>Annotation  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-annotation'].first.short}"/></h3>            
+	    <h3>Annotation  <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['p-annotation'].first.short}"/></h3>        
 	    <section class="left">
 		    <table class="annotation">
 		      <repeat with="&@annotations_main.group_by(&:topic)"> 

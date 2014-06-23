@@ -74,16 +74,20 @@ class Protein < ActiveRecord::Base
 
   def htmlsequence
     numbering = ''
-    blocks = (self.sequence.length/10).to_i
+    blocks = (self.sequence.length/10).to_i + 1
     number=10
     blocks.times do |i|
-      number = ((i+1)*10).to_s
-      numbering = numbering.concat(' '*(10-number.length))
-      numbering = numbering.concat(number)
+      number = ((i+1)*10).to_s  # current digit
+      if(i + 1 != blocks) then
+        numbering = numbering.concat(' '*(10-number.length))  # adds empty space between digits
+        numbering = numbering.concat(number)  # adds digits (0, 10, 20, 30,...)
+      else
+        numbering = numbering.concat('   ')
+      end
     end
-    numberstrings = numbering.to_s.scan(/.{1,59}./).map {|s| s.gsub(/(.{10})/,'\1 ')}
-    seqstrings = self.sequence.scan(/.{1,59}./).map {|s| s.gsub(/(.{10})/,'\1 ')}
-    numberstrings.zip(seqstrings).flatten.join('<br/>').gsub(/ /,'&nbsp;').html_safe
+    numberstrings = numbering.to_s.scan(/.{1,59}./).map {|s| s.gsub(/(.{10})/,'\1 ')} # break into array (elements length 60) and add spaces in elements
+    seqstrings = self.sequence.scan(/.{1,59}./).map {|s| s.gsub(/(.{10})/,'\1 ')} # as above
+    numberstrings.zip(seqstrings).flatten.join('<br/>').gsub(/ /,'&nbsp;').html_safe # merge arrays alternating one by one (zip) and then join with new space (<br>)
   end
   
   def recname
