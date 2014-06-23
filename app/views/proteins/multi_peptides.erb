@@ -5,16 +5,15 @@
   <h1>
     Multi-Peptide Search
   </h1>
-  <p>
-  <b> Protein Uniprot Accession Numbers: </b><br>
-  <%= text_field_tag(:proteins)%> <br>
-  example: P07091 P06870 P0A8M0 P01019
 
-  </p>
   <p>
-    <b> Peptide Sequences: </b> <br>
-    <%= text_area_tag(:peptides)  %> <br>
-  example: MMCNEFFEG IVGGWECEQHS SVVPVADVLQGR VIHNESTCEQ
+    <b> Protein Accessions and Peptide Sequences: </b> <br>
+    <%= text_area_tag(:all)  %> <br>
+  example:<br>
+  P07091 MMCNEFFEG<br>
+  P06870 IVGGWECEQHS<br>
+  SP0A8M0 VVPVADVLQGR<br>
+  P01019 VIHNESTCEQ<br>
   </p>
  
  <p>Information available<br>
@@ -25,10 +24,9 @@
  <%= check_box_tag(:isoform)%> Isoform <br>
  </p>
  
-  <%= submit_tag("Process into table") %>
+<%= submit_tag("Process into table") %>
 <%end%>
 
 <%form_tag(:action => "multi_export", :method => "get") do %>
 <%= submit_tag("Process into exportable form")%>
 <%end%>
-

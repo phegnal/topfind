@@ -2,7 +2,7 @@ class ProteinsController < ApplicationController
 
   require 'graph/path'
   require 'graph/mapMouseHuman'
-
+ 
   hobo_model_controller
   
   caches_page :show
@@ -695,6 +695,9 @@ class ProteinsController < ApplicationController
     query = ["P08246", "P01009", "P01023", "P09958"]
   end
   
+  def peptide_search
+  end
+
   def peptide_search2
     @accession = params["protein"]
     @peptide = params["peptide"]
@@ -714,18 +717,30 @@ class ProteinsController < ApplicationController
     @evidences_1 = @evidence_ids.collect {|f| Evidence.find(:first, :conditions => ["id = ?", f])}
   end  
   
-  def multi_peptides2
+  def multi_peptides
+  end
 
+  def multi_peptides2
+=begin
     @accessions_input = params["proteins"]
     @peptides_input = params['peptides']
     @accessions = @accessions_input.split
     @peptides = @peptides_input.split
-=begin
-    @all_input = params['all']
-    @input = @all_input.split(/\r?\n|\r/)
-    @accessions = @input.delete_if { |e| e.index.even? }
-    @peptides = @input.delete_if { |e| e.index.odd? }
 =end
+    @all_input = params["all"] #string
+    @input1 = @all_input.split("\n") #array of strings
+    @input = @input1.each do |s|
+      s.split
+    end
+
+    @accessions = @input.each do |s|
+      s.delete_at(2).to_s
+    end
+=begin    
+    @peptides = @input.each do |s|
+      s.delete_at(1).to_s
+    end
+
     @proteins = @accessions.collect{|a| Protein.find(:first, :conditions => ["ac = ?", a])}   
     @sequences = @proteins.collect {|p| p.sequence}
     @sql_ids = @proteins.collect {|p| p.id}
@@ -757,8 +772,9 @@ class ProteinsController < ApplicationController
     @domain = params['domain']
     @precede = params['precede']
     @isoform = params['isoform']
-
+=end
   end
+
 
 
 end
