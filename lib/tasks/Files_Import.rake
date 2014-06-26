@@ -39,10 +39,7 @@ namespace :fileImport do
     
     importInfoFile = File.open("#{RAILS_ROOT}/public/system/csvfiles/#{import.id}/ImportInfoFile.txt", "w")
     import.attributes.each_pair{|key, value|
-      if value.class == String then
-        value = value.gsub(/\n/, "newLine")
-      end
-      importInfoFile << "#{key}#{sep}#{value}\n"
+      importInfoFile << "#{key}#{sep}#{value.to_s.gsub(/\r\n/, "newLine")}\n"
     }
     importInfoFile.close
     
@@ -84,12 +81,12 @@ namespace :fileImport do
       
       importInfoFile.each_line do |line|
         l = line.gsub(/\n/, "").split("\t")
-        i[l[0]] = l[1]
+        i[l[0]] = l[1].gsub(/newLine/, "\r\n")
       end
       
       evidenceInfoFile.each_line do |line|
         l = line.gsub(/\n/, "").split("\t")
-        e[l[0]] = l[1]
+        e[l[0]] = l[1].gsub(/newLine/, "\r\n")
       end
         
       require 'time'
