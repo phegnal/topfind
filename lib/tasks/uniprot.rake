@@ -10,8 +10,8 @@ task :import_uniprot do
   puts "biomart connected"
   case ARGV[1]
     when 'human' 
-      # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_human.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_human.dat.txt")
+       io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot/uniprot_sprot_human.dat.gz")
+      #io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_human.dat.txt")
       @mart = biomart.datasets["hsapiens_gene_ensembl"]
     when 'mouse'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_rodents.dat.gz")
@@ -37,6 +37,7 @@ task :import_uniprot do
     @updated = 0
     
     
+  #create a Terminusmodifciation of kind 'unknown' to be used as default
   Terminusmodification.find_or_create_by_name(:name => "unknown", :nterm => true, :cterm => true, :display => true)  
 
   #generate or select "inferred from uniprot" evidence
@@ -74,6 +75,24 @@ task :import_uniprot do
       skip = ARGV[2]
       if skip.present? && i < skip.to_i 
        puts "#{i} - "
+
+	      entry.cc.each do |k, v|
+
+	        [entry.cc(k)].flatten.each do |value|
+	          temp = Cc.new(:topic => k, 
+	                          :contents => value) 
+	        end
+
+	        ### create separate protein entry for each isofrom if there are any
+	        if k == 'ALTERNATIVE PRODUCTS'
+	        	y k
+	        end
+
+	      end
+
+
+
+
        next
       end 
     
@@ -284,10 +303,16 @@ task :import_uniprot do
       print "."
   
       entry.cc.each do |k, v|
+
         [entry.cc(k)].flatten.each do |value|
           temp = Cc.new(:topic => k, 
                           :contents => value) 
         end
+
+        ### create separate protein entry for each isofrom if there are any
+        if k == 'ALTERNATIVE PRODUCTS'
+        end
+
       end
   
       print "."
@@ -457,15 +482,20 @@ task :import_isoforms do
     # if i == 1 
     #   break
     # end
-    protein_ac = entry.accessions.first.split('-')[0]  
-    protein = Protein.find_by_ac(protein_ac)
+    isoform_ac = entry.accessions.first
+    isoform = Protein.find_by_ac(isoform_ac)
+    canonical_protein_ac = entry.accessions.first.split('-')[0]  
+    canonical_protein = Protein.find_by_ac(protein_ac)
     @imported = 0
     
-    if protein
-      Isoform.find_or_create_by_ac(:protein => protein, 
+    if canonical_protein && isoform
+      Isoform.find_or_create_by_ac(:protein => canoncical_protein, 
                   :ac => entry.accessions.first, 
                   :name => entry.identifiers.description.split(' OS=')[0], 
                   :sequence => entry.aaseq)
+      isoform.update_attributes(:sequence => entry.aaseq,
+                  :aalen => entry.aaseq.count)
+      isoform.proteinnames << Proteinname.find_or_create_by_full(:full => entry.identifiers.description.split(' OS=')[0], :short => isoform.name, :recommended => true)
       @imported = @imported.next
     end
 
