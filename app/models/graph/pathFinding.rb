@@ -3,38 +3,53 @@
 # - 
 class PathFinding
 
+  require 'graph/mapMouseHuman'
 
-def initialize(maxSteps)
-  @g = {}
-  @ListOfPaths = []
+
+def initialize(graph, maxSteps)
+  @g = graph.graph_array()
+  @allPaths = Hash.new
   @maxSteps = maxSteps
 end
 
-
-# add edges to the graph g
-def add_edge(x, y)
-  if(!@g.has_key?(x)) then 
-    @g[x] = []
-  end
-  if(!@g[x].include? y) then
-    @g[x] << y
-  end
+def find_all_paths_map2mouse(start, targets)
+  mapper = MapMouseHuman.new()
+  return find_all_paths(mapper.mouse4human([start])[0], mapper.mouse4human(targets))
 end
 
+def find_all_paths_map2human(start, targets)
+  mapper = MapMouseHuman.new()
+  return find_all_paths(mapper.human4mouse([start])[0], mapper.human4mouse(targets))
+end
 
-# show all edges (list of lists)
-def print
-  @g.each{|k,v|
-    puts k.to_s + " --> " + v.join(",")
+def find_all_paths(start, targets)
+  targets.each{|target|
+    res = find_all_paths_for_one(start, target)
+    @allPaths[target] = res.clone
   }
+  return @allPaths
 end
 
+def get_gene_names()
+  proteins = @allPaths.each_value{|v| v.each{|l| all_ps += l}}
+  proteins = proteins + @allPaths.keys
+  proteins = proteins.uniq
+  
+  @gnames = {}
+  g_query = 'select  p.ac, g.name from proteins p, gns g where g.protein_id = p.id and p.ac in ("' + proteins.join('", "') + '") ;'
+  g_result =  ActiveRecord::Base.connection.execute(g_query);
+  g_result.each{|x|
+    @gnames[x[0]] = x[1]
+  }
+  return @gnames
+end
 
-def find_all_paths(start, target)
+def find_all_paths_for_one(start, target)
+  @ListOfPaths = []
   find_path(start, target, [])
   result = @ListOfPaths.clone
   @ListOfPaths = []
-  result
+  return result
 end
 
 
@@ -59,6 +74,25 @@ def find_path(current, target, currentPath) # current vertex (recursive!), targe
   end
   # after analyzing all successors, go back up the path one step
   currentPath.pop
+end
+
+def test
+  puts "pathfinding works"
+end
+
+def paths_gene_names()
+  proteins = (@allPaths.values.flatten + @allPaths.keys).uniq
+  return get_gene_names(proteins)
+end
+
+def get_gene_names(proteins)
+  @gnames = {}
+  g_query = 'select  p.ac, g.name from proteins p, gns g where g.protein_id = p.id and p.ac in ("' + proteins.join('", "') + '") ;'
+  g_result =  ActiveRecord::Base.connection.execute(g_query);
+  g_result.each{|x|
+    @gnames[x[0]] = x[1]
+  }
+  return @gnames
 end
 
 end

@@ -1,7 +1,7 @@
 <page>
 	<%= @x %>
 
-	<% form_tag(:action => "blabla", :method => "get") do %>
+	<% form_tag(:action => "pw_output", :method => "get") do %>
 	<p>
 		<b> Network: </b><br>
 		<%= radio_button_tag "network_org", "human", true %> human <br>
@@ -11,17 +11,19 @@
 	<p>
 		<b> Protease's Uniprot Id: </b><br>
 		<%= text_field_tag(:start)  %> <br>
-		example: P22894
+		example: P14091
 	</p>
 	<p>
 		<b> Substrates' Uniprot Ids: </b> <br>
 		<%= radio_button_tag "list_org", "human", true %> human <br>
 		<%= radio_button_tag "list_org", "mouse" %> mouse <br>
 		<%= text_area_tag(:targets)  %> <br>
-		example: P08246
-		P01009
-		P01023
-		P09958    
+		example: P00734
+		P17655
+		P25774
+		P09668
+		P05120
+		P10144    
 	</p>
 	<p>
 		<b> Maximum path length: </b><br>

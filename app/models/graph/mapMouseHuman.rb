@@ -11,11 +11,19 @@ class MapMouseHuman
   end
   
   def mouse4human(proteins)
-    @map.select{|x| proteins.include?(x["h"])}
+    # if there is only one protein
+    if proteins.class == String then
+      proteins = [proteins]
+    end
+    return @map.select{|x| proteins.include?(x["h"])}.collect{|x| x["m"]}
   end
   
   def human4mouse(proteins)
-    @map.select{|x| proteins.include?(x["m"])}
+    # if there is only one protein
+    if proteins.class == String then
+      proteins = [proteins]
+    end
+    return @map.select{|x| proteins.include?(x["m"])}.collect{|x| x["h"]}
   end
   
 end
