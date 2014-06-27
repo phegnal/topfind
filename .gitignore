@@ -23,8 +23,9 @@
 # Logs and databases #
 ######################
 *.log
-*.sql
-*.sqlite
+databases/Ensembl/
+databases/TISdb/*.txt
+databases/TISdb/*.fasta
  
 # OS generated files #
 ######################
@@ -68,3 +69,6 @@ Gemfile.lock, .ruby-version, .ruby-gemset
 # TopFIND specific #
 ####################
 /config/environments/
+/config/environment.rb
+/config/database.yml
+/databases/topfind_users*
