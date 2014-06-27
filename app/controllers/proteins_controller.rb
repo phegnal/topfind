@@ -625,7 +625,8 @@ class ProteinsController < ApplicationController
     @proteins = @proteins.paginate :page => params[:page], :per_page => @perpage
      
     respond_to do |format|
-      format.xml
+      format.xmrequire "proteins_controller"
+      l
     end    
   end
   
@@ -637,7 +638,7 @@ class ProteinsController < ApplicationController
     if(params["start"] != "" &&  params["targets"] != "" && params["maxLength"] != "")
       # CLEAN UP INPUT
       start = params["start"].strip
-      targets = params["targets"].split
+      targets = params["targets"].split("\n").collect{|s| {:id => s.split("\s")[0], :pos => s.split("\s")[1]}}
       maxLength = params["maxLength"].to_i
       # ORGANISMS
       nwOrg = params["network_org"]
