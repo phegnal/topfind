@@ -23,9 +23,6 @@
 # Logs and databases #
 ######################
 *.log
-databases/Ensembl/
-databases/TISdb/*.txt
-databases/TISdb/*.fasta
  
 # OS generated files #
 ######################
@@ -72,3 +69,5 @@ Gemfile.lock, .ruby-version, .ruby-gemset
 /config/environment.rb
 /config/database.yml
 /databases/topfind_users*
+/source_data/*
+/databases/*
