@@ -75,24 +75,6 @@ task :import_uniprot do
       skip = ARGV[2]
       if skip.present? && i < skip.to_i 
        puts "#{i} - "
-
-	      entry.cc.each do |k, v|
-
-	        [entry.cc(k)].flatten.each do |value|
-	          temp = Cc.new(:topic => k, 
-	                          :contents => value) 
-	        end
-
-	        ### create separate protein entry for each isofrom if there are any
-	        if k == 'ALTERNATIVE PRODUCTS'
-	        	y k
-	        end
-
-	      end
-
-
-
-
        next
       end 
     
@@ -483,19 +465,28 @@ task :import_isoforms do
     #   break
     # end
     isoform_ac = entry.accessions.first
-    isoform = Protein.find_by_ac(isoform_ac)
-    canonical_protein_ac = entry.accessions.first.split('-')[0]  
+    isoform_num = entry.accessions.first.split('-')[1]
+    fullname = entry.identifiers.description.split(' OS=')[0]
+    short_canonical_name = fullname.split(' ')[0]
+    long_name = fullname.gsub("#{short_canonical_name} ",'')
+    short_isoform_name = short_canonical_name.gsub('_',"-Isoform#{isoform_num}_") 
+
+    canonical_protein_ac = isoform_ac.split('-')[0]  
     canonical_protein = Protein.find_by_ac(protein_ac)
     @imported = 0
     
-    if canonical_protein && isoform
+    if canonical_protein
       Isoform.find_or_create_by_ac(:protein => canoncical_protein, 
                   :ac => entry.accessions.first, 
                   :name => entry.identifiers.description.split(' OS=')[0], 
                   :sequence => entry.aaseq)
-      isoform.update_attributes(:sequence => entry.aaseq,
-                  :aalen => entry.aaseq.count)
+
+      isoform = Protein.find_or_create_by_ac(isoform_ac)( :name => short_isoform_name, 
+    	:sequence => entry.aaseq,
+        :aalen => entry.aaseq.count )	
+
       isoform.proteinnames << Proteinname.find_or_create_by_full(:full => entry.identifiers.description.split(' OS=')[0], :short => isoform.name, :recommended => true)
+      
       @imported = @imported.next
     end
 
@@ -667,6 +658,9 @@ task :import_keywlist do
 end 
 
 desc "import uniprot evidence codes from evidence_code.obo"
+
+
+
 task :import_evidencecodes do
   require "#{RAILS_ROOT}/config/environment"
   require 'bio'  
