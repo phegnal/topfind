@@ -1,6 +1,6 @@
 <body bgcolor="Azure"></body>
 
-<table border="1" style="width:1325px">
+<table border="1" >
 	<thead>
 	 <tr>
 		<th>Accession</th>
@@ -21,19 +21,15 @@
 		<%if @domain%>
 		<th>Domain</th>
 		<%end%>
-		
-		<th>Sequence</th>
-		<th>Pos</th>
-		
-		<%if @precede%>
-		<th>Preceding Sequence</th>
-		<%end%>
-		
-		<th>Cleavages</th>	
-		
 		<%if @isoform%>	
 		<th>Isoforms</th>
 		<%end%>
+		<th>Sequence</th>
+		<th>Pos</th>
+		
+		<th>Cleavages</th>	
+		
+		
 		
 		<th>Evidences</th>
 	</tr>
@@ -78,14 +74,6 @@
 				<%indexx += 1%>
 				<%end end%>
 		<%end%>
-		<td><%= @peptides.fetch(i)%></td>
-		<td><%= @locations.fetch(i).succ%></td>
-		<%if @precede%>
-			<td><%= @upstreams.fetch(i)%></td>
-		<%end%>
-		<td><% @proteases.fetch(i).each do |s|%>
-			<%= s.split[0]%><br>
-			<%end%></td>
 		<%if @isoform%>
 			<td><%q = @isoforms.fetch(i)%>
 				<%q.each do |s|%>
@@ -93,8 +81,15 @@
 				<%end %><br>
 			</td>
 		<%end%>
-		<td><%@evidences.fetch(i).each do |s|%>
-			<%= s%>
+
+		<td><%= @upstreams.fetch(i)%>|<%= @peptides.fetch(i)%></td>
+		<td><%= @locations.fetch(i).succ%></td>
+		<td><% @proteases.fetch(i).each do |s|%>
+			<%= s%><br>
+			<%end%></td>
+		
+		<td><%@evidences_2.fetch(i).each do |s|%>
+			<%= s.name%><br>
 			<%end%>
 
 			</td>

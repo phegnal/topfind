@@ -731,7 +731,7 @@ class ProteinsController < ApplicationController
     @input1 = @all_input.split("\n") #array 
     @input = @input1.collect{|a| a.split("\s")} #array of arrays [accession, peptide]  
     @accessions = @input.collect{|b| b.fetch(0)}
-    @peptides = @input.collect{|b| b.fetch(1)}
+    @peptides = @input.collect{|b| b.fetch(1).gsub(/[^[:upper:]]+/, "")}
     @proteins = @accessions.collect{|a| Protein.find(:first, :conditions => ["ac = ?", a])}   
 
     @sequences = @proteins.collect {|p| p.sequence}
@@ -747,49 +747,26 @@ class ProteinsController < ApplicationController
       @sequences.fetch(e)[@locations.fetch(e) - 7, 7]
       else "Not Available"
        end}
-#first try
     @pep_nterms = Array.new(@accessions.size) {|a| if Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @sql_ids.fetch(a), @locations_1.fetch(a)]) != nil
       Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @sql_ids.fetch(a), @locations_1.fetch(a)])
       else "Not Available"
         end}
-    @pep_cleavages = @pep_nterms.collect {|f| Cleavage.find(:all, :conditions => ["nterm_id = ?", f])}
-    @proteases = @pep_cleavages.collect {|g| g.each do |h|
-            Protein.find(:first, :conditions => ["id = ?", h])
-                end}
-
-   # @proteases = @proteases1.collect{|h| h.collect{|i| i.split.first}}
-
-=begin
-
-    @ids_and_locations = @sql_ids.zip(@locations)
-    @pep_cleavages = @ids_and_locations.collect {|i, j| Cleavage.find(:all, :conditions => ['substrate_id = ? AND pos = ?', i, j])}
-    @protease_ids = @pep_cleavages.collect {|e| e.collect {|f| f.protease_id}}
-    @proteases = @protease_ids.collect {|n| n.each do |o|
-      Protein.find(:first, :conditions => ['id = ?', o])
-    end}
-=end
-
-
+    @pep_cleavages = @pep_nterms.collect { |b| Cleavage.find(:all, :conditions => ["nterm_id = ?", b.id])}
+    @proteases = @pep_cleavages.collect { |c| c.collect { |d| Protein.find(:first, :conditions => ["id = ?", d.protease_id]) } 
     @domains = @sql_ids.collect {|i| Ft.find(:all, :conditions => ["protein_id = ?", i])}
     @isoforms = @sql_ids.collect {|j| Isoform.find(:all, :conditions => ["protein_id = ?", j])}
-    @evidences_ids = @pep_nterms.collect {|k| Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", k.id])}
-    @evidences = @evidences_ids.collect {|m| m.each do |n|
-      Evidence.find(:first, :conditions => ["id = ?", n.evidence_id])
-    end}
-=begin
-    puts evidences.each do |s|
-      s.class
-    end
-=end
+ 
+    @evidences_nterms = @pep_nterms.collect {|k| Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", k.id])}
+    @evidences_ids = @evidences_nterms.collect {|l| l.collect { |m| m.evidence_id  }}
+    @evidences_2 = @evidences_ids.collect {|n| n.collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])  }}
     @chromosome = params['chromosome']
     @band = params['band']
     @domain = params['domain']
-    @precede = params['precede']
     @isoform = params['isoform']
     @spec = params['spec']
 
-
   end
+
 
 
 
