@@ -45,6 +45,7 @@ capybara-*.html
 /public/system
 /coverage/
 /spec/tmp
+/app/views/taglibs/auto/*
 **.orig
 rerun.txt
 pickle-email-*.html
@@ -71,3 +72,4 @@ Gemfile.lock, .ruby-version, .ruby-gemset
 /databases/topfind_users*
 /source_data/*
 /databases/*
+/public/*.html

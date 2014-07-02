@@ -229,11 +229,12 @@ class Protein < ActiveRecord::Base
 
 
     self.is_canonical ? canonical = self : canonical = Protein.find_by_ac(self.ac.split('-')[0])
-    ac_list = canonical.isoforms.map(ac)+canonical.ac
+    ac_list = canonical.isoforms.map {|x| x.ac}<<canonical.ac
 
     ac_list.each do |ac|
       unless ac == self.ac
         mapto = Protein.find_by_ac(ac)
+        next unless mapto.present?
         case orientation
           when 'left'
           to_pos = mapto.sequence.index(from_sequence)+1 if mapto.sequence.scan.count ==  1
@@ -242,7 +243,8 @@ class Protein < ActiveRecord::Base
           when 'centre'
           to_pos = mapto.sequence.index(from_sequence)+1+(window/2) if mapto.sequence.scan.count ==  1
         end
-      result[ac] = to_pos
+      	result[ac] = to_pos
+      end
     end
     return result
   end

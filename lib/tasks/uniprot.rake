@@ -40,6 +40,7 @@ task :import_uniprot do
   #create a Terminusmodifciation of kind 'unknown' to be used as default
   Terminusmodification.find_or_create_by_name(:name => "unknown", :nterm => true, :cterm => true, :display => true)  
 
+
   #generate or select "inferred from uniprot" evidence
   @evidence = Evidence.find_or_create_by_name(:name => 'inferred from uniprot',
     :idstring => 'uniprot-ECO:0000203',
@@ -55,6 +56,13 @@ task :import_uniprot do
   )
   @evidence.save
 
+  #generate "inferred from isoform" evidence
+  Evidence.find_or_create_by_name(:name => 'inferred from isoform',
+    :idstring => 'uniprot-ECO:0000041',
+    :description => 'The stated informations has been inferred from an isoform by sequence similarity at the stated position.',
+    :phys_relevance => 'unknown',
+    :method => 'electronic annotation'
+  )
 
   @evidencesimilarity = Evidence.find_or_create_by_name(:name => 'inferred from uniprot (by similarity)',
     :idstring => 'uniprot-ECO:0000041',
@@ -77,6 +85,8 @@ task :import_uniprot do
        puts "#{i} - "
        next
       end 
+    
+    exit if i == 20
     
     orgs = entry.os.map {|os| os['os']}
 
@@ -367,7 +377,7 @@ task :import_uniprot do
     	  unless nterm
 	          nft = p.fts.matchfrom(chain.from).name_is('MOD_RES').first
 	          nft ? nmodname = nft.description.delete('.').split(';')[0] : nmodname = 'unknown'
-            nmodname = 'acetylation' if nmodname.inlcude('acetyl')
+              nmodname = 'acetylation' if nmodname.include?('acetyl')
 	          nmod = Terminusmodification.nterm_is(true).name_is(nmodname).first
             nmod = Terminusmodification.name_is('unknown').first if nmod.blank?    	  	 
 	          nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-#{chain.from}-#{nmod.name}",:protein_id => p.id, :pos => chain.from, :terminusmodification => nmod )
@@ -381,7 +391,7 @@ task :import_uniprot do
     p.fts.name_is('INIT_MET').each do |ft|
       nft = p.fts.matchfrom(ft.from).name_is('MOD_RES').first
       nft ? nmodname = nft.description.delete('.').split(';')[0] : nmodname = 'unknown'
-      nmodname = 'acetylation' if nmodname.inlcude('acetyl')
+      nmodname = 'acetylation' if nmodname.include?('acetyl')
       nmod = Terminusmodification.nterm_is(true).name_is(nmodname).first  
       nmod = Terminusmodification.name_is('unknown').first if nmod.blank?  	  	 
       nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-2-#{nmod.name}",:protein_id => p.id, :pos => ft.from, :terminusmodification => nmod )
@@ -402,7 +412,7 @@ task :import_uniprot do
     p.fts.id_in(ftids).each do |ft|
       nft = p.fts.matchfrom(ft.to.to_i+1).name_is('MOD_RES').first
       nft ? nmodname = nft.description.delete('.').split(';')[0] : nmodname = 'unknown'
-      nmodname = 'acetylation' if nmodname.inlcude('acetyl')
+      nmodname = 'acetylation' if nmodname.include?('acetyl')
       nmod = Terminusmodification.nterm_is(true).name_is(nmodname).first 
       nmod = Terminusmodification.name_is('unknown').first if nmod.blank?   	  	 
       nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-#{ft.to.to_i+1}-#{nmod.name}",:protein_id => p.id, :pos => ft.to.to_i+1, :terminusmodification => nmod )
@@ -420,7 +430,7 @@ task :import_uniprot do
     p.fts.description_like('Removed').name_is('SIGNAL').each do |ft|
       nft = p.fts.matchfrom(ft.to.to_i+1).name_is('MOD_RES').first
       nft ? nmodname = nft.description.delete('.').split(';')[0] : nmodname = 'unknown'
-      nmodname = 'acetylation' if nmodname.inlcude('acetyl')
+      nmodname = 'acetylation' if nmodname.include?('acetyl')
       nmod = Terminusmodification.nterm_is(true).name_is(nmodname).first
       nmod = Terminusmodification.name_is('unknown').first if nmod.blank?    	  	 
       nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-#{ft.to.to_i+1}-#{nmod.name}",:protein_id => p.id, :pos => ft.to.to_i+1, :terminusmodification => nmod )
@@ -488,7 +498,8 @@ task :import_isoforms do
                   :name => entry.identifiers.description.split(' OS=')[0], 
                   :sequence => entry.aaseq)
 
-      isoform = Protein.find_or_create_by_ac(isoform_ac)( :name => short_isoform_name, 
+      isoform = Protein.find_or_create_by_ac(:ac => isoform_ac,
+        :name => short_isoform_name, 
     	:sequence => entry.aaseq,
         :aalen => entry.aaseq.count )	
 
@@ -550,11 +561,11 @@ task :import_tislist do
   require 'bio'
   require 'zlib'
   # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/ontologies/uniprot/tislist.dat.gz")
-  io = "#{RAILS_ROOT}/databases/ontologies/uniprot/tislist.txt"
+  filename = "#{RAILS_ROOT}/source_data/tisslist.txt"
     @skipped = 0
     @added = 0
 
-  a = Bio::FlatFile.new(Bio::SPTR,io)
+  a = Bio::FlatFile.open(Bio::SPTR,filename)
   a.each do |e|
    tsid = e.get('ID').delete('ID    ').delete('.')
    ac = e.get('AC').delete('AC    ').delete('.')
@@ -575,7 +586,7 @@ task :import_ptmlist do
   require "#{RAILS_ROOT}/config/environment"
   require 'bio'
   require 'zlib'
-  filename = "#{RAILS_ROOT}/databases/ontologies/uniprot/ptmlist.txt"
+  filename = "#{RAILS_ROOT}/source_data/ptmlist.txt"
     @skipped = 0
     @added = 0
 	
@@ -633,7 +644,7 @@ task :import_keywlist do
   require "#{RAILS_ROOT}/config/environment"
   require 'bio'
   require 'zlib'
-  filename = "#{RAILS_ROOT}/databases/ontologies/uniprot/keywlist.txt"
+  filename = "#{RAILS_ROOT}/source_data/keywlist.txt"
     @skipped = 0
     @added = 0
 		   
@@ -673,7 +684,7 @@ task :import_evidencecodes do
   require "#{RAILS_ROOT}/config/environment"
   require 'bio'  
   
-  filename = "#{RAILS_ROOT}/databases/ontologies/uniprot/evidence_code.obo"
+  filename = "#{RAILS_ROOT}/source_data/evidence_code.obo"
   
   @term = Hash.new
   
