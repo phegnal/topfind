@@ -72,6 +72,10 @@ class Protein < ActiveRecord::Base
     # self.sequence.gsub(/(.{5})/,'\1 ')
   # end
 
+  def is_canonical
+    !self.ac.include?('-') || self.ac.include('-1')
+  end
+
   def htmlsequence
     numbering = ''
     blocks = (self.sequence.length/10).to_i
@@ -207,6 +211,42 @@ class Protein < ActiveRecord::Base
     @res.sort! {|x,y| x.from.to_i <=> y.from.to_i}
     @res
   end
+
+  # take a position and orientation (left,center,right) and derive corresponding positions in the other canonical and isofrom sequences
+  # returns a hash with the acs and corresponding positions
+  def isoform_crossmapping(pos,orientation)
+    window = 20 # length of the sequence that must be identical for mapping
+    result = {}
+
+    case orientation
+      when 'left'
+        from_sequence = self.sequence[pos-1-window..pos-1]
+      when 'right'
+        from_sequence = self.sequence[pos-1..pos-1+window]
+      when 'centre'
+        from_sequence = self.sequence[pos-1-(window/2)..pos-1+(window/2)]
+    end
+
+
+    self.is_canonical ? canonical = self : canonical = Protein.find_by_ac(self.ac.split('-')[0])
+    ac_list = canonical.isoforms.map(ac)+canonical.ac
+
+    ac_list.each do |ac|
+      unless ac == self.ac
+        mapto = Protein.find_by_ac(ac)
+        case orientation
+          when 'left'
+          to_pos = mapto.sequence.index(from_sequence)+1 if mapto.sequence.scan.count ==  1
+          when 'right'
+          to_pos = mapto.sequence.index(from_sequence)+1+window if mapto.sequence.scan.count ==  1
+          when 'centre'
+          to_pos = mapto.sequence.index(from_sequence)+1+(window/2) if mapto.sequence.scan.count ==  1
+        end
+      result[ac] = to_pos
+    end
+    return result
+  end
+
   
 
  

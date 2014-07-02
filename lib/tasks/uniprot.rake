@@ -185,6 +185,9 @@ task :import_uniprot do
     p.proteinnames << temp unless p.proteinnames.include?(temp)
     print "."
 
+
+
+
     entry.accessions.each do |ac|
       temp = Ac.find_or_create_by_name(:name => ac)
       p.acs << temp unless p.acs.include?(temp)
@@ -364,6 +367,7 @@ task :import_uniprot do
     	  unless nterm
 	          nft = p.fts.matchfrom(chain.from).name_is('MOD_RES').first
 	          nft ? nmodname = nft.description.delete('.').split(';')[0] : nmodname = 'unknown'
+            nmodname = 'acetylation' if nmodname.inlcude('acetyl')
 	          nmod = Terminusmodification.nterm_is(true).name_is(nmodname).first
             nmod = Terminusmodification.name_is('unknown').first if nmod.blank?    	  	 
 	          nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-#{chain.from}-#{nmod.name}",:protein_id => p.id, :pos => chain.from, :terminusmodification => nmod )
@@ -377,9 +381,10 @@ task :import_uniprot do
     p.fts.name_is('INIT_MET').each do |ft|
       nft = p.fts.matchfrom(ft.from).name_is('MOD_RES').first
       nft ? nmodname = nft.description.delete('.').split(';')[0] : nmodname = 'unknown'
+      nmodname = 'acetylation' if nmodname.inlcude('acetyl')
       nmod = Terminusmodification.nterm_is(true).name_is(nmodname).first  
       nmod = Terminusmodification.name_is('unknown').first if nmod.blank?  	  	 
-      nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-#{ft.from}-#{nmod.name}",:protein_id => p.id, :pos => ft.from, :terminusmodification => nmod )
+      nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-2-#{nmod.name}",:protein_id => p.id, :pos => ft.from, :terminusmodification => nmod )
       
       if ft.description.include?('similarity')
       	nterm.evidences << @evidencesimilarity unless nterm.evidences.include?(@evidencesimilarity)
@@ -397,6 +402,7 @@ task :import_uniprot do
     p.fts.id_in(ftids).each do |ft|
       nft = p.fts.matchfrom(ft.to.to_i+1).name_is('MOD_RES').first
       nft ? nmodname = nft.description.delete('.').split(';')[0] : nmodname = 'unknown'
+      nmodname = 'acetylation' if nmodname.inlcude('acetyl')
       nmod = Terminusmodification.nterm_is(true).name_is(nmodname).first 
       nmod = Terminusmodification.name_is('unknown').first if nmod.blank?   	  	 
       nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-#{ft.to.to_i+1}-#{nmod.name}",:protein_id => p.id, :pos => ft.to.to_i+1, :terminusmodification => nmod )
@@ -414,6 +420,7 @@ task :import_uniprot do
     p.fts.description_like('Removed').name_is('SIGNAL').each do |ft|
       nft = p.fts.matchfrom(ft.to.to_i+1).name_is('MOD_RES').first
       nft ? nmodname = nft.description.delete('.').split(';')[0] : nmodname = 'unknown'
+      nmodname = 'acetylation' if nmodname.inlcude('acetyl')
       nmod = Terminusmodification.nterm_is(true).name_is(nmodname).first
       nmod = Terminusmodification.name_is('unknown').first if nmod.blank?    	  	 
       nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-#{ft.to.to_i+1}-#{nmod.name}",:protein_id => p.id, :pos => ft.to.to_i+1, :terminusmodification => nmod )
@@ -485,8 +492,8 @@ task :import_isoforms do
     	:sequence => entry.aaseq,
         :aalen => entry.aaseq.count )	
 
-      isoform.proteinnames << Proteinname.find_or_create_by_full(:full => entry.identifiers.description.split(' OS=')[0], :short => isoform.name, :recommended => true)
-      
+      isoform.proteinnames << Proteinname.find_or_create_by_full(:full => long_name, :short => short_isoform_name, :recommended => true)
+        
       @imported = @imported.next
     end
 
@@ -537,12 +544,13 @@ end
 
 
 
-desc "import tissues from tislist.dat"
+desc "import tissues from uniprot"
 task :import_tislist do
   require "#{RAILS_ROOT}/config/environment"
   require 'bio'
   require 'zlib'
-  io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/ontologies/uniprot/tislist.dat.gz")
+  # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/ontologies/uniprot/tislist.dat.gz")
+  io = "#{RAILS_ROOT}/databases/ontologies/uniprot/tislist.txt"
     @skipped = 0
     @added = 0
 
