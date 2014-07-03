@@ -18,19 +18,19 @@
 		<th>Band</th>
 		<%end%>
 		
-		<%if @domain%>
-		<th>Domain</th>
-		<%end%>
+		
 		<%if @isoform%>	
 		<th>Isoforms</th>
 		<%end%>
 		<th>Sequence</th>
 		<th>Pos</th>
 		
-		<th>Cleavages</th>	
-		
-		
-		
+		<th>Proteases</th>	
+	
+		<%if @domain%>
+		<th>Domain</th>
+		<%end%>
+
 		<th>Evidences</th>
 	</tr>
 	</thead>
@@ -63,17 +63,7 @@
 		<%if @band%>
 			<td><%= @proteins.fetch(i).band%></td>
 		<%end%>
-		<%if @domain%>
-			<td><%q = @domains.fetch(i)%>		
-				<%indexx = 0%>
-				<%while indexx < @accessions.size%>
-				<%q.each do |r|%>
-				<%if @locations.fetch(i) >= r.from.to_i && @locations.fetch(i) <= r.to.to_i %>
-				<%= r.name%><br>
-				<%end%>
-				<%indexx += 1%>
-				<%end end%>
-		<%end%>
+	
 		<%if @isoform%>
 			<td><%q = @isoforms.fetch(i)%>
 				<%q.each do |s|%>
@@ -92,6 +82,18 @@
 			<%= s.name%><br>
 			<%end%>
 
+	<%if @domain%>
+			<td><%q = @domains.fetch(i)%>		
+				<%indexx = 0%>
+				<%while indexx < @accessions.size%>
+				<%q.each do |r|%>
+				<%if @locations.fetch(i) >= r.from.to_i && @locations.fetch(i) <= r.to.to_i %>
+				<%= r.name%><br>
+				<%end%>
+				<%indexx += 1%>
+				<%end end%>
+		<%end%>
+		
 			</td>
 
 

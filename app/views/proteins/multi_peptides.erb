@@ -24,6 +24,12 @@
  <%= check_box_tag(:isoform)%> Isoform <br>
  </p>
  
+Number of Amino Acids <b>N-terminal</b> to retrieve information for (leave blank for 0, up to 10)<br>
+    <%= text_field_tag(:nterminal)  %> <br><br>
+
+Number of Amino Acids <b>C-Terminal</b> to retrieve information for (leave blank for 0, up to 10)<br>
+    <%= text_field_tag(:cterminal)  %> <br><br>
+
 <%= submit_tag("Process into table") %>
 <%end%>
 

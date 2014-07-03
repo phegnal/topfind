@@ -743,16 +743,17 @@ class ProteinsController < ApplicationController
     else 0
       end}
     @locations_1 = @locations.collect {|l| l + 1}
-    @upstreams = Array.new(@accessions.size) {|e| if @sequences.fetch(e)[@locations.fetch(e) - 7, 7] != nil
-      @sequences.fetch(e)[@locations.fetch(e) - 7, 7]
-      else "Not Available"
+    @upstreams = Array.new(@accessions.size) {|e| if @locations.fetch(e) < 10
+      @sequences.fetch(e)[0, @locations.fetch(e)]
+    else
+      @sequences.fetch(e)[@locations.fetch(e) - 10, 10]
        end}
     @pep_nterms = Array.new(@accessions.size) {|a| if Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @sql_ids.fetch(a), @locations_1.fetch(a)]) != nil
       Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @sql_ids.fetch(a), @locations_1.fetch(a)])
       else "Not Available"
         end}
     @pep_cleavages = @pep_nterms.collect { |b| Cleavage.find(:all, :conditions => ["nterm_id = ?", b.id])}
-    @proteases = @pep_cleavages.collect { |c| c.collect { |d| Protein.find(:first, :conditions => ["id = ?", d.protease_id]) } 
+    @proteases = @pep_cleavages.collect { |c| c.collect { |d| Protein.find(:first, :conditions => ["id = ?", d.protease_id]) }} 
     @domains = @sql_ids.collect {|i| Ft.find(:all, :conditions => ["protein_id = ?", i])}
     @isoforms = @sql_ids.collect {|j| Isoform.find(:all, :conditions => ["protein_id = ?", j])}
  
