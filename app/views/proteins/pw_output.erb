@@ -1,0 +1,21 @@
+<table border="0">
+<% @sortet_subs.each do |target| -%>
+	<tr>
+	<td><b><%= "#{@gnames[target[:id]]}(#{target[:id]})"%></b></td>
+	</tr>
+	<% @allPaths[target].each do |path| %>
+		<tr>
+		<% path.each do |path_node| %>
+			<% if(path_node[:pos] == -1) %>
+			<% elsif(path_node[:pos] == 0) %>
+			<td><%= "inh" %></td>
+			<% else %>
+			<td><%= path_node[:pos] %></td>
+			<% end %>
+			<td><%= '<a href="http://clipserve.clip.ubc.ca/topfind/proteins/' + path_node[:id] + '">' + @gnames[path_node[:id]] + '</a>' %></td>
+		<% end %>
+		</tr>
+	<% end %>
+	<tr><td> --- </td></tr>
+<% end %>
+</table>

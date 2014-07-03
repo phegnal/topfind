@@ -1,7 +1,7 @@
 class ProteinsController < ApplicationController
-
-  require 'graph/path'
-  require 'graph/mapMouseHuman'
+ 
+  require 'graph/pathFinding'
+  require 'graph/graph'
  
   hobo_model_controller
   
@@ -15,10 +15,10 @@ class ProteinsController < ApplicationController
   	
     @documentations = Documentation.all.group_by(&:name)
     @perpage = 20
-  	quick = 0
+    quick = 0
   	
-  	joins = Array.new
-  	includes = Array.new
+    joins = Array.new
+    includes = Array.new
     conditions = Array.new
     select = ['DISTINCT proteins.*']
     having = Array.new
@@ -29,13 +29,13 @@ class ProteinsController < ApplicationController
     conditionvars = Hash.new
     
     #take the shortcut when searching for a single existing accession
-  	if params[:query].present?
-  	  # if it matches the accession number schema
-  	  match = params[:query].match(/^[A-Za-z]\w{5}(-\d)?$/).present?
-  	  protein = Protein.find_by_ac(params[:query]) if match
-  	end
+    if params[:query].present?
+      # if it matches the accession number schema
+      match = params[:query].match(/^[A-Za-z]\w{5}(-\d)?$/).present?
+      protein = Protein.find_by_ac(params[:query]) if match
+    end
     if protein.present?
-     redirect_to protein
+      redirect_to protein
     end
     
     
@@ -48,20 +48,20 @@ class ProteinsController < ApplicationController
      
         match = params[:query].match(/(human|mouse|arabidopsis|yeast|ecoli)/)
         if match
-           params[:query].gsub!(/((\A|\s)(human|mouse|arabidopsis|yeast|ecoli|)(\z|\s))/,'')
-           case match[1]
-             when 'human'
-               params[:species] = 'Homo sapiens'
-             when 'mouse'
-               params[:species] = 'Mus musculus'
-             when 'arabidopsis'
-               params[:species] = 'Arabidopsis thaliana'
-             when 'yeast'
-               params[:species] = 'Saccharomyces cerevisiae'
-             when 'ecoli'
-               params[:species] = 'Esherichia coli'
-           end
-         end  
+          params[:query].gsub!(/((\A|\s)(human|mouse|arabidopsis|yeast|ecoli|)(\z|\s))/,'')
+          case match[1]
+          when 'human'
+            params[:species] = 'Homo sapiens'
+          when 'mouse'
+            params[:species] = 'Mus musculus'
+          when 'arabidopsis'
+            params[:species] = 'Arabidopsis thaliana'
+          when 'yeast'
+            params[:species] = 'Saccharomyces cerevisiae'
+          when 'ecoli'
+            params[:species] = 'Esherichia coli'
+          end
+        end  
       end 
       
       #remove chromosome information and return error message if we try unsupported search agains chromosome
@@ -88,87 +88,87 @@ class ProteinsController < ApplicationController
       end
       
       #species  
-        if params[:species].present?   
-          andconditions << "species.name = '#{params[:species]}'" 
-          joins <<  :species 
-        end
+      if params[:species].present?   
+        andconditions << "species.name = '#{params[:species]}'" 
+        joins <<  :species 
+      end
       #//species   
       
       #modification
-        if params[:modification].present?
-          andconditions << "(kws_terminusmodifications.name = '#{params[:modification]}' OR kws.name = '#{params[:modification]}')"
+      if params[:modification].present?
+        andconditions << "(kws_terminusmodifications.name = '#{params[:modification]}' OR kws.name = '#{params[:modification]}')"
 
-          joins <<  {:nterms => {:terminusmodification => :kw} }
-          joins <<  {:cterms => {:terminusmodification => :kw} }
-        end
+        joins <<  {:nterms => {:terminusmodification => :kw} }
+        joins <<  {:cterms => {:terminusmodification => :kw} }
+      end
       #//modification       
 
       
       #Number of N termini
-        if params[:minntermini].present?
-          having << "nterminicount >= '#{params[:minntermini]}'"
-          select << 'count(nterms.id) as nterminicount'
-          joins << :nterms
-        end
+      if params[:minntermini].present?
+        having << "nterminicount >= '#{params[:minntermini]}'"
+        select << 'count(nterms.id) as nterminicount'
+        joins << :nterms
+      end
       #//ntermini 
 
       #Number of C termini
-        if params[:minctermini].present?
-          having << "cterminicount >= '#{params[:minctermini]}'"
-          select << 'count(cterms.id) as cterminicount'
-          joins << :cterms
-        end
+      if params[:minctermini].present?
+        having << "cterminicount >= '#{params[:minctermini]}'"
+        select << 'count(cterms.id) as cterminicount'
+        joins << :cterms
+      end
       #//ctermini
                
  
       #chromosome
-        if params[:chromosome].present?
-          andconditions << "proteins.chromosome = '#{params[:chromosome]}'" 
-        end
-        if params[:chromosomeposition].present?
-          andconditions << "proteins.band LIKE ?"
-          andqueries << "%#{params[:chromosomeposition]}%"
-        end
+      if params[:chromosome].present?
+        andconditions << "proteins.chromosome = '#{params[:chromosome]}'" 
+      end
+      if params[:chromosomeposition].present?
+        andconditions << "proteins.band LIKE ?"
+        andqueries << "%#{params[:chromosomeposition]}%"
+      end
       #//chromosome      
   
       #function
-        if params[:function].present?
-          if params[:function] == 'protease'
-            joins << :substrates
-          elsif params[:function] =='inhibitor'
-            joins << :inhibited_proteases
-          end
+      if params[:function].present?
+        if params[:function] == 'protease'
+          joins << :substrates
+        elsif params[:function] =='inhibitor'
+          joins << :inhibited_proteases
         end
+      end
       #//function    
       
       # #merops
-        # if params[:query].present?
-          # orconditions << "meropscode = '#{params[:query]}'"
-          # orconditions << "meropsfamily = '#{params[:query]}'"
-          # orconditions << "meropssubfamily = '#{params[:query]}'"
-        # end
+      # if params[:query].present?
+      # orconditions << "meropscode = '#{params[:query]}'"
+      # orconditions << "meropsfamily = '#{params[:query]}'"
+      # orconditions << "meropssubfamily = '#{params[:query]}'"
+      # end
       # #//merops
-# 
-#       
+      # 
+      #       
       # #search for exact matches if we have a query
       # if params[:query].present?
-        # if namevariants.present?
-          # orconditions << "proteins.name IN ('#{namevariants}')"
-          # orconditions << "proteinnames.full IN ('#{namevariants}')"
-          # orconditions << "proteinnames.short IN ('#{namevariants}')"   
-          # orconditions << "gns.name IN ('#{namevariants}')"  
-          # orconditions << "gn_synonyms.synonym IN ('#{namevariants}')"
-          # joins << {:gn => :synonyms}     
-        # end 
-        # orconditions << "proteins.name LIKE ?"
-        # orqueries << "%#{params[:query]}%"
-        # orconditions << "proteins.ac LIKE ?"
-        # orqueries << "%#{params[:query]}%"
-        # orconditions << "proteinnames.full LIKE ?"
-        # orqueries << "%#{params[:query]}%"
-        # orconditions << "proteinnames.short LIKE ?"
-        # orqueries << "%#{params[:query]}%"
-        # # conditionvars[:likequery] = params[:query]
+      # if namevariants.present?
+      # orconditions << "proteins.name IN ('#{namevariants}')"
+      # orconditions << "proteinnames.full IN ('#{namevariants}')"
+      # orconditions << "proteinnames.short IN ('#{namevariants}')"   
+      # orconditions << "gns.name IN ('#{namevariants}')"  
+      # orconditions << "gn_synonyms.synonym IN ('#{namevariants}')"
+      # joins << {:gn => :synonyms}     
+      # end 
+      # orconditions << "proteins.name LIKE ?"
+      # orqueries << "%#{params[:query]}%"
+      # orconditions << "proteins.ac LIKE ?"
+      # orqueries << "%#{params[:query]}%"
+      # orconditions << "proteinnames.full LIKE ?"
+      # orqueries << "%#{params[:query]}%"
+      # orconditions << "proteinnames.short LIKE ?"
+      # orqueries << "%#{params[:query]}%"
+      # # conditionvars[:likequery] = params[:query]
       # end
 
 
@@ -232,43 +232,43 @@ class ProteinsController < ApplicationController
 
     
     @cleavages = Cleavage.apply_scopes(
-      :protease_is => @protein)
+    :protease_is => @protein)
     @cleavages = @cleavages.map {|x| x if x.substrate_id}.compact
     
     @cleavagesites = Cleavage.apply_scopes(
-      :protease_is => @protein).*.cleavagesite
+    :protease_is => @protein).*.cleavagesite
     @cleavagesites.delete(nil)
     
     @inverse_cleavages = Cleavage.apply_scopes(
-      :substrate_is => @protein)
+    :substrate_is => @protein)
       
     @inhibitions = Inhibition.apply_scopes(
-      :inhibitor_is => @protein
-      )
+    :inhibitor_is => @protein
+    )
 
     @inverse_inhibitions = Inhibition.apply_scopes(
-      :inhibited_protease_is => @protein
-      )      
+    :inhibited_protease_is => @protein
+    )      
       
     @cterms = Cterm.apply_scopes(
-      :protein_is => @protein
-      )
+    :protein_is => @protein
+    )
       
     @nterms = Nterm.apply_scopes(
-      :protein_is => @protein
-      )      
+    :protein_is => @protein
+    )      
     
     analysis = Analysis.new(@protein,
-                @cleavages,
-                @cleavagesites,
-                @inverse_cleavages,
-                @inhibitions,
-                @inverse_inhibitions,
-                @cterms,
-                @nterms,
-                false,
-                [],
-                @ppi)
+    @cleavages,
+    @cleavagesites,
+    @inverse_cleavages,
+    @inhibitions,
+    @inverse_inhibitions,
+    @cterms,
+    @nterms,
+    false,
+    [],
+    @ppi)
     @network = analysis.graph
     @simplepanel = analysis.simplepanel
     if @protein.isprotease && !@cleavagesites.nil?
@@ -309,12 +309,12 @@ class ProteinsController < ApplicationController
     
     #filter:
     if params[:phys_rel].present?
-    	paramids = Evidence.phys_relevance_in(params[:phys_rel]).*.id 
-    	ids.present? ? ids = ids & paramids : ids = paramids
+      paramids = Evidence.phys_relevance_in(params[:phys_rel]).*.id 
+      ids.present? ? ids = ids & paramids : ids = paramids
     end
     if params[:directness].present?
-  		paramids = Evidence.directness_in(params[:directness]).*.id
-    	ids.present? ? ids = ids & paramids : ids = paramids
+      paramids = Evidence.directness_in(params[:directness]).*.id
+      ids.present? ? ids = ids & paramids : ids = paramids
     end
     if params[:confidence].present?  && params[:confidence_type].present?
       paramids = Evidence.confidence_gte(params[:confidence]).*.id
@@ -322,20 +322,20 @@ class ProteinsController < ApplicationController
       ids.present? ? ids = ids & paramids & paramids2 : ids = paramids & paramids2
     end
     if params[:tissues].present?
-  		paramids = Evidence.tissues_tsid_in(params[:tissues]).*.id
-    	ids.present? ? ids = ids & paramids : ids = paramids
+      paramids = Evidence.tissues_tsid_in(params[:tissues]).*.id
+      ids.present? ? ids = ids & paramids : ids = paramids
     end
     if params[:evidencecodes].present?
-  		paramids = Evidence.evidencecodes_name_in(params[:evidencecodes]).*.id
-    	ids.present? ? ids = ids & paramids : ids = paramids
+      paramids = Evidence.evidencecodes_name_in(params[:evidencecodes]).*.id
+      ids.present? ? ids = ids & paramids : ids = paramids
     end
     if params[:methodologies].present?
-  		paramids = Evidence.methodology_in(params[:methodologies]).*.id
-    	ids.present? ? ids = ids & paramids : ids = paramids
+      paramids = Evidence.methodology_in(params[:methodologies]).*.id
+      ids.present? ? ids = ids & paramids : ids = paramids
     end
     if params[:perturbations].present? # added by nik
-  		paramids = Evidence.method_perturbation_in(params[:perturbations]).*.id
-    	ids.present? ? ids = ids & paramids : ids = paramids
+      paramids = Evidence.method_perturbation_in(params[:perturbations]).*.id
+      ids.present? ? ids = ids & paramids : ids = paramids
     end
     if params[:methodsystems].present?
       paramids = Evidence.method_system_in(params[:methodsystems]).*.id
@@ -350,16 +350,16 @@ class ProteinsController < ApplicationController
       ids.present? ? ids = ids & paramids : ids = paramids
     end
     if params[:sources].present?
-  		paramids = Evidence.evidencesource_dbname_in(params[:sources]).*.id
-    	ids.present? ? ids = ids & paramids : ids = paramids
+      paramids = Evidence.evidencesource_dbname_in(params[:sources]).*.id
+      ids.present? ? ids = ids & paramids : ids = paramids
     end
     if params[:labs].present?
-  		paramids = Evidence.lab_in(params[:labs]).*.id
-    	ids.present? ? ids = ids & paramids : ids = paramids
+      paramids = Evidence.lab_in(params[:labs]).*.id
+      ids.present? ? ids = ids & paramids : ids = paramids
     end
     if params[:evidences].present?
-  		paramids = Evidence.name_in(params[:evidences]).*.id
-    	ids.present? ? ids = ids & paramids : ids = paramids
+      paramids = Evidence.name_in(params[:evidences]).*.id
+      ids.present? ? ids = ids & paramids : ids = paramids
     end
     
     ids.blank? ?  filteredevidences = nil : filteredevidences = ids.uniq
@@ -370,44 +370,44 @@ class ProteinsController < ApplicationController
     @documentations = Documentation.all.group_by(&:name)
 
     @allcleavages = Cleavage.apply_scopes(
-      :protease_is => @protein)
-	 @allcleavages = @allcleavages.map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact      
+    :protease_is => @protein)
+    @allcleavages = @allcleavages.map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact      
     @cleavagesites = @allcleavages.*.cleavagesite.compact
     
     
     @cleavages = @allcleavages.map {|x| x if x.substrate_id}.compact
     
     @inverse_cleavages = Cleavage.apply_scopes(
-      :substrate_is => @protein).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact
+    :substrate_is => @protein).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact
       
     @inhibitions = Inhibition.apply_scopes(
-      :inhibitor_is => @protein
-      ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact
+    :inhibitor_is => @protein
+    ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact
 
     @inverse_inhibitions = Inhibition.apply_scopes(
-      :inhibited_protease_is => @protein
-      ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact    
+    :inhibited_protease_is => @protein
+    ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact    
       
     @cterms = Cterm.apply_scopes(
-      :protein_is => @protein
-      ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact    
+    :protein_is => @protein
+    ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact    
       
     @nterms = Nterm.apply_scopes(
-      :protein_is => @protein
+    :protein_is => @protein
     ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact         
 
       
     analysis = Analysis.new(@protein,
-                @cleavages,
-                @cleavagesites,
-                @inverse_cleavages,
-                @inhibitions,
-                @inverse_inhibitions,
-                @cterms,
-                @nterms,
-                true,
-                filteredevidences,
-                @ppi)
+    @cleavages,
+    @cleavagesites,
+    @inverse_cleavages,
+    @inhibitions,
+    @inverse_inhibitions,
+    @cterms,
+    @nterms,
+    true,
+    filteredevidences,
+    @ppi)
     @network = analysis.graph
     @simplepanel = analysis.simplepanel
 
@@ -471,12 +471,12 @@ class ProteinsController < ApplicationController
       ids.present? ? ids = ids & paramids : ids = paramids
     end
     # if params[:methods].present?
-      # paramids = Evidence.method_like(params[:methods]).*.id
-      # ids.present? ? ids = ids & paramids : ids = paramids
+    # paramids = Evidence.method_like(params[:methods]).*.id
+    # ids.present? ? ids = ids & paramids : ids = paramids
     # end
     # if params[:sources].present?
-      # paramids = Evidence.evidencesource_dbname_in(params[:sources]).*.id
-      # ids.present? ? ids = ids & paramids : ids = paramids
+    # paramids = Evidence.evidencesource_dbname_in(params[:sources]).*.id
+    # ids.present? ? ids = ids & paramids : ids = paramids
     # end
     if params[:labs].present?
       filter = true
@@ -498,35 +498,35 @@ class ProteinsController < ApplicationController
 
     unless filter
       @cleavages = Cleavage.apply_scopes(
-        :protease_is => @protein)
+      :protease_is => @protein)
       @cleavages = @cleavages.map {|x| x if x.substrate_id}.compact
       
       @cleavagesites = Cleavage.apply_scopes(
-        :protease_is => @protein).*.cleavagesite
+      :protease_is => @protein).*.cleavagesite
       @cleavagesites.delete(nil)
       
       @inverse_cleavages = Cleavage.apply_scopes(
-        :substrate_is => @protein)
+      :substrate_is => @protein)
         
       @inhibitions = Inhibition.apply_scopes(
-        :inhibitor_is => @protein
-        )
+      :inhibitor_is => @protein
+      )
   
       @inverse_inhibitions = Inhibition.apply_scopes(
-        :inhibited_protease_is => @protein
-        )      
+      :inhibited_protease_is => @protein
+      )      
         
       @cterms = Cterm.apply_scopes(
-        :protein_is => @protein
-        )
+      :protein_is => @protein
+      )
         
       @nterms = Nterm.apply_scopes(
-        :protein_is => @protein
-        )      
+      :protein_is => @protein
+      )      
     else 
       #filtered
       @allcleavages = Cleavage.apply_scopes(
-        :protease_is => @protein)
+      :protease_is => @protein)
       @allcleavages = @allcleavages.map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact      
       @cleavagesites = @allcleavages.*.cleavagesite.compact
       
@@ -534,22 +534,22 @@ class ProteinsController < ApplicationController
       @cleavages = @allcleavages.map {|x| x if x.substrate_id}.compact
       
       @inverse_cleavages = Cleavage.apply_scopes(
-        :substrate_is => @protein).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact
+      :substrate_is => @protein).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact
         
       @inhibitions = Inhibition.apply_scopes(
-        :inhibitor_is => @protein
-        ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact
+      :inhibitor_is => @protein
+      ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact
   
       @inverse_inhibitions = Inhibition.apply_scopes(
-        :inhibited_protease_is => @protein
-        ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact    
+      :inhibited_protease_is => @protein
+      ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact    
         
       @cterms = Cterm.apply_scopes(
-        :protein_is => @protein
-        ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact    
+      :protein_is => @protein
+      ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact    
         
       @nterms = Nterm.apply_scopes(
-        :protein_is => @protein
+      :protein_is => @protein
       ).map {|x| x if (filteredevidences & x.evidences.*.id).present?}.compact         
   
     end #filtered              
@@ -568,138 +568,99 @@ class ProteinsController < ApplicationController
     count = params.has_key?('count')
     spec = params[:species]
       
-      joins = Array.new
-      joins << :species if params[:species].present?
-      joins << :nterms if (params[:ntermini_at].present? || params[:ntermini_before].present? || params[:ntermini_after].present?)
-      # joins << {:nterms => [:evidences]} if ((params[:directness].present? || params[:relevance].present? || params[:confidence_greater].present?) && (params[:ntermini_at].present? || params[:ntermini_before].present? || params[:ntermini_after].present?))
+    joins = Array.new
+    joins << :species if params[:species].present?
+    joins << :nterms if (params[:ntermini_at].present? || params[:ntermini_before].present? || params[:ntermini_after].present?)
+    # joins << {:nterms => [:evidences]} if ((params[:directness].present? || params[:relevance].present? || params[:confidence_greater].present?) && (params[:ntermini_at].present? || params[:ntermini_before].present? || params[:ntermini_after].present?))
             
-      joins << :cterms if (params[:ctermini_at].present? || params[:ctermini_before].present? || params[:ctermini_after].present?)
-      # joins << {:cterms => [:evidences]} if ((params[:directness].present? || params[:relevance].present? || params[:confidence_greater].present?) && (params[:ctermini_at].present? || params[:ctermini_before].present? || params[:ctermini_after].present?))
+    joins << :cterms if (params[:ctermini_at].present? || params[:ctermini_before].present? || params[:ctermini_after].present?)
+    # joins << {:cterms => [:evidences]} if ((params[:directness].present? || params[:relevance].present? || params[:confidence_greater].present?) && (params[:ctermini_at].present? || params[:ctermini_before].present? || params[:ctermini_after].present?))
       
-      joins << :cleavages if (params[:cleavages_at].present? || params[:cleavages_before].present? || params[:cleavages_after].present?)
-      # joins << {:cleavages => [:evidences]} if ((params[:directness].present? || params[:relevance].present? || params[:confidence_greater].present?) && (params[:cleavages_at].present? || params[:cleavages_before].present? || params[:cleavages_after].present? || params[:cleaved_by].present? || params[:cleaves].present?))
+    joins << :cleavages if (params[:cleavages_at].present? || params[:cleavages_before].present? || params[:cleavages_after].present?)
+    # joins << {:cleavages => [:evidences]} if ((params[:directness].present? || params[:relevance].present? || params[:confidence_greater].present?) && (params[:cleavages_at].present? || params[:cleavages_before].present? || params[:cleavages_after].present? || params[:cleaved_by].present? || params[:cleaves].present?))
 
-      joins << :inhibitions if (params[:inhibits].present? || params[:inhibited_by].present?)
-      joins << :proteases if params[:cleaved_by].present?
-      joins << :substrates if params[:cleaves].present?
-      joins << :inhibitors if params[:inhibits].present?
-      joins << :inhibited_proteases if params[:inhibited_by].present?
+    joins << :inhibitions if (params[:inhibits].present? || params[:inhibited_by].present?)
+    joins << :proteases if params[:cleaved_by].present?
+    joins << :substrates if params[:cleaves].present?
+    joins << :inhibitors if params[:inhibits].present?
+    joins << :inhibited_proteases if params[:inhibited_by].present?
     
       
+    conditions = Array.new
+    conditions << "species.name = '#{params[:species]}'" if params[:species].present?
+    conditions << "proteases_proteins.ac IN ('#{params[:cleaved_by]}')" if params[:cleaved_by].present?
+    conditions << "substrates_proteins.ac IN ('#{params[:cleaves]}')" if params[:cleaves].present?      
+    conditions << "inhibitors_proteins.ac IN ('#{params[:inhibits]}')" if params[:inhibits].present?      
+    conditions << "inhibited_proteases_proteins.ac IN ('#{params[:inhibited_by]}')" if params[:inhibited_by].present?
+    conditions << "cleavages.pos = '#{params[:cleavages_at]}'" if params[:cleavages_at].present?
+    conditions << "cleavages.pos < '#{params[:cleavages_before]}'" if params[:cleavages_before].present?
+    conditions << "cleavages.pos > '#{params[:cleavages_after]}'" if params[:cleavages_after].present?
+    conditions << "nterms.pos = '#{params[:ntermini_at]}'" if params[:ntermini_at].present?
+    conditions << "nterms.pos < '#{params[:ntermini_before]}'" if params[:ntermini_before].present?
+    conditions << "nterms.pos > '#{params[:ntermini_after]}'" if params[:ntermini_after].present?
+    conditions << "cterms.pos = '#{params[:ctermini_at]}'" if params[:ctermini_at].present?
+    conditions << "cterms.pos < '#{params[:ctermini_before]}'" if params[:ctermini_before].present?
+    conditions << "cterms.pos > '#{params[:ctermini_after]}'" if params[:ctermini_after].present?
+    # conditions << "evidences.directness = '#{params[:directness]}'" if params[:directness].present?
+    # conditions << "evidences.phys_relevance = '#{params[:relevance]}'" if params[:relevance].present?
+    # conditions << "evidences.confidence >= '#{params[:confidence_greater]}'" if params[:confidence_greater].present?
+      
+    @proteins = Protein.all :joins => joins, :conditions => conditions.join(' AND ').to_a, :group => 'proteins.ac'  
+    @proteins = Protein.all :joins => joins, :conditions => conditions.join(' AND ').to_a, :group => 'proteins.ac' unless params[:site_specific_proteases].present?
+    if params[:site_specific_proteases].present? 
       conditions = Array.new
-      conditions << "species.name = '#{params[:species]}'" if params[:species].present?
-      conditions << "proteases_proteins.ac IN ('#{params[:cleaved_by]}')" if params[:cleaved_by].present?
-      conditions << "substrates_proteins.ac IN ('#{params[:cleaves]}')" if params[:cleaves].present?      
-      conditions << "inhibitors_proteins.ac IN ('#{params[:inhibits]}')" if params[:inhibits].present?      
-      conditions << "inhibited_proteases_proteins.ac IN ('#{params[:inhibited_by]}')" if params[:inhibited_by].present?
-      conditions << "cleavages.pos = '#{params[:cleavages_at]}'" if params[:cleavages_at].present?
-      conditions << "cleavages.pos < '#{params[:cleavages_before]}'" if params[:cleavages_before].present?
-      conditions << "cleavages.pos > '#{params[:cleavages_after]}'" if params[:cleavages_after].present?
-      conditions << "nterms.pos = '#{params[:ntermini_at]}'" if params[:ntermini_at].present?
-      conditions << "nterms.pos < '#{params[:ntermini_before]}'" if params[:ntermini_before].present?
-      conditions << "nterms.pos > '#{params[:ntermini_after]}'" if params[:ntermini_after].present?
-      conditions << "cterms.pos = '#{params[:ctermini_at]}'" if params[:ctermini_at].present?
-      conditions << "cterms.pos < '#{params[:ctermini_before]}'" if params[:ctermini_before].present?
-      conditions << "cterms.pos > '#{params[:ctermini_after]}'" if params[:ctermini_after].present?
-      # conditions << "evidences.directness = '#{params[:directness]}'" if params[:directness].present?
-      # conditions << "evidences.phys_relevance = '#{params[:relevance]}'" if params[:relevance].present?
-      # conditions << "evidences.confidence >= '#{params[:confidence_greater]}'" if params[:confidence_greater].present?
-      
-      @proteins = Protein.all :joins => joins, :conditions => conditions.join(' AND ').to_a, :group => 'proteins.ac'  
-      @proteins = Protein.all :joins => joins, :conditions => conditions.join(' AND ').to_a, :group => 'proteins.ac' unless params[:site_specific_proteases].present?
-      if params[:site_specific_proteases].present? 
-      	conditions = Array.new
-      	conditions << "pos = '#{params[:position]}'"
-      	conditions << "proteins.ac = '#{params[:protein]}'"
-      	cs = Cleavage.all :joins => [:substrate], :conditions => conditions.join(' AND ').to_a 
-      	acs = cs.map {|c| Protein.ac_is(c.protease.ac).first.ac}.uniq.join("','")
-      	@proteins = Protein.all :conditions => ["ac IN ('#{acs}')"]
-      end
+      conditions << "pos = '#{params[:position]}'"
+      conditions << "proteins.ac = '#{params[:protein]}'"
+      cs = Cleavage.all :joins => [:substrate], :conditions => conditions.join(' AND ').to_a 
+      acs = cs.map {|c| Protein.ac_is(c.protease.ac).first.ac}.uniq.join("','")
+      @proteins = Protein.all :conditions => ["ac IN ('#{acs}')"]
+    end
 
       
-      if count
-        @count = @proteins.count
-        @pages = (@count/@perpage).ceil
-      end
+    if count
+      @count = @proteins.count
+      @pages = (@count/@perpage).ceil
+    end
     
-      @proteins = @proteins.paginate :page => params[:page], :per_page => @perpage
+    @proteins = @proteins.paginate :page => params[:page], :per_page => @perpage
      
     respond_to do |format|
-      format.xml
+      format.xmrequire "proteins_controller"
+      l
     end    
   end
+  
+  def pw_input
+  end
     
-  def blabla
-    start = params["start"]
-    targets = params["targets"]
-    maxLength = params["maxLength"]
-    nwOrg = params["network_org"]
-    listOrg = params["list_org"]
-            
-    if(start != "" && 
-        targets != "" &&
-        maxLength != "")
-        
-        # clean up input
-        start = start.strip
-        targets = targets.split
-        maxLength = maxLength.to_i
-        if(nwOrg == "human") 
-          nwOrg = 1 
-          else 
-            nwOrg = 2 
-            end
-        if(listOrg == "human") 
-          listOrg = 1 
-          else 
-            listOrg = 2 
-            end
-        # map mouse human
-        mapper = MapMouseHuman.new()
-        map = []
-        if(nwOrg > listOrg) # nw is mouse and list is human
-          map = mapper.mouse4human(targets)
-          targets = map.collect{|x| x["m"]}
-          start = mapper.mouse4human([start])[0]["m"]
-        elsif(nwOrg < listOrg)  # nw is human and list is mouse
-          map = mapper.human4mouse(targets)
-          targets = map.collect{|x| x["h"]}
-          puts start
-          puts [start]
-          start = mapper.human4mouse([start])[0]["h"]
-        else 
-        end
-        
-        # path finding
-        finder = Path.new(maxLength)
-        finder.graph_from_sql(nwOrg)
-        @allPaths = Hash.new
-        targets.each{|target|
-          res = finder.find_paths(start, target)
-          @allPaths[target] = res.clone
-          }
-          
-        # get gene names
-        all_ps = []
-        @allPaths.each_value{|v| v.each{|l| all_ps += l}}
-        all_ps = all_ps.uniq + @allPaths.keys
-        @gnames = finder.get_gene_names(all_ps)
-        
-        # sort proteins
-        @sortet_subs = @allPaths.keys.sort{|x, y| @allPaths[y].size <=> @allPaths[x].size}
-        
+  def pw_output
+    # if parameters are not well defined, return to input page
+    if(params["start"] != "" &&  params["targets"] != "" && params["maxLength"] != "")
+      # CLEAN UP INPUT
+      start = params["start"].strip
+      targets = params["targets"].split("\n").collect{|s| {:id => s.split("\s")[0], :pos => s.split("\s")[1]}}
+      maxLength = params["maxLength"].to_i
+      # ORGANISMS
+      nwOrg = params["network_org"]
+      listOrg = params["list_org"]
+      # FIND PATHS
+      finder = PathFinding.new(Graph.new(nwOrg), maxLength)
+      if(nwOrg == "mouse" && listOrg == "human") # nw is mouse and list is human
+        @allPaths = finder.find_all_paths_map2mouse(start, targets)
+      elsif(nwOrg == "human" && listOrg == "mouse")  # nw is human and list is mouse
+        @allPaths = finder.find_all_paths_map2human(start, targets)
       else
-        puts 'else'
-        render :action => 'tryouts'
+        @allPaths = finder.find_all_paths(start, targets)
       end
+      @gnames = finder.paths_gene_names()                                                     # GENE NAMES FOR PROTEINS
+      @sortet_subs = @allPaths.keys.sort{|x, y| @allPaths[y].size <=> @allPaths[x].size}      # SORT OUTPUT
+    else
+      puts 'else'
+      render :action => 'pw_input'
+    end
+    
   end
   
-  def tryouts
-  end
-  
-  def tryouts2
-    query = ["P08246", "P01009", "P01023", "P09958"]
-  end
   
   def peptide_search
   end
@@ -728,10 +689,26 @@ class ProteinsController < ApplicationController
 
   def multi_peptides2
     @all_input = params["all"] #string
+<<<<<<< HEAD
     @input1 = @all_input.split("\n") #array 
     @input = @input1.collect{|a| a.split("\s")} #array of arrays [accession, peptide]  
     @accessions = @input.collect{|b| b.fetch(0)}
     @peptides = @input.collect{|b| b.fetch(1).gsub(/[^[:upper:]]+/, "")}
+=======
+    @input1 = @all_input.split("\n") #array of strings
+    @input = @input1.each do |s|
+      s.split
+    end
+
+    @accessions = @input.each do |s|
+      s.delete_at(2).to_s
+    end
+=begin
+    @peptides = @input.each do |s|
+    s.delete_at(1).to_s
+    end
+
+>>>>>>> 0512bacfaedc485639c8b97d94bcf1a8b0b0ba6d
     @proteins = @accessions.collect{|a| Protein.find(:first, :conditions => ["ac = ?", a])}   
 
     @sequences = @proteins.collect {|p| p.sequence}
@@ -739,10 +716,11 @@ class ProteinsController < ApplicationController
     @sql_ids = @proteins.collect {|p| p.id}
     @all_names = @sql_ids.collect {|q| Searchname.find(:all, :conditions => ['protein_id = ?', q])}
     @locations = Array.new(@accessions.size) {|s| if @sequences.fetch(s).index(@peptides.fetch(s)) != nil
-      @sequences.fetch(s).index(@peptides.fetch(s))
+    @sequences.fetch(s).index(@peptides.fetch(s))
     else 0
-      end}
+    end}
     @locations_1 = @locations.collect {|l| l + 1}
+<<<<<<< HEAD
     @upstreams = Array.new(@accessions.size) {|e| if @locations.fetch(e) < 10
       @sequences.fetch(e)[0, @locations.fetch(e)]
     else
@@ -760,6 +738,26 @@ class ProteinsController < ApplicationController
     @evidences_nterms = @pep_nterms.collect {|k| Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", k.id])}
     @evidences_ids = @evidences_nterms.collect {|l| l.collect { |m| m.evidence_id  }}
     @evidences_2 = @evidences_ids.collect {|n| n.collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])  }}
+=======
+    @upstreams = Array.new(@accessions.size) {|e| if @sequences.fetch(e)[@locations.fetch(e) - 7, 7] != nil
+    @sequences.fetch(e)[@locations.fetch(e) - 7, 7]
+    else "Not Available"
+    end}
+    @pep_nterms = Array.new(@accessions.size) {|a| if Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @sql_ids.fetch(a), @locations_1.fetch(a)]) != nil
+    Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @sql_ids.fetch(a), @locations_1.fetch(a)])
+    else "Not Available"
+    end}
+    @pep_cleavages = @pep_nterms.collect {|f| Cleavage.find(:all, :conditions => ["nterm_id = ?", f])}
+    @proteases = @pep_cleavages.collect {|g| g.each do |h|
+    Protein.find(:first, :conditions => ["id = ?", h])
+    end}
+    @domains = @sql_ids.collect {|i| Ft.find(:all, :conditions => ["protein_id = ?", i])}
+    @isoforms = @sql_ids.collect {|j| Isoform.find(:all, :conditions => ["protein_id = ?", j])}
+    @evidences_ids = @pep_nterms.collect {|k| Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", k.id])}
+    @evidences = @evidences_ids.collect {|m| m.each do |n|
+    Evidence.find(:first, :conditions => ["id = ?", n.evidence_id])
+    end}
+>>>>>>> 0512bacfaedc485639c8b97d94bcf1a8b0b0ba6d
     @chromosome = params['chromosome']
     @band = params['band']
     @domain = params['domain']

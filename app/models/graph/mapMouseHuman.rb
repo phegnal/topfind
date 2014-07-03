@@ -6,16 +6,33 @@ class MapMouseHuman
     @map = []
     File.open("databases/one2one_large.csv").readlines.each do |line|
        l = line.split(";")
-       @map << {"h" => l[1].strip(), "m" => l[0].strip()}
+       @map << {:h => l[1].strip(), :m => l[0].strip()}
     end
   end
   
   def mouse4human(proteins)
-    @map.select{|x| proteins.include?(x["h"])}
+    # if there is only one protein
+    if proteins.class == String then
+      proteins = [proteins]
+    end
+    return @map.select{|x| proteins.include?(x["h"])}.collect{|x| x["m"]}
   end
   
   def human4mouse(proteins)
-    @map.select{|x| proteins.include?(x["m"])}
+    # if there is only one protein
+    if proteins.class == String then
+      proteins = [proteins]
+    end
+    return @map.select{|x| proteins.include?(x["m"])}.collect{|x| x["h"]}
+  end
+  
+  
+  def m4h(prot)
+    return  @map.find{|hash| hash[:h] == prot}[:m]
+  end
+  
+  def h4m(prot)
+    return  @map.find{|hash| hash[:m] == prot}[:h]
   end
   
 end

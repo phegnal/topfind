@@ -9,9 +9,8 @@ ActionController::Routing::Routes.draw do |map|
   map.connect  'download', :controller => 'documentations', :action => 'download' 
   map.connect  'api', :controller => 'documentations', :action => 'api'
   map.connect 'contribute', :controller => 'imports', :action => 'index'
-  map.connect 'proteins/blabla', :controller => 'proteins', :action => 'blabla'
-  map.connect 'proteins/tryouts', :controller => 'proteins', :action => 'tryouts'
-  map.connect 'proteins/tryouts2', :controller => 'proteins', :action => 'tryouts2'
+  map.connect 'proteins/pw_input', :controller => 'proteins', :action => 'pw_input'
+  map.connect 'proteins/pw_output', :controller => 'proteins', :action => 'pw_output'
   map.connect 'proteins/peptide', :controller => 'proteins', :action => 'peptide_search'
   map.connect 'proteins/peptide_search2', :controller => 'proteins', :action => 'peptide_search2'
   map.connect 'proteins/multi_peptides', :controller => 'proteins', :action => 'multi_peptides'
@@ -19,7 +18,6 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'proteins/multi_export', :controller => 'proteins', :action => 'multi_export'
   
   map.connect 'interactions/:id', :controller => 'cleavages', :action => 'psicquicshow'
-
 
   map.connect 'ntermini/', :controller => 'nterms', :action => 'index'
   map.connect 'ctermini/', :controller => 'cterms', :action => 'index'
