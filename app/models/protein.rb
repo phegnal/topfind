@@ -16,8 +16,8 @@ class Protein < ActiveRecord::Base
     mw             :integer
     crc64          :string
     aalen          :integer
-    chromosome	   :string, :index => true
-    band	         :string, :index => true
+    chromosome     :string, :index => true
+    band           :string, :index => true
     meropsfamily   :string, :index => true
     meropssubfamily :string, :index => true
     meropscode     :string, :index => true
@@ -72,6 +72,10 @@ class Protein < ActiveRecord::Base
     # self.sequence.gsub(/(.{5})/,'\1 ')
   # end
 
+  def is_canonical
+    !self.ac.include?('-') || self.ac.include('-1')
+  end
+
   def htmlsequence
     numbering = ''
     blocks = (self.sequence.length/10).to_i
@@ -87,10 +91,10 @@ class Protein < ActiveRecord::Base
   end
   
   def recname
-  	if self.proteinnames.first
-  		return self.proteinnames.first.full
-  	else 
-    	return self.name
+    if self.proteinnames.first
+      return self.proteinnames.first.full
+    else 
+      return self.name
     end
   end
   
@@ -107,7 +111,7 @@ class Protein < ActiveRecord::Base
   end   
   
   # def proteasefamily
-  	# self.merid ? self.merid.split('.')[0] : false
+    # self.merid ? self.merid.split('.')[0] : false
   # end
 
   def proteasefamily
@@ -116,9 +120,9 @@ class Protein < ActiveRecord::Base
   
  
   
-  def meropslink  	
-  	self.merid ? link = "http://merops.sanger.ac.uk/cgi-bin/pepsum?mid=#{self.merid}" : link = false
-  	return link
+  def meropslink    
+    self.merid ? link = "http://merops.sanger.ac.uk/cgi-bin/pepsum?mid=#{self.merid}" : link = false
+    return link
   end
   
   # def species
@@ -207,6 +211,44 @@ class Protein < ActiveRecord::Base
     @res.sort! {|x,y| x.from.to_i <=> y.from.to_i}
     @res
   end
+
+  # take a position and orientation (left,center,right) and derive corresponding positions in the other canonical and isofrom sequences
+  # returns a hash with the acs and corresponding positions
+  def isoform_crossmapping(pos,orientation)
+    window = 20 # length of the sequence that must be identical for mapping
+    result = {}
+
+    case orientation
+      when 'left'
+        from_sequence = self.sequence[pos-1-window..pos-1]
+      when 'right'
+        from_sequence = self.sequence[pos-1..pos-1+window]
+      when 'centre'
+        from_sequence = self.sequence[pos-1-(window/2)..pos-1+(window/2)]
+    end
+
+
+    self.is_canonical ? canonical = self : canonical = Protein.find_by_ac(self.ac.split('-')[0])
+    ac_list = canonical.isoforms.map {|x| x.ac}<<canonical.ac
+
+    ac_list.each do |ac|
+      unless ac == self.ac
+        mapto = Protein.find_by_ac(ac)
+        next unless mapto.present?
+        case orientation
+          when 'left'
+          to_pos = mapto.sequence.index(from_sequence)+1 if mapto.sequence.scan.count ==  1
+          when 'right'
+          to_pos = mapto.sequence.index(from_sequence)+1+window if mapto.sequence.scan.count ==  1
+          when 'centre'
+          to_pos = mapto.sequence.index(from_sequence)+1+(window/2) if mapto.sequence.scan.count ==  1
+        end
+        result[ac] = to_pos
+      end
+    end
+    return result
+  end
+
   
 
  
@@ -353,8 +395,8 @@ class Kw < ActiveRecord::Base
   fields do
     name           :string, :required, :unique, :index => true  
     ac             :string, :index => true
-    description	   :text
-    category	   :string, :index => true
+    description    :text
+    category     :string, :index => true
   end
   
   has_and_belongs_to_many :proteins
