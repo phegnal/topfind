@@ -768,7 +768,7 @@ class ProteinsController < ApplicationController
     @nterminal = params['nterminal']
     @cterminal = params['cterminal']
 
-    @
+    
 
   end
 
