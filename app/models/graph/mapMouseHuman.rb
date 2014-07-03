@@ -11,28 +11,22 @@ class MapMouseHuman
   end
   
   def mouse4human(proteins)
-    # if there is only one protein
-    if proteins.class == String then
-      proteins = [proteins]
-    end
-    return @map.select{|x| proteins.include?(x["h"])}.collect{|x| x["m"]}
+    return proteins.collect{|p| m4h(p)}
   end
   
   def human4mouse(proteins)
-    # if there is only one protein
-    if proteins.class == String then
-      proteins = [proteins]
-    end
-    return @map.select{|x| proteins.include?(x["m"])}.collect{|x| x["h"]}
+    return proteins.collect{|p| h4m(p)}
   end
   
   
   def m4h(prot)
-    return  @map.find{|hash| hash[:h] == prot}[:m]
+    x =  @map.find{|hash| hash[:h] == prot}
+    return x.nil? ? "No mouse AC found" : x[:m]
   end
   
   def h4m(prot)
-    return  @map.find{|hash| hash[:m] == prot}[:h]
+    x =  @map.find{|hash| hash[:m] == prot}
+    return x.nil? ? "No human AC found" : x[:h]
   end
   
 end

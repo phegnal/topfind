@@ -635,7 +635,12 @@ class ProteinsController < ApplicationController
     
   def pw_output
     # if parameters are not well defined, return to input page
-    if(params["start"] != "" &&  params["targets"] != "" && params["maxLength"] != "")
+    if(params["start"] == "" ||  params["targets"] == "" || params["maxLength"] == "")
+      puts 'else'
+      render :action => 'pw_input'
+    elsif(Protein.find_by_ac(params["start"].strip).nil?)
+      render :text => "The start protease couldn't be found"
+    else
       # CLEAN UP INPUT
       start = params["start"].strip
       targets = params["targets"].split("\n").collect{|s| {:id => s.split("\s")[0], :pos => s.split("\s")[1]}}
@@ -654,11 +659,8 @@ class ProteinsController < ApplicationController
       end
       @gnames = finder.paths_gene_names()                                                     # GENE NAMES FOR PROTEINS
       @sortet_subs = @allPaths.keys.sort{|x, y| @allPaths[y].size <=> @allPaths[x].size}      # SORT OUTPUT
-    else
-      puts 'else'
-      render :action => 'pw_input'
-    end
-    
+      @int_domains = ["SIGNAL", "PROPEP", "ACT_SITE", "TRANSMEM"]
+    end 
   end
   
   def peptide_search

@@ -22,7 +22,7 @@ end
 
 def find_all_paths_map2mouse(start, targets)
   mapper = MapMouseHuman.new()
-  return find_all_paths(mapper.m4h(start), targets.collect{|hash| {:id => mapper.m4h(hash[:id]), :pos => hash[:pos]}})
+  return find_all_paths(find_all_paths(mapper.m4h(start), targets.collect{|hash| {:id => mapper.m4h(hash[:id]), :pos => hash[:pos]}})
 end
 
 def find_all_paths_map2human(start, targets)
@@ -31,16 +31,22 @@ def find_all_paths_map2human(start, targets)
 end
 
 def find_all_paths(start, targets)
-  targets.each{|target|
-    res = find_all_paths_for_one(start, target)
-    @allPaths[target] = res.clone
-  }
+  if not Protein.find_by_ac(start).nil?
+    targets.each{|target|
+      res = find_all_paths_for_one(start, target)
+      @allPaths[target] = res.clone
+    }
+  else
+    targets.each{|target| @allPaths[target] = [{:id => "Start protease not found", :pos => 0}] }
+  end
   return @allPaths
 end
 
 def find_all_paths_for_one(start, target)
   @ListOfPaths = []
-  find_path({:id => start, :pos => -1}, target, []) # starts with empty path
+  if not Protein.find_by_ac(target[:id]).nil?
+    find_path({:id => start, :pos => -1}, target, []) # starts with empty path
+  end
   result = @ListOfPaths.clone
   @ListOfPaths = []
   return result

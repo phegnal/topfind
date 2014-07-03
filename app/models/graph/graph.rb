@@ -18,7 +18,7 @@ class Graph
     c_query = "SELECT p.ac as protease, s.ac, c.pos as substrate from cleavages c, proteins p, proteins s WHERE p.id = c.protease_id AND s.id = c.substrate_id AND p.species_id = #{@species_id} AND s.species_id = #{@species_id};"
     c_result =  ActiveRecord::Base.connection.execute(c_query);
     c_result.each{|x| 
-      add_edge(x[0], x[1], x[2])
+      add_edge(x[0], x[1], x[2].to_i)
       }
     
     i_query = "SELECT i.ac as inhibitor, p.ac as protease from inhibitions inh, proteins i, proteins p WHERE i.id = inh.inhibitor_id AND p.id = inh.inhibited_protease_id AND i.species_id = #{@species_id} AND p.species_id = #{@species_id};"
