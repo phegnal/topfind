@@ -13,12 +13,11 @@
 			</td>
 			<% else %>
 			<td>
-				<% f = Protein.find_by_ac(path_node[:id]).fts.find_all_by_name(@int_domains) %>
-				<%= f.select{|x| x.to.to_i < path_node[:pos]}.collect{|x| x.name.downcase}.join(", ") %>
+				<%= path_node[:domains_left].join(" ") %>
 				<b><%= " #{path_node[:pos]} " %></b>
-				<%= f.select{|x| x.from.to_i <= path_node[:pos] && x.to.to_i >= path_node[:pos]}.collect{|x| x.name.downcase}.join(", ") %>
+				<%= path_node[:domains_hit].join(" ") %>
 				<b><%= " #{path_node[:pos]} " %></b>
-				<%= f.select{|x| x.from.to_i > path_node[:pos]}.collect{|x| x.name.downcase}.join(", ")%>
+				<%= path_node[:domains_right].join(" ") %>
 			</td>
 			<% end %>
 			<td><%= '<a href="http://clipserve.clip.ubc.ca/topfind/proteins/' + path_node[:id] + '">' + @gnames[path_node[:id]] + '</a>' %></td>

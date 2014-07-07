@@ -643,13 +643,14 @@ class ProteinsController < ApplicationController
     else
       # CLEAN UP INPUT
       start = params["start"].strip
-      targets = params["targets"].split("\n").collect{|s| {:id => s.split("\s")[0], :pos => s.split("\s")[1]}}
+      targets = params["targets"].split("\n").collect{|s| {:id => s.split("\s")[0], :pos => s.split("\s")[1].to_i}}
       maxLength = params["maxLength"].to_i
+      byPos = params["byPos"] == "yes"
       # ORGANISMS
       nwOrg = params["network_org"]
       listOrg = params["list_org"]
       # FIND PATHS
-      finder = PathFinding.new(Graph.new(nwOrg), maxLength)
+      finder = PathFinding.new(Graph.new(nwOrg), maxLength, byPos)
       if(nwOrg == "mouse" && listOrg == "human") # nw is mouse and list is human
         @allPaths = finder.find_all_paths_map2mouse(start, targets)
       elsif(nwOrg == "human" && listOrg == "mouse")  # nw is human and list is mouse
@@ -658,8 +659,9 @@ class ProteinsController < ApplicationController
         @allPaths = finder.find_all_paths(start, targets)
       end
       @gnames = finder.paths_gene_names()                                                     # GENE NAMES FOR PROTEINS
+#      domains_descriptions = ["%protease%inhibitor%", "%proteinase%inhibitor%", "%inhibitor%"]
+      @allPaths =  finder.get_domain_info(["SIGNAL", "PROPEP", "ACT_SITE", "TRANSMEM"], nil)
       @sortet_subs = @allPaths.keys.sort{|x, y| @allPaths[y].size <=> @allPaths[x].size}      # SORT OUTPUT
-      @int_domains = ["SIGNAL", "PROPEP", "ACT_SITE", "TRANSMEM"]
     end 
   end
   
