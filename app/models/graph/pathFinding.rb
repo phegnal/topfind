@@ -2,11 +2,13 @@ class PathFinding
 
   require 'graph/mapMouseHuman'
 
-  def initialize(graph, maxSteps, byPos)
+  def initialize(graph, maxSteps, byPos, rangeLeft, rangeRight)
     @g = graph.graph_array()
     @allPaths = Hash.new
     @maxSteps = maxSteps
     @byPos = byPos # defines whether the target has to be hit at exactly that position
+    @rangeLeft = rangeLeft
+    @rangeRight = rangeRight
   end
 
 
@@ -55,7 +57,7 @@ class PathFinding
     successors = @g[current[:id]]
     if(successors != nil && successors.class.to_s == "Array") then 
       successors.each{|x|
-        by_pos_condition = @byPos ? (x[:id] == target[:id] && x[:pos] == target[:pos]) : (x[:id] == target[:id])
+        by_pos_condition = @byPos ? (x[:id] == target[:id] && ((target[:pos]-@rangeLeft..target[:pos]+@rangeRight).to_a.include? x[:pos])) : (x[:id] == target[:id])
         if(by_pos_condition) then # THIS IS WHERE POSITION COULD COME INTO PLAY! TODO
           toSubmit = currentPath.clone # needs to be cloned!
           toSubmit << x
@@ -106,5 +108,28 @@ class PathFinding
     }
     return @allPaths
   end
-
+  
+  # takes the @allPaths from this method and makes a graphviz file
+  # returns the file path for the graphviz file or nil if it didn't work
+  #
+  def make_graphviz(folder, gnames)
+  firstNode = @allPaths.values.select{|pathset| pathset != []}.collect{|pathset| pathset[0][0]}.uniq[0] # get first element of any path
+  if not firstNode.nil?   # WRITES Graphviz only if there was any path (so there was a first element somewhere)
+    nodestyles=["#{gnames[firstNode[:id]]} [style=filled fillcolor=turquoise];\n"]
+    edges = []
+    @allPaths.values.each{|pathset| pathset.each{|path|
+      nodestyles << "#{gnames[path[path.length-1][:id]]} [style=filled fillcolor=grey];\n"
+      (1..path.length-1).each{|i| edges << "#{gnames[path[i-1][:id]]} -> #{gnames[path[i][:id]]} [label=#{path[i][:pos] == 0 ? 'inh' : path[i][:pos]}];\n"
+      }}}
+      outputFile = File.open("#{folder}/pw_graphviz.txt", "w")
+      outputFile << "digraph G {\n"
+      nodestyles.uniq.each{|e| outputFile << e}
+      outputFile << "edge [style=bold  color=grey labelfontname=Arial];\n"
+      edges.flatten.uniq.each{|e| outputFile << e}
+      outputFile << "}"
+      outputFile.close
+    end
+    return "#{folder}/pw_graphviz.pdf" if system "dot #{folder}/pw_graphviz.txt -Tpdf -o #{folder}/pw_graphviz.pdf"
+  end
+  
 end
