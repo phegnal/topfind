@@ -122,7 +122,7 @@ namespace :fileImport do
       :directness => e["directness"],
       :methodology => e["methodology"],
       :created_at => toTime(e["created_at"]),
-      :idstring => e["idstring"],
+      :idstring => e["idstring"], # TODO will change
       :evidencefile_file_name => e["evidencefile_file_name"],
       :confidence_type => e["confidence_type"],
       :evidencefile_content_type => e["evidencefile_content_type"],

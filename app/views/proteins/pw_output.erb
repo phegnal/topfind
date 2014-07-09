@@ -8,9 +8,17 @@
 		<% path.each do |path_node| %>
 			<% if(path_node[:pos] == -1) %>
 			<% elsif(path_node[:pos] == 0) %>
-			<td><%= "inh" %></td>
+			<td>
+				<%= "inh" %>
+			</td>
 			<% else %>
-			<td><%= path_node[:pos] %></td>
+			<td>
+				<%= path_node[:domains_left].join(" ") %>
+				<b><%= " #{path_node[:pos]} " %></b>
+				<%= path_node[:domains_hit].join(" ") %>
+				<b><%= " #{path_node[:pos]} " %></b>
+				<%= path_node[:domains_right].join(" ") %>
+			</td>
 			<% end %>
 			<td><%= '<a href="http://clipserve.clip.ubc.ca/topfind/proteins/' + path_node[:id] + '">' + @gnames[path_node[:id]] + '</a>' %></td>
 		<% end %>

@@ -10,26 +10,25 @@
 
 	<p>
 		<b> Protease's Uniprot Id: </b><br>
-		<%= text_field_tag(:start)  %> <br>
-		example: P14091
+		<%= text_field_tag(:start, "P14091") %> <br>
 	</p>
 	<p>
 		<b> Substrates' Uniprot Ids: </b> <br>
 		<%= radio_button_tag "list_org", "human", true %> human <br>
 		<%= radio_button_tag "list_org", "mouse" %> mouse <br>
-		<%= text_area_tag(:targets)  %> <br>
-		example:  <br>
-		P00734&nbsp0 <br>
-		P17655&nbsp0 <br>
-		P25774&nbsp0 <br>
-		P09668&nbsp0 <br>
-		P05120&nbsp0 <br>
-		P10144&nbsp0 <br>
+		<%= text_area_tag(:targets, "P00734 314\nP17655 21\nP25774 31\nP09668 41\nP05120 122\nP10144 20")  %> <br>
+		</p>
+	<p>
+		<b> Find cleavages on substrates at the indicated position only: </b><br>
+		<%= radio_button_tag "byPos", "yes", true %> yes <br>
+		<%= radio_button_tag "byPos", "no" %> no
 	</p>
 	<p>
 		<b> Maximum path length: </b><br>
-		<%= text_field_tag(:maxLength)  %> <br>
-		example: 4
+		<%= text_field_tag(:maxLength, "4")  %> <br>
+	</p>
+	<p>
+		<b> Range </b> left: <%= text_field_tag(:rangeLeft, "4")  %> right: <%= text_field_tag(:rangeRight, "3")  %> <br>
 	</p>
 	<%= submit_tag("Process") %>
 <% end %>

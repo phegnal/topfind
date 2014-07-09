@@ -109,14 +109,16 @@ namespace :tisDB_v2 do
     p "TIS DB done"
 
     ###
-    ### MAP to TOPFIND GENES
+    ### GET PROTEIN SEQUENCES FOR THE GENES
     ###
     if ok
+      # remove genes which are not TopFIND (mapping done via gene name)
       origLength = tisdb.length
       rm = tisdb.keys - genes.keys
       rm.each{|k|
         tisdb.delete(k)
       }
+      # get ncbi ids
       ncbis = []
       tisdb.each_value{|v|
         v.each{|x|
@@ -126,9 +128,6 @@ namespace :tisDB_v2 do
       ncbis = ncbis.uniq
       outputFile << "#{tisdb.length} of #{origLength} genes found in TopFIND with #{ncbis.length} ncbi transcript ids \n"    
     
-      ###
-      ### GET SEQUENCES FROM NCBI
-      ###
       Bio::NCBI.default_email = "a@bc.de" 
       ncbi = Bio::NCBI::REST::EFetch.new
       fastaString = ncbi.nucleotide(ncbis, "fasta")
@@ -160,9 +159,8 @@ namespace :tisDB_v2 do
       # missedCTer = 0
       multipleNTer = 0
       # multipleCTer = 0
-      
 
-      ## map protein sequence to original sequence
+      ## map protein sequence to original sequence (mapped via geneName)
       tisdb.keys.each_with_index{|g, ind|
         tisdb[g].each{|t|
           rnaSeq = ncbiSequ[t["id"]]

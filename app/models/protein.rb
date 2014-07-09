@@ -387,6 +387,7 @@ class Ft < ActiveRecord::Base
   named_scope :present, lambda { |from,to|
     {:conditions => ['`from` >= ? AND `to` <= ?',from,to] }
   }
+  
   named_scope :absent, lambda { |from,to|
     {:conditions => ['(`to` < ? ) OR ( `from` > ?)',from,to] }
   }
@@ -399,10 +400,12 @@ class Ft < ActiveRecord::Base
     {:conditions => ['( `from` > ?)',pos] }
   }    
   
+  # domains that are fully in this chunk
   named_scope :spanning, lambda { |from,to|
     {:conditions => ['(`from` <= ? ) AND ( `to` >= ?)',from,to] }
   }
   
+  # features that start or end at this position
   named_scope :matching, lambda { |pos|
     {:conditions => ['(`from` = ? ) OR ( `to` = ?)',pos,pos-1] }
   }
