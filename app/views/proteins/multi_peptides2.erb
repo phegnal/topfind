@@ -31,7 +31,9 @@
 		<th>Domain</th>
 		<%end%>
 
+		<%if @evidence%>
 		<th>Evidences</th>
+		<%end%>
 	</tr>
 	</thead>
 
@@ -72,15 +74,17 @@
 			</td>
 		<%end%>
 
-		<td><%= @upstreams.fetch(i)%>|<%= @peptides.fetch(i)%></td>
+		<td><%= @upstreams.fetch(i)%> | <%= @peptides.fetch(i)%></td>
 		<td><%= @locations.fetch(i).succ%></td>
 		<td><% @proteases.fetch(i).each do |s|%>
 			<%= s%><br>
 			<%end%></td>
-		
+
+		<%if @evidence%>
 		<td><%@evidences_2.fetch(i).each do |s|%>
 			<%= s.name%><br>
 			<%end%>
+		<%end%>
 
 	<%if @domain%>
 			<td><%q = @domains.fetch(i)%>		

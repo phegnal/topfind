@@ -697,11 +697,10 @@ class ProteinsController < ApplicationController
     @species_ids = @proteins.collect {|p| p.species_id}
     @sql_ids = @proteins.collect {|p| p.id}
     @all_names = @sql_ids.collect {|q| Searchname.find(:all, :conditions => ['protein_id = ?', q])}
-    @locations = Array.new(@accessions.size) {|s| if @sequences.fetch(s).index(@peptides.fetch(s)) != nil
-      @sequences.fetch(s).index(@peptides.fetch(s))
+    @locations = Array.new(@accessions.size) {|s| if @sequences.fetch(s).index(@peptides.fetch(s)) != nil && @nterminal == 0 && @cterminal == 0
     else 0
       end}
-    @locations_1 = @locations.collect {|l| l + 1}
+    @locations_1 = @locations.collect {|l| l + 1} #array of arrays TODO 
     @upstreams = Array.new(@accessions.size) {|e| if @locations.fetch(e) < 10
       @sequences.fetch(e)[0, @locations.fetch(e)]
     else
@@ -725,10 +724,21 @@ class ProteinsController < ApplicationController
     @isoform = params['isoform']
     @spec = params['spec']
 
-    @nterminal = params['nterminal']
-    @cterminal = params['cterminal']
-
+    @nterminal = params['nterminal'].to_i 
+    @cterminal = params['cterminal'].to_i
     
+
+    @locations2 = @locations.collect {|p| if (p - @nterminal) < 0
+        (0..p).to_a
+      elsif (p + @cterminal) > @sequences.fetch(p.index).length
+        (p..@sequences.fetch(p.index).length).to_a
+      else
+        ((p - @nterminal)..(p + @cterminal)).to_a
+      end}
+
+
+puts @locations2
+
 
   end
 
