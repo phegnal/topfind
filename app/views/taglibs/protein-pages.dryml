@@ -261,9 +261,13 @@
 	    <h3>Isoforms</h3>
 	    <collection:isoforms>
 	      <% jqac = "\'##{this.ac}\'"%>
-	      <a href="#" onclick="jQuery(#{jqac}).toggle();; return false;"><view:name/> (<view:ac/>)</a>
+	      <view:name/> (<view:ac/>): <a href="#" onclick="jQuery(#{jqac}).toggle();; return false;">sequence view</a> | <a href="/topfind/proteins/#{this.ac}">extended view</a>
 	      <div class="hidden solidbox" id="#{this.ac}"><view:htmlsequence /></div>
 	    </collection>
+	  </section> 
+	  <section class="block" unless="&this.is_canonical">
+	    <h3>Isoforms</h3>
+	    Additional information might be associated with the canonical isoform entry (<a href="/topfind/proteins/#{this.canonical_ac}">extended view</a>)
 	  </section>            	
 	
 	  <section class="block">

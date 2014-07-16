@@ -73,7 +73,11 @@ class Protein < ActiveRecord::Base
   # end
 
   def is_canonical
-    !self.ac.include?('-') || self.ac.include('-1')
+    !self.ac.include?('-') || self.ac.include?('-1')
+  end
+  
+  def canonical_ac
+  	self.ac.split('-').first
   end
 
   def htmlsequence
