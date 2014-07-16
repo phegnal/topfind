@@ -57,12 +57,14 @@ task :import_uniprot do
   @evidence.save
 
   #generate "inferred from isoform" evidence
-  Evidence.find_or_create_by_name(:name => 'inferred from isoform',
+  @isoevidence = Evidence.find_or_create_by_name(:name => 'inferred from isoform',
     :idstring => 'uniprot-ECO:0000041',
     :description => 'The stated informations has been inferred from an isoform by sequence similarity at the stated position.',
     :phys_relevance => 'unknown',
     :method => 'electronic annotation'
   )
+  @isoevidence.evidencecodes << Evidencecode.code_is('ECO:0000041').first
+  @isoevidence.save
 
   @evidencesimilarity = Evidence.find_or_create_by_name(:name => 'inferred from uniprot (by similarity)',
     :idstring => 'uniprot-ECO:0000041',
@@ -304,9 +306,6 @@ task :import_uniprot do
                           :contents => value) 
         end
 
-        ### create separate protein entry for each isofrom if there are any
-        if k == 'ALTERNATIVE PRODUCTS'
-        end
 
       end
   
@@ -475,7 +474,9 @@ task :import_isoforms do
   require "#{RAILS_ROOT}/config/environment"
   require 'bio'
   require 'zlib'
-  
+
+  @evidence = Evidence.name_is('inferred from uniprot').first
+  @iso_evidence = Evidence.name_is('inferred from isoform').first
 
   Bio::FlatFile.open(ARGV[1]).each_with_index do |entry,i|
     # if i == 1 
@@ -484,26 +485,48 @@ task :import_isoforms do
     isoform_ac = entry.accessions.first
     isoform_num = entry.accessions.first.split('-')[1]
     fullname = entry.identifiers.description.split(' OS=')[0]
-    short_canonical_name = fullname.split(' ')[0]
-    long_name = fullname.gsub("#{short_canonical_name} ",'')
+    short_canonical_name = entry.identifiers.sp.split(' ')[0]
     short_isoform_name = short_canonical_name.gsub('_',"-Isoform#{isoform_num}_") 
 
     canonical_protein_ac = isoform_ac.split('-')[0]  
-    canonical_protein = Protein.find_by_ac(protein_ac)
+    canonical_protein = Protein.find_by_ac(canonical_protein_ac)
     @imported = 0
     
     if canonical_protein
-      Isoform.find_or_create_by_ac(:protein => canoncical_protein, 
+      Isoform.find_or_create_by_ac(:protein => canonical_protein, 
                   :ac => entry.accessions.first, 
-                  :name => entry.identifiers.description.split(' OS=')[0], 
+                  :name => fullname, 
                   :sequence => entry.aaseq)
 
       isoform = Protein.find_or_create_by_ac(:ac => isoform_ac,
         :name => short_isoform_name, 
     	:sequence => entry.aaseq,
-        :aalen => entry.aaseq.count )	
+        :aalen => entry.aalen,
+        :chromosome => canonical_protein.chromosome,
+        :band => canonical_protein.band,
+        :species_id => canonical_protein.species_id)
+        
+      isoform.drs << Dr.new(:db_name   => 'Ensembl', 
+                          :protein_name => '', 
+                          :content1   => '', 
+                          :content2   => canonical_protein.drs.db_name_is('Ensembl').first.content2, 
+                          :content3   => '')	
 
-      isoform.proteinnames << Proteinname.find_or_create_by_full(:full => long_name, :short => short_isoform_name, :recommended => true)
+      isoform.proteinnames << Proteinname.find_or_create_by_full(:full => fullname, :short => short_isoform_name, :recommended => true)
+      
+	  #add N and C termin for sequence start and end
+    	#Cterm
+    	cmod = Terminusmodification.name_is('unknown').first    	  	 
+		cterm = Cterm.find_or_create_by_idstring(:idstring => "#{isoform.ac}-#{entry.aalen}-#{cmod.name}",:protein_id => isoform.id, :pos => entry.aalen, :terminusmodification => cmod )
+	    cterm.evidences << @evidence unless cterm.evidences.include?(@evidence)
+	    isoform.cterms << cterm	unless isoform.cterms.include?(cterm)
+	    
+		#Nterm
+    	nmod = Terminusmodification.name_is('unknown').first    	  	 
+		nterm = Nterm.find_or_create_by_idstring(:idstring => "#{isoform.ac}-1-#{nmod.name}",:protein_id => isoform.id, :pos => 1, :terminusmodification => nmod )
+	    nterm.evidences << @evidence unless nterm.evidences.include?(@evidence)
+	    isoform.nterms << nterm	unless isoform.nterms.include?(nterm)
+    	  
         
       @imported = @imported.next
     end
@@ -512,6 +535,48 @@ task :import_isoforms do
   end
 end
 
+
+desc "cross map termini between isoforms"
+task :cross_map_termini do
+  require "#{RAILS_ROOT}/config/environment"
+  
+  @iso_evidence = Evidence.find_or_create_by_name(:name => 'inferred from isoform',
+    :idstring => 'uniprot-ECO:0000041',
+    :description => 'The stated information has been inferred from an isoform by local sequence similarity.',
+    :phys_relevance => 'unknown',
+    :method => 'electronic annotation'
+  )
+  
+  @iso_evidence.evidencecodes << Evidencecode.code_is('ECO:0000041').first
+  @iso_evidence.save
+  
+  Protein.all.each do |p|
+  	p.nterms.each do |n|
+  		#ignore termini only derived from isoform mapping 
+  		unless n.evidences.count == 1 && n.evidences.include?(@iso_evidence)
+  			mapping = p.isoform_crossmapping(n.pos,'right')
+  			mapping.each_pair do |ac,pos|
+  				matchprot = Protein.ac_is(ac).first
+  				nterm = Nterm.find_or_create_by_idstring(:idstring => "#{ac}-pos-#{n.terminusmodification.name}",:protein_id => matchprot.id, :pos => pos, :terminusmodification => n.terminusmodification )
+	    		nterm.evidences << @iso_evidence unless nterm.evidences.include?(@iso_evidence)
+	    		matchprot.nterms << nterm	unless matchprot.nterms.include?(nterm)
+	    	end
+	    end
+	end
+  	p.cterms.each do |c|
+  		#ignore termini only derived from isoform mapping 
+  		unless c.evidences.count == 1 && c.evidences.include?(@iso_evidence)
+  			mapping = p.isoform_crossmapping(c.pos,'left')
+  			mapping.each_pair do |ac,pos|
+  				matchprot = Protein.ac_is(ac).first
+  				cterm = Cterm.find_or_create_by_idstring(:idstring => "#{ac}-pos-#{c.terminusmodification.name}",:protein_id => matchprot.id, :pos => pos, :terminusmodification => c.terminusmodification )
+	    		cterm.evidences << @iso_evidence unless cterm.evidences.include?(@iso_evidence)
+	    		matchprot.cterms << cterm	unless matchprot.cterms.include?(cterm)
+	    	end
+	    end
+	end
+  end
+end
 
 desc "delete all uniprot data"
 task :prune_uniprot do
