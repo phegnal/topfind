@@ -241,13 +241,13 @@ class Protein < ActiveRecord::Base
         next unless mapto.present?
         case orientation
           when 'left'
-          to_pos = mapto.sequence.index(from_sequence)+1 if mapto.sequence.scan(from_sequence).count ==  1
-          when 'right'
           to_pos = mapto.sequence.index(from_sequence)+1+window if mapto.sequence.scan(from_sequence).count ==  1
+          when 'right'
+          to_pos = mapto.sequence.index(from_sequence)+1 if mapto.sequence.scan(from_sequence).count ==  1
           when 'centre'
           to_pos = mapto.sequence.index(from_sequence)+1+(window/2) if mapto.sequence.scan(from_sequence).count ==  1
         end
-      	result[ac] = to_pos
+      	result[ac] = to_pos if to_pos.present?
       end
     end
     return result

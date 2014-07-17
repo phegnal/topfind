@@ -28,6 +28,8 @@ class Cterm < ActiveRecord::Base
   has_many :cterm2evidences
   has_many :evidences, :through => :cterm2evidences, :uniq => true
 
+  after_create :map_to_isoforms
+
   def name
     "#{protein.name}-#{pos.to_s} (#{terminusmodification.name})"
   end
@@ -57,6 +59,22 @@ class Cterm < ActiveRecord::Base
     		self.protein.fts.matchfrom(self.pos+1)
 	end
   end         
+
+  def map_to_isoforms
+	@iso_evidence = Evidence.name_is('inferred from isoform').first
+
+    unless self.evidences.count == 1 && self.evidences.include?(@iso_evidence)
+	  mapping = self.protein.isoform_crossmapping(self.pos,'left')
+	  puts mapping
+	  mapping.each_pair do |ac,pos|
+	    matchprot = Protein.ac_is(ac).first
+	  	cterm = Cterm.find_or_create_by_idstring(:idstring => "#{ac}-#{pos}-#{self.terminusmodification.name}",:protein_id => matchprot.id, :pos => pos, :terminusmodification => self.terminusmodification )
+		cterm.evidences << @iso_evidence unless cterm.evidences.include?(@iso_evidence)
+		matchprot.cterms << cterm unless matchprot.cterms.include?(cterm)
+	  end
+	end
+  end
+
 
  def self.generate_csv(ids)
     FasterCSV.generate({:col_sep => "\t"}) do |csv|

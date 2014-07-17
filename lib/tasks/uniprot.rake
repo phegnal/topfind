@@ -58,11 +58,17 @@ task :import_uniprot do
 
   #generate "inferred from isoform" evidence
   @isoevidence = Evidence.find_or_create_by_name(:name => 'inferred from isoform',
-    :idstring => 'uniprot-ECO:0000041',
+    :idstring => isoform-ECO:0000041',
     :description => 'The stated informations has been inferred from an isoform by sequence similarity at the stated position.',
     :phys_relevance => 'unknown',
     :method => 'electronic annotation'
   )
+
+  @isoevidence.evidencesource = Evidencesource.find_or_create_by_dbname(
+    :dbname => 'TopFIND',
+    :dburl => 'http://clipserve.clip.ubc.ca/topfind',
+    :dbdesc => ''
+  ) 	
   @isoevidence.evidencecodes << Evidencecode.code_is('ECO:0000041').first
   @isoevidence.save
 
@@ -88,7 +94,7 @@ task :import_uniprot do
        next
       end 
     
-    exit if i == 20
+    exit if i == 40
     
     orgs = entry.os.map {|os| os['os']}
 
@@ -552,28 +558,10 @@ task :cross_map_termini do
   
   Protein.all.each do |p|
   	p.nterms.each do |n|
-  		#ignore termini only derived from isoform mapping 
-  		unless n.evidences.count == 1 && n.evidences.include?(@iso_evidence)
-  			mapping = p.isoform_crossmapping(n.pos,'right')
-  			mapping.each_pair do |ac,pos|
-  				matchprot = Protein.ac_is(ac).first
-  				nterm = Nterm.find_or_create_by_idstring(:idstring => "#{ac}-pos-#{n.terminusmodification.name}",:protein_id => matchprot.id, :pos => pos, :terminusmodification => n.terminusmodification )
-	    		nterm.evidences << @iso_evidence unless nterm.evidences.include?(@iso_evidence)
-	    		matchprot.nterms << nterm	unless matchprot.nterms.include?(nterm)
-	    	end
-	    end
+  	  n.map_to_isoforms
 	end
   	p.cterms.each do |c|
-  		#ignore termini only derived from isoform mapping 
-  		unless c.evidences.count == 1 && c.evidences.include?(@iso_evidence)
-  			mapping = p.isoform_crossmapping(c.pos,'left')
-  			mapping.each_pair do |ac,pos|
-  				matchprot = Protein.ac_is(ac).first
-  				cterm = Cterm.find_or_create_by_idstring(:idstring => "#{ac}-pos-#{c.terminusmodification.name}",:protein_id => matchprot.id, :pos => pos, :terminusmodification => c.terminusmodification )
-	    		cterm.evidences << @iso_evidence unless cterm.evidences.include?(@iso_evidence)
-	    		matchprot.cterms << cterm	unless matchprot.cterms.include?(cterm)
-	    	end
-	    end
+  	  c.map_to_isoforms
 	end
   end
 end
