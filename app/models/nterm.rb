@@ -58,6 +58,22 @@ class Nterm < ActiveRecord::Base
 	end
   end  
 
+  def infer_isoform_entries
+	@iso_evidence = Evidence.find_by_name(:name => 'inferred from isoform').first
+
+    unless self.evidences.count == 1 && self.evidences.include?(@iso_evidence)
+	  mapping = self.protein.isoform_crossmapping(self.pos,'right')
+	  mapping.each_pair do |ac,pos|
+	    matchprot = Protein.ac_is(ac).first
+	  	nterm = Nterm.find_or_create_by_idstring(:idstring => "#{ac}-pos-#{self.terminusmodification.name}",:protein_id => matchprot.id, :pos => pos, :terminusmodification => self.terminusmodification )
+		nterm.evidences << @iso_evidence unless nterm.evidences.include?(@iso_evidence)
+		matchprot.nterms << nterm unless matchprot.nterms.include?(nterm)
+	  end
+	end
+  end
+
+
+
   def self.generate_csv(ids)
     FasterCSV.generate({:col_sep => "\t"}) do |csv|
       csv << ['topcat terminus id','position','sequence','protein (uniprot ac)','topcat evidence ids']
