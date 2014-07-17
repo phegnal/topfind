@@ -58,7 +58,7 @@ task :import_uniprot do
 
   #generate "inferred from isoform" evidence
   @isoevidence = Evidence.find_or_create_by_name(:name => 'inferred from isoform',
-    :idstring => isoform-ECO:0000041',
+    :idstring => 'isoform-ECO:0000041',
     :description => 'The stated informations has been inferred from an isoform by sequence similarity at the stated position.',
     :phys_relevance => 'unknown',
     :method => 'electronic annotation'
@@ -1003,7 +1003,7 @@ task :import_uniprot_gene_names do
 end
 
 
-desc "write meropscodes from drs to protein itself"
+desc "populate searchnames table with a set of searchable names and ids"
 task :populate_searchnames do
   require "#{RAILS_ROOT}/config/environment"
 
@@ -1040,8 +1040,15 @@ task :write_meropscodes do
 
   Protein.drs_db_name_is('MEROPS').each do |p|
     merdrs = p.drs.db_name_is('MEROPS')
-    code = merdrs.first.protein_name if merdrs.present?
-    mer = Merops.find_by_code(code) if merdrs.present?
+
+    #select protease entry for multi domain protease / inhibitors 
+    merdr = merdrs.first
+    if merdrs.count >> 1 && merdr.protein_name.match(/^I/)
+      merdrs.map {|x| merdr = x unless x.protein_name.match(/^I/)}
+    end
+      
+    code = merdr.protein_name if merdr.present?
+    mer = Merops.find_by_code(code) if merdr.present?
     fam = mer.family if mer.present?
     subfam = mer.subfamily if mer.present?
     Protein.find(p.id).update_attributes(:meropscode => code,:meropsfamily => fam,:meropssubfamily => subfam) if mer.present?
