@@ -698,18 +698,74 @@ class ProteinsController < ApplicationController
   def multi_peptides2
     @all_input = params["all"] #string
     @input1 = @all_input.split("\n") #array 
+    @chromosome = params['chromosome']
+    @domain = params['domain']
+    @isoform = params['isoform']
+    @spec = params['spec']
+    @nterminal = params['nterminal'].to_i
+    @cterminal = params['cterminal'].to_i
+
+    @mainarray = Array.new()
+    @input1.each{|i|
+      @q = {}
+      @q[:acc] = i.split("\s").fetch(0)
+      @q[:pep] = i.split("\s").fetch(1).gsub(/[^[:upper:]]+/, "")
+      @q[:protein] = Protein.find(:first, :conditions => ["ac = ?", @q[:acc]])
+      @q[:sequence] = @q[:protein].sequence
+      @q[:species] = if @q[:protein].species == 1
+          "Human"
+        elsif @q[:protein].species == 2
+          "Mouse"
+        elsif @q[:protein].species == 3
+          "E. Coli"
+        elsif @q[:protein].species == 4
+          "Yeast"
+        elsif @q[:protein].species == 5
+          "Arabidopsis"
+        end
+    @q[:sql_id] = @q[:protein].id
+    @q[:all_names] = Searchname.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
+    @q[:short_names] = Proteinname.find(:all, :conditions => ['protein_id = ? AND recommended = ?', @q[:sql_id], 1]).uniq
+    @q[:location] = @q[:sequence].index(@q[:sql_id])
+    @q[:location_1] = @q[:location] + 1
+    @q[:location_range] = ((@q[:location] - @nterminal)..(@q[:location] + @cterminal)).to_a
+    @q[:nterms] = Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
+    @q[:cleavages] = Cleavage.find(:all, :conditions => ["nterm_id = ?", @q[:nterms].id])
+    @q[:proteases] = @q[:cleavages].collect {|a| Protein.find(:first, :conditions => ["id = ?", a.protease_id])} #might not work as a line
+    @q[:domains] =  Ft.find(:all, :conditions => ["protein_id = ?", @q[:sql_id]i])} #array
+    @q[:evidence_nterms] = Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', @q[:nterms].id])
+    @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.evidence_id } #array
+    @q[:evidences] = @q[:evidence_ids].collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])}
+    @q[:chr] = [@q[:protein].chromosome, @q[:protein].band] if @chromosome
+     # @q[:something] = "xx" if chromosome
+      #@mainhash[@q[:acc]+ "_" + @q[:pep]] = @q
+    }
+
     @input = @input1.collect{|a| a.split("\s")} #array of arrays [accession, peptide]  
     @accessions = @input.collect{|b| b.fetch(0)}
     @peptides = @input.collect{|b| b.fetch(1).gsub(/[^[:upper:]]+/, "")}
     @proteins = @accessions.collect{|a| Protein.find(:first, :conditions => ["ac = ?", a])} 
     @sequences = @proteins.collect {|p| p.sequence}
-    @species_ids = @proteins.collect {|p| p.species_id}
+    @species_ids = @proteins.collect {|p|  if p.species_id == 1
+      "Human"
+    elsif p.species_id == 2
+      "Mouse"
+    elsif p.species_id == 3
+      "E. Coli"
+    elsif p.species_id == 4
+      "Yeast"
+    elsif p.species_id == 5
+      "Arabidopsis"
+    end}
     @sql_ids = @proteins.collect {|p| p.id}
     @all_names = @sql_ids.collect {|q| Searchname.find(:all, :conditions => ['protein_id = ?', q])}
-    @locations = Array.new(@accessions.size) {|s| if @sequences.fetch(s).index(@peptides.fetch(s)) != nil && @nterminal == 0 && @cterminal == 0
+    @short_names = @sql_ids.collect {|s| Proteinname.find(:all, :conditions => ['protein_id = ? AND recommended = ?', s, 1]).uniq}
+    @locations = Array.new(@accessions.size) {|s| if @sequences.fetch(s).index(@peptides.fetch(s)) != nil
+      @sequences.fetch(s).index(@peptides.fetch(s))
     else 0
       end}
-    @locations_1 = @locations.collect {|l| l + 1} #array of arrays TODO 
+    @locations_1 = @locations.collect {|l| l + 1}  
+    @locations_range = @locations.collect {|m| ((m - @nterminal)..(m + @cterminal)).to_a.delete_if {|n| n < 0}}
     @upstreams = Array.new(@accessions.size) {|e| if @locations.fetch(e) < 10
       @sequences.fetch(e)[0, @locations.fetch(e)]
     else
@@ -719,35 +775,15 @@ class ProteinsController < ApplicationController
       Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @sql_ids.fetch(a), @locations_1.fetch(a)])
       else "Not Available"
         end}
-    @pep_cleavages = @pep_nterms.collect { |b| Cleavage.find(:all, :conditions => ["nterm_id = ?", b.id])}
+    @pep_cleavages = @pep_nterms.collect { |b| Cleavage.find(:all, :conditions => ["nterm_id = ?", b.id])}     
     @proteases = @pep_cleavages.collect { |c| c.collect { |d| Protein.find(:first, :conditions => ["id = ?", d.protease_id]) }} 
     @domains = @sql_ids.collect {|i| Ft.find(:all, :conditions => ["protein_id = ?", i])}
-    @isoforms = @sql_ids.collect {|j| Isoform.find(:all, :conditions => ["protein_id = ?", j])}
- 
+    #@isoforms = @sql_ids.collect {|j| Isoform.find(:all, :conditions => ["protein_id = ?", j])} 
     @evidences_nterms = @pep_nterms.collect {|k| Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", k.id])}
     @evidences_ids = @evidences_nterms.collect {|l| l.collect { |m| m.evidence_id  }}
     @evidences_2 = @evidences_ids.collect {|n| n.collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])  }}
-    @chromosome = params['chromosome']
-    @band = params['band']
-    @domain = params['domain']
-    @isoform = params['isoform']
-    @spec = params['spec']
-
-    @nterminal = params['nterminal'].to_i 
-    @cterminal = params['cterminal'].to_i
-    
-
-    @locations2 = @locations.collect {|p| if (p - @nterminal) < 0
-        (0..p).to_a
-      elsif (p + @cterminal) > @sequences.fetch(p.index).length
-        (p..@sequences.fetch(p.index).length).to_a
-      else
-        ((p - @nterminal)..(p + @cterminal)).to_a
-      end}
-
-
-puts @locations2
-
+   
+ 
 
   end
 

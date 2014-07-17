@@ -1,9 +1,10 @@
 <body bgcolor="Azure"></body>
-
+<!--
 <table border="1" >
 	<thead>
 	 <tr>
 		<th>Accession</th>
+		<th>Protein Name</th>
 		<th>All Names</th>
 		<%if @spec%>
 		<th>Species</th>
@@ -14,26 +15,23 @@
 		<th>Chr</th>
 		<%end%>
 		
-		<%if @band%>
-		<th>Band</th>
-		<%end%>
-		
-		
-		<%if @isoform%>	
-		<th>Isoforms</th>
-		<%end%>
+	
+
 		<th>Sequence</th>
 		<th>Pos</th>
 		
 		<th>Proteases</th>	
 	
-		<%if @domain%>
-		<th>Domain</th>
-		<%end%>
-
 		<%if @evidence%>
 		<th>Evidences</th>
 		<%end%>
+
+		<%if @domain%>
+		<th>Domain Before</th>
+		<th>Domain At</th>
+		<th>Domain After</th>
+		<%end%>
+
 	</tr>
 	</thead>
 
@@ -42,37 +40,23 @@
 	<tr>	
 		<td><a href="http://clipserve.clip.ubc.ca/topfind/proteins/<%= @accessions.fetch(i)%>"><%= @accessions.fetch(i)%></a></td>
 
+		<td><% @short_names.fetch(i).uniq.each do |s|%>
+			<%= s.full%><br>
+			<%= s.short%><br>
+			<%end%></td>
 		<td><% @all_names.fetch(i).each do |s|%>
 			<%= s.name%><br>
 			<%end%></td>
-		<%if @spec%>
-			<td><%if @species_ids.fetch(i) == 1%>
-				<%= "Human"%>
-				<%elsif  @species_ids.fetch(i) == 2%>
-				<%= "Mouse"%>
-				<%elsif  @species_ids.fetch(i) == 3%>
-				<%= "E. coli"%>
-				<%elsif  @species_ids.fetch(i) == 4%>
-				<%= "Yeast"%>
-				<%elsif  @species_ids.fetch(i) == 5%>
-				<%= "Arabidopsis"%>
-				<%end%>
-			</td>
-		<%end%>
-		<%if @chromosome%>
-			<td><%= @proteins.fetch(i).chromosome%></td>
-		<%end%>
-		<%if @band%>
-			<td><%= @proteins.fetch(i).band%></td>
-		<%end%>
 	
-		<%if @isoform%>
-			<td><%q = @isoforms.fetch(i)%>
-				<%q.each do |s|%>
-				<%= s%><br>					
-				<%end %><br>
-			</td>
+		<%if @spec%>
+			<td><%= @species_ids.fetch(i)%></td>
 		<%end%>
+
+		<%if @chromosome%>
+			<td><%= @proteins.fetch(i).chromosome%><br>
+				<%= @proteins.fetch(i).band%></td>
+		<%end%>
+		
 
 		<td><%= @upstreams.fetch(i)%> | <%= @peptides.fetch(i)%></td>
 		<td><%= @locations.fetch(i).succ%></td>
@@ -87,11 +71,33 @@
 		<%end%>
 
 	<%if @domain%>
+
+			<td><%q = @domains.fetch(i)%>		
+				<%indexx = 0%>
+				<%while indexx < @accessions.size%>
+				<%q.uniq.each do |r|%>
+				<%if @locations.fetch(i) <= r.to.to_i %>
+				<%= r.name%><br>
+				<%end%>
+				<%indexx += 1%>
+				<%end end%></td>
+
 			<td><%q = @domains.fetch(i)%>		
 				<%indexx = 0%>
 				<%while indexx < @accessions.size%>
 				<%q.each do |r|%>
-				<%if @locations.fetch(i) >= r.from.to_i && @locations.fetch(i) <= r.to.to_i %>
+				<%if (@locations.fetch(i) - @nterminal) >= r.from.to_i && (@locations.fetch(i) + @cterminal) <= r.to.to_i %>
+				<%= r.name%><br>
+				<%end%>
+				<%indexx += 1%>
+				<%end end%></td>
+
+
+			<td><%q = @domains.fetch(i)%>		
+				<%indexx = 0%>
+				<%while indexx < @accessions.size%>
+				<%q.each do |r|%>
+				<%if @locations.fetch(i) >= r.from.to_i%>
 				<%= r.name%><br>
 				<%end%>
 				<%indexx += 1%>
@@ -107,5 +113,119 @@
 	
 
 </table>
+-->
 
 
+<table border="1" >
+	<thead>
+	 <tr>
+		<th>Accession</th>
+		<th>Protein Name</th>
+		<th>All Names</th>
+		<%if @spec%>
+		<th>Species</th>
+		<%end%>
+		
+		
+		<%if @chromosome%>
+		<th>Chr</th>
+		<%end%>
+		
+	
+
+		<th>Sequence</th>
+		<th>Pos</th>
+		
+		<th>Proteases</th>	
+	
+		<%if @evidence%>
+		<th>Evidences</th>
+		<%end%>
+
+		<%if @domain%>
+		<th>Domain Before</th>
+		<th>Domain At</th>
+		<th>Domain After</th>
+		<%end%>
+
+	</tr>
+	</thead>
+
+	<tbody>
+	<% @accessions.each_index do |i|%>
+	<tr>	
+		<td><a href="http://clipserve.clip.ubc.ca/topfind/proteins/<%= @accessions.fetch(i)%>"><%= @accessions.fetch(i)%></a></td>
+
+		<td><% @short_names.fetch(i).uniq.each do |s|%>
+			<%= s.full%><br>
+			<%= s.short%><br>
+			<%end%></td>
+		<td><% @all_names.fetch(i).each do |s|%>
+			<%= s.name%><br>
+			<%end%></td>
+	
+		<%if @spec%>
+			<td><%= @species_ids.fetch(i)%></td>
+		<%end%>
+
+		<%if @chromosome%>
+			<td><%= @proteins.fetch(i).chromosome%><br>
+				<%= @proteins.fetch(i).band%></td>
+		<%end%>
+		
+
+		<td><%= @upstreams.fetch(i)%> | <%= @peptides.fetch(i)%></td>
+		<td><%= @locations.fetch(i).succ%></td>
+		<td><% @proteases.fetch(i).each do |s|%>
+			<%= s%><br>
+			<%end%></td>
+
+		<%if @evidence%>
+		<td><%@evidences_2.fetch(i).each do |s|%>
+			<%= s.name%><br>
+			<%end%>
+		<%end%>
+
+	<%if @domain%>
+
+			<td><%q = @domains.fetch(i)%>		
+				<%indexx = 0%>
+				<%while indexx < @accessions.size%>
+				<%q.uniq.each do |r|%>
+				<%if @locations.fetch(i) <= r.to.to_i %>
+				<%= r.name%><br>
+				<%end%>
+				<%indexx += 1%>
+				<%end end%></td>
+
+			<td><%q = @domains.fetch(i)%>		
+				<%indexx = 0%>
+				<%while indexx < @accessions.size%>
+				<%q.each do |r|%>
+				<%if (@locations.fetch(i) - @nterminal) >= r.from.to_i && (@locations.fetch(i) + @cterminal) <= r.to.to_i %>
+				<%= r.name%><br>
+				<%end%>
+				<%indexx += 1%>
+				<%end end%></td>
+
+
+			<td><%q = @domains.fetch(i)%>		
+				<%indexx = 0%>
+				<%while indexx < @accessions.size%>
+				<%q.each do |r|%>
+				<%if @locations.fetch(i) >= r.from.to_i%>
+				<%= r.name%><br>
+				<%end%>
+				<%indexx += 1%>
+				<%end end%>
+		<%end%>
+		
+			</td>
+
+
+
+	</tr><% end %>
+	</tbody>
+	
+
+</table>
