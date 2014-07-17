@@ -59,9 +59,26 @@ class Nterm < ActiveRecord::Base
   end  
 
   def map_to_isoforms
-	@iso_evidence = Evidence.name_is('inferred from isoform').first
 
-    unless self.evidences.count == 1 && self.evidences.include?(@iso_evidence)
+  	#dont propagate entires derived from these databases
+  	exclude = ['TopFIND','Ensembl','TISdb']
+    unless exclude.include?(self.evidences.first.evidencesource.dbname)
+  	  #generate "inferred from isoform" evidence
+	  @isoevidence = Evidence.find_or_create_by_name(:name => "inferred from #{self.externalid}",
+	    :idstring => "inferred-isoform-#{self.externalid}",
+	    :description => 'The stated informations has been inferred from an isoform by sequence similarity at the stated position.',
+        :phys_relevance => "unknown",
+        :directness => 'indirect',
+      	:method => 'electronic annotation'
+	  )
+	  @isoevidence.evidencesource = Evidencesource.find_or_create_by_dbid(
+	    :dbname => "TopFIND",
+	    :dbid => self.externalid,
+	    :dburl => "http://clipserve.clip.ubc.ca/topfind/proteins/#{self.protein.ac}\##{self.externalid}"
+	  ) 	
+	  @isoevidence.evidencecodes << Evidencecode.find_or_create_by_name(:name => 'inferred from isoform by sequence similarity',																	:code => 'TopFIND:0000002')
+	  @isoevidence.save
+
 	  mapping = self.protein.isoform_crossmapping(self.pos,'right')
 	  mapping.each_pair do |ac,pos|
 	    matchprot = Protein.ac_is(ac).first

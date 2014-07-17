@@ -153,17 +153,20 @@ class Cleavage < ActiveRecord::Base
         #get all evidences for the cleavage, modify to reflect indirectness, add to c and nterm
         self.evidences.each do |e|
           newevidence =  Evidence.find_or_create_by_idstring(
-          	:idstring => "Imer-#{e.idstring}",
-              :name => "Inferred from cleavage-#{e.id}",
+          	:idstring => "inferred-cleavage-#{self.externalid}",
+              :name => "Inferred from cleavage #{self.externalid}",
               :description => "Inferred from cleavage #{e.name}:\n#{e.description}",
               :phys_relevance => "unknown",
               :directness => 'indirect',
       		:method => 'electronic annotation'
            )
-           newevidence.evidencesource = e.evidencesource
-           newevidence.publications << e.publications
+           newevidence.evidencesource = Evidencesource.find_or_create_by_dbid(
+              :dbname => "TopFIND",
+              :dbid => self.externalid,
+              :dburl => "http://clipserve.clip.ubc.ca/topfind/proteins/#{self.protein.ac}\##{self.externalid}"
+            )   
            newevidence.evidencecodes << Evidencecode.find_or_create_by_name(:name => 'inferred from cleavage',
-      																	  :code => 'TOPCAT:0000001')
+      																	  :code => 'TopFIND:0000001')
            
            cterm.evidences.include?(newevidence) ? 1 : cterm.evidences << newevidence
            nterm.evidences.include?(newevidence) ? 1 : nterm.evidences << newevidence

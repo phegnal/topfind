@@ -36,7 +36,7 @@
 
             <section class="full category general">
               <pagenav />            
-              <a name="top"/><h2>General information <a class="uniprotlink" target="_blank" href="http://www.uniprot.org/uniprot/#{this.ac}">(UniProtKB)</a> <%= "<a class='uniprotlink' target='_blank' href='http://www.nextprot.org/db/entry/NX_#{this.ac}'>(nextprot)</a>" if this.species == 'Homo sapiens' %></h2>
+              <a name="top"/><h2>General information <a class="uniprotlink" target="_blank" href="http://www.uniprot.org/uniprot/#{this.ac}">(UniProtKB)</a> <%= "<a class='uniprotlink' target='_blank' href='http://www.nextprot.org/db/entry/NX_#{this.ac}'>(nextprot)</a>" if this.species.name == 'Homo sapiens' %></h2>
             </section>            
 
 <!-- ==== General proteotypic protein information === -->	
