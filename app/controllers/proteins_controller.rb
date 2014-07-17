@@ -705,9 +705,8 @@ class ProteinsController < ApplicationController
     @nterminal = params['nterminal'].to_i
     @cterminal = params['cterminal'].to_i
 
-    @mainarray = Array.new()
-    @input1.each{|i|
-      @q = {}
+    @mainarray = []
+    @input1.collect {|i|   @q = {}
       @q[:acc] = i.split("\s").fetch(0)
       @q[:pep] = i.split("\s").fetch(1).gsub(/[^[:upper:]]+/, "")
       @q[:protein] = Protein.find(:first, :conditions => ["ac = ?", @q[:acc]])
@@ -732,15 +731,17 @@ class ProteinsController < ApplicationController
     @q[:nterms] = Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
     @q[:cleavages] = Cleavage.find(:all, :conditions => ["nterm_id = ?", @q[:nterms].id])
     @q[:proteases] = @q[:cleavages].collect {|a| Protein.find(:first, :conditions => ["id = ?", a.protease_id])} #might not work as a line
-    @q[:domains] =  Ft.find(:all, :conditions => ["protein_id = ?", @q[:sql_id]i])} #array
+    @q[:domains] =  Ft.find(:all, :conditions => ["protein_id = ?", @q[:sql_id]])} #array
     @q[:evidence_nterms] = Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', @q[:nterms].id])
     @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.evidence_id } #array
     @q[:evidences] = @q[:evidence_ids].collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])}
-    @q[:chr] = [@q[:protein].chromosome, @q[:protein].band] if @chromosome
-     # @q[:something] = "xx" if chromosome
-      #@mainhash[@q[:acc]+ "_" + @q[:pep]] = @q
-    }
-
+    @q[:chr] = if @chromosome 
+      [@q[:protein].chromosome, @q[:protein].band] 
+    end
+    @mainarray << @q
+  }
+   p @mainarray #prints whole data structure
+=begin
     @input = @input1.collect{|a| a.split("\s")} #array of arrays [accession, peptide]  
     @accessions = @input.collect{|b| b.fetch(0)}
     @peptides = @input.collect{|b| b.fetch(1).gsub(/[^[:upper:]]+/, "")}
@@ -782,7 +783,7 @@ class ProteinsController < ApplicationController
     @evidences_nterms = @pep_nterms.collect {|k| Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", k.id])}
     @evidences_ids = @evidences_nterms.collect {|l| l.collect { |m| m.evidence_id  }}
     @evidences_2 = @evidences_ids.collect {|n| n.collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])  }}
-   
+=end   
  
 
   end
