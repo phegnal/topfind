@@ -239,12 +239,14 @@
          		     <if test="&this_parent.publications">
           		  	   <a href="#{this_parent.publications.first.url}"><%=this_parent.name%></a> 
           		     </if>
-         		     <if test="&this_parent.evidencesource">
-          		  	   <a href="#{this_parent.evidencesource.dburl}"><%=this_parent.name%></a> 
-          		     </if>
-          		     <else>
-          		       <%=this%> 
-          		     </else>
+         		     <else>
+						 <if test="&this_parent.evidencesource">
+						   <a href="#{this_parent.evidencesource.dburl}"><%=this_parent.name%></a> 
+						 </if>
+						 <else>
+						   <%=this%> 
+						 </else>
+					  </else>
          		   </name-view:> 
         		 <evidencecodes-view:>
 	    			<%= this.*.name.join(', ')%>
@@ -281,12 +283,14 @@
          		     <if test="&this_parent.publications">
           		  	   <a href="#{this_parent.publications.first.url}"><%=this_parent.name%></a> 
           		     </if>
-         		     <if test="&this_parent.evidencesource">
-          		  	   <a href="#{this_parent.evidencesource.dburl}"><%=this_parent.name%></a> 
-          		     </if>
-          		     <else>
-          		       <%=this%> 
-          		     </else>
+         		     <else>
+						 <if test="&this_parent.evidencesource">
+						   <a href="#{this_parent.evidencesource.dburl}"><%=this_parent.name%></a> 
+						 </if>
+						 <else>
+						   <%=this%> 
+						 </else>
+					  </else>
          		   </name-view:>
         		 <evidencecodes-view:>
 	    			<%= this.*.name.join(', ')%>
@@ -301,7 +305,7 @@
 <def tag="nterminus">
   <% t=this %>
   <%= "<a name='#{t.externalid}' />"%>
-  <% t.terminusmodification.kw.to_s == '' ? mod = '' : mod = link_to("#{t.terminusmodification.kw.to_s.downcase}-", t.terminusmodification, :class=>"popup", :rel=> "#overlay")%>  
+  <% t.terminusmodification.kw.to_s == '' ? mod = '' : mod = "#{t.terminusmodification.kw.to_s.downcase}-"%>  
   <div class='position'>
     <span class="boxlabel"><%="<sup>#{mod}#{t.pos}</sup>#{@protein.sequence[t.pos-1,1]}#{@protein.sequence[t.pos..t.pos+4]}..."%></span>
     <br/><span class='bulletgraph' ><t.pos/>,<%=@protein.aalen%></span>
@@ -319,12 +323,14 @@
          		     <if test="&this_parent.publications">
           		  	   <a href="#{this_parent.publications.first.url}"><%=this_parent.name%></a> 
           		     </if>
-         		     <if test="&this_parent.evidencesource">
-          		  	   <a href="#{this_parent.evidencesource.dburl}"><%=this_parent.name%></a> 
-          		     </if>
-          		     <else>
-          		       <%=this%> 
-          		     </else>
+         		     <else>
+						 <if test="&this_parent.evidencesource">
+						   <a href="#{this_parent.evidencesource.dburl}"><%=this_parent.name%></a> 
+						 </if>
+						 <else>
+						   <%=this%> 
+						 </else>
+					  </else>
          		   </name-view:>
         <evidencecodes-view:>
 	    		<%= this.*.name.join(', ')%>
@@ -357,7 +363,7 @@
 <def tag="cterminus">
   <% t=this %>
   <%= "<a name='#{t.externalid}' />"%>
-  <% t.terminusmodification.kw.to_s == '' ? mod = '' : mod = link_to("-#{t.terminusmodification.kw.to_s.downcase}", t.terminusmodification, :class=>"popup", :rel=> "#overlay")%>
+  <% t.terminusmodification.kw.to_s == '' ? mod = '' : mod = "-#{t.terminusmodification.kw.to_s.downcase}"%>
   <div class='position'>
     <span class="boxlabel"><%="...#{@protein.sequence[t.pos-5..t.pos-1]}<sup>#{t.pos}#{mod}</sup>"%></span> 
     <br/><span class='bulletgraph' ><t.pos/>,<%=@protein.aalen%></span>
@@ -375,12 +381,14 @@
          		     <if test="&this_parent.publications">
           		  	   <a href="#{this_parent.publications.first.url}"><%=this_parent.name%></a> 
           		     </if>
-         		     <if test="&this_parent.evidencesource">
-          		  	   <a href="#{this_parent.evidencesource.dburl}"><%=this_parent.name%></a> 
-          		     </if>
-          		     <else>
-          		       <%=this%> 
-          		     </else>
+         		     <else>
+						 <if test="&this_parent.evidencesource">
+						   <a href="#{this_parent.evidencesource.dburl}"><%=this_parent.name%></a> 
+						 </if>
+						 <else>
+						   <%=this%> 
+						 </else>
+					  </else>
          		   </name-view:>
 	    	<evidencecodes-view:>
 	    		<%= this.*.name.join(', ')%>

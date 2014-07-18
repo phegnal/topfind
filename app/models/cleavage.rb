@@ -31,8 +31,6 @@ class Cleavage < ActiveRecord::Base
   has_many :cleavage2evidences
   has_many :evidences, :through => :cleavage2evidences, :uniq => true
   
-  after_create :process_cleavagesite
-  after_create :process_termini
   
   belongs_to :import
 
@@ -128,7 +126,7 @@ class Cleavage < ActiveRecord::Base
     end
   end
   
-  def process_termini   
+  def process_termini
       if substrate
         #get all evidences for the cleavage, modify to reflect indirectness, add to c and nterm
         puts evidences

@@ -57,7 +57,7 @@ class Nterm < ActiveRecord::Base
   end  
 
   def map_to_isoforms
-
+	  
 	  mapping = self.protein.isoform_crossmapping(self.pos,'right')
 	  
 	  if mapping.present?

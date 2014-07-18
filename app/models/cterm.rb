@@ -34,7 +34,7 @@ class Cterm < ActiveRecord::Base
   end
   
   def externalid
-  	"TNt#{self.id}"
+  	"TCt#{self.id}"
   end 
    
   

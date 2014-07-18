@@ -80,6 +80,8 @@ class Import < ActiveRecord::Base
           )  
         newcleavage.evidences << self.evidence
         self.update_attributes(:cleavages_imported => self.cleavages_imported.next) 
+        newcleavage.process_termini
+        newcleavage.process_cleavagesite
         newcleavage.map_to_isoforms
       end     
     end

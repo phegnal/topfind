@@ -51,7 +51,7 @@ task :import_uniprot do
   @evidence.evidencecodes << Evidencecode.code_is('ECO:0000203').first
   @evidence.evidencesource = Evidencesource.find_or_create_by_dbname(
     :dbname => 'UniProtKB',
-    :dburl => 'www.uniprot.org',
+    :dburl => 'http://www.uniprot.org',
     :dbdesc => 'Uniprot/SWISSprot'
   )
   @evidence.save
@@ -65,7 +65,7 @@ task :import_uniprot do
   @evidencesimilarity.evidencecodes << Evidencecode.code_is('ECO:0000041').first
   @evidencesimilarity.evidencesource = Evidencesource.find_or_create_by_dbname(
     :dbname => 'UniprotKB',
-    :dburl => 'www.uniprot.org',
+    :dburl => 'http://www.uniprot.org',
     :dbdesc => 'Uniprot/SWISSprot'
   )
   @evidencesimilarity.save
@@ -352,7 +352,7 @@ task :import_uniprot do
     	#cterms    
     	  cterm = chain.cterm
     	  unless cterm
-	          cft = p.fts.matchfrom(chain.to).name_is('MOD_RES').first
+	          cft = p.fts.matchfrom(chain.to).name_is('MOD_RES').first if p.fts.matchfrom(chain.to).present?
 	          cft ? cmodname = cft.description.delete('.').split(';')[0] : cmodname = 'unknown'
 	          cmod = Terminusmodification.cterm_is(true).name_is(cmodname).first
       		  cmod = Terminusmodification.name_is('unknown').first if cmod.blank?    	  	 
@@ -364,7 +364,7 @@ task :import_uniprot do
     	#nterms    
    	  	  nterm = chain.nterm
     	  unless nterm
-	          nft = p.fts.matchfrom(chain.from).name_is('MOD_RES').first
+	          nft = p.fts.matchfrom(chain.from).name_is('MOD_RES').first if p.fts.matchfrom(chain.from).present?
 	          nft ? nmodname = nft.description.delete('.').split(';')[0] : nmodname = 'unknown'
               nmodname = 'acetylation' if nmodname.include?('acetyl')
 	          nmod = Terminusmodification.nterm_is(true).name_is(nmodname).first
@@ -531,13 +531,11 @@ desc "cross map termini between isoforms"
 task :cross_map_termini do
   require "#{RAILS_ROOT}/config/environment"
   
-  Protein.all.each do |p|
-  	p.nterms.each do |n|
-  	  n.map_to_isoforms
-	end
-  	p.cterms.each do |c|
-  	  c.map_to_isoforms
-	end
+  Nterm.all.each do |n|
+    n.map_to_isoforms
+  end
+  Cterm.all.each do |c|
+    c.map_to_isoforms
   end
 end
 

@@ -119,6 +119,7 @@ task :import_merops_cleavages do
           e.lab = elab
           e.directness = 'unknown'
         end
+        newevidence.save
 
         
         if epub.present?
@@ -126,6 +127,7 @@ task :import_merops_cleavages do
         end
         
         newevidence.evidencesource = @esource
+        newevidence.save
               
         if merevidence == 'experimental'
           ecode = Evidencecode.find_or_create_by_code(:name => 'inferred from experiment', :code => 'ECO:0000006')
@@ -137,8 +139,8 @@ task :import_merops_cleavages do
         
         newcleavage.evidences.include?(newevidence) ? 1 : newcleavage.evidences << newevidence
         
-        #newcleavage.process_termini
-        #newcleavage.process_cleavagesite
+        newcleavage.process_termini
+        newcleavage.process_cleavagesite
         newcleavage.map_to_isoforms
         
         @added = @added.next
