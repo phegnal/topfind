@@ -258,6 +258,7 @@
 
 <def tag="nterminus">
   <% t=this %>
+  <a id="#{t.externalid}" />
   <% t.terminusmodification.kw.to_s == 'unknown' ? mod = '' : mod = link_to("#{t.terminusmodification.kw.to_s.downcase}-", t.terminusmodification, :class=>"popup", :rel=> "#overlay")%>  
   <div class='position'>
     <span class="boxlabel"><%="<sup>#{mod}#{t.pos}</sup>#{@protein.sequence[t.pos-1,1]}#{@protein.sequence[t.pos..t.pos+4]}..."%></span>
@@ -267,7 +268,13 @@
 	  <div class='details'>  
 	  	<h4>Evidence: <span class="morelink">(<a this class="popup" rel="#overlay">more...</a>)</span></h4> 
 	    <table:evidences fields="evidencecodes,evidencesource,lab,name,directness,phys_relevance,confidence" class="evidencetable">
-	    	<evidencecodes-view:>
+	    	<evidencesource-view:>
+          <a href="#{this.dburl}">#{this.dbname}</a>
+         </evidencesource-view:> 
+        <name-view:>
+          <a href="#{this_parent.evidencesource.dburl}">#{this_parent.name}</a> 
+         </name-view:> 
+        <evidencecodes-view:>
 	    		<%= this.*.name.join(', ')%>
 	    	</evidencecodes-view:>
 	    	<confidence-view:>

@@ -8,7 +8,6 @@
     <nav-item with="&Chain"><ht key="chains.nav_item">Chains</ht></nav-item>
     <nav-item with="&Cleavage"><ht key="cleavages.nav_item">Cleavages</ht></nav-item>
     <nav-item with="&Cleavagesite"><ht key="cleavagesites.nav_item">Cleavagesites</ht></nav-item>
-    <nav-item with="&Crosscorrelation"><ht key="crosscorrelations.nav_item">Crosscorrelations</ht></nav-item>
     <nav-item with="&Cterm"><ht key="cterms.nav_item">Cterms</ht></nav-item>
   </navigation>
 </def>
@@ -375,123 +374,6 @@
 
 
 
-
-
-<!-- ====== Crosscorrelation Pages ====== -->
-
-<def tag="index-page" for="Crosscorrelation">
-  <page merge title="#{ht 'crosscorrelations.index.title', :default=>['Crosscorrelations'] }">
-    <body: class="index-page crosscorrelation" param/>
-
-    <content: param>
-      <header param="content-header">
-        <h2 param="heading">
-          <ht key="crosscorrelations.index.heading">
-            Crosscorrelations
-          </ht>
-        </h2>
-
-        <p param="count" if>
-          <ht key="crosscorrelations.collection.count" count="&this.size">
-            There <count prefix="are"/>
-          </ht>
-        </p>
-      </header>
-
-      <section param="content-body">
-        <a action="new" to="&model" param="new-link">
-          <ht key="crosscorrelations.actions.new">New Crosscorrelation</ht>
-        </a>
-
-        <page-nav param="top-page-nav"/>
-
-        <collection param/>
-
-        <page-nav param="bottom-page-nav"/>
-
-
-      </section>
-    </content:>
-  </page>
-</def>
-
-
-<def tag="new-page" for="Crosscorrelation">
-  <page merge title="#{ht 'crosscorrelations.new.title', :default=>[' New Crosscorrelation'] }">
-    <body: class="new-page crosscorrelation" param/>
-
-    <content: param>
-      <section param="content-header">
-        <h2 param="heading">
-          <ht key="crosscorrelations.new.heading">
-            New Crosscorrelation
-          </ht>
-        </h2>
-      </section>
-
-      <section param="content-body">
-        <form param>
-          <submit: label="#{ht 'crosscorrelations.actions.create', :default=>['Create Crosscorrelation']}"/>
-        </form>
-      </section>
-    </content:>
-  </page>
-</def>
-
-
-<def tag="show-page" for="Crosscorrelation">
-  <page merge title="#{ht 'crosscorrelations.show.title', :default=>['Crosscorrelation'] }">
-
-    <body: class="show-page crosscorrelation" param/>
-
-    <content: param>
-          <header param="content-header">
-            <h2 param="heading">
-              <ht key="crosscorrelations.show.heading" name="&this.respond_to?(:name) ? this.name : ''">
-                <name/>
-              </ht>
-            </h2>
-
-            <record-flags fields="" param/>
-
-            <a action="edit" if="&can_edit?" param="edit-link">
-              <ht key="crosscorrelations.actions.edit" name="&this.respond_to?(:name) ? this.name : ''">
-                Edit Crosscorrelation
-              </ht>
-            </a>
-          </header>
-
-          <section param="content-body">
-            <field-list fields="email, desc, ntermini, ctermini, cleavagesites, ip" param/>
-          </section>
-    </content:>
-
-  </page>
-</def>
-
-
-<def tag="edit-page" for="Crosscorrelation">
-  <page merge title="#{ht 'crosscorrelations.edit.title', :default=>['Edit Crosscorrelation'] }">
-
-    <body: class="edit-page crosscorrelation" param/>
-
-    <content:>
-      <section param="content-header">
-        <h2 param="heading">
-          <ht key="crosscorrelations.edit.heading" name="&this.respond_to?(:name) ? this.name : ''">
-            Edit <type-name/>
-          </ht>
-        </h2>
-        <delete-button label="#{ht 'crosscorrelations.actions.delete', :default=>['Remove This Crosscorrelation']}" param/>
-      </section>
-
-      <section param="content-body">
-        <form param/>
-      </section>
-    </content:>
-
-  </page>
-</def>
 
 
 

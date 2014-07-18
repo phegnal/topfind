@@ -128,46 +128,93 @@ class Cleavage < ActiveRecord::Base
     end
   end
   
-  def process_termini
-    if substrate
-      ct_idstring = "#{substrate.ac}-#{pos}-unknown"
-      cterm = self.cterm = Cterm.find_or_create_by_idstring(
-        :idstring => ct_idstring,  
-        :protein => self.substrate,
-        :isoform => self.substrateisoform,
-        :pos => pos-1,
-        :terminusmodification => Terminusmodification.find_or_create_by_name('unknown'))
+  def process_termini   
+      if substrate
+        #get all evidences for the cleavage, modify to reflect indirectness, add to c and nterm
+        puts evidences
+        self.evidences.each do |e|
+          @newevidence =  Evidence.find_or_create_by_idstring(
+          	:idstring => "inferred-cleavage-#{self.externalid}",
+              :name => "Inferred from cleavage #{self.externalid}",
+              :description => "Inferred from cleavage #{e.name}:\n#{e.description}",
+              :phys_relevance => "unknown",
+              :directness => 'indirect',
+      		:method => 'electronic annotation'
+           )
+           @newevidence.evidencesource = Evidencesource.find_or_create_by_dbid(
+              :dbname => "TopFIND",
+              :dbid => self.externalid,
+              :dburl => "http://clipserve.clip.ubc.ca/topfind/proteins/#{self.substrate.ac}\##{self.externalid}"
+            )   
+           @newevidence.evidencecodes << Evidencecode.find_or_create_by_name(:name => 'inferred from cleavage',
+      																	  :code => 'TopFIND:0000001')
+      	   @newevidence.save
+      	   
+			if pos.to_i-1 >= 2
+				ct_idstring = "#{substrate.ac}-#{pos}-unknown"
+				puts ct_idstring
+				cterm = self.cterm = Cterm.find_or_create_by_idstring(
+				  :idstring => ct_idstring,  
+				  :protein => self.substrate,
+				  :isoform => self.substrateisoform,
+				  :pos => pos-1,
+				  :terminusmodification => Terminusmodification.find_or_create_by_name('unknown'))
+			  
+			   cterm.evidences.include?(@newevidence) ? 1 : cterm.evidences << @newevidence
+			end
 
-      nt_idstring = "#{substrate.ac}-#{pos+1}-unknown"
-      nterm = self.nterm = Nterm.find_or_create_by_idstring(
-        :idstring => nt_idstring,  
-        :protein => self.substrate,
-        :isoform => self.substrateisoform,
-        :pos => pos,
-        :terminusmodification => Terminusmodification.find_or_create_by_name('unknown'))
-
-      #get all evidences for the cleavage, modify to reflect indirectness, add to c and nterm
-      self.evidences.each do |e|
-        newevidence =  Evidence.find_or_create_by_idstring(
-        	:idstring => "Imer-#{e.idstring}",
-            :name => "Inferred from cleavage-#{e.id}",
-            :description => "Inferred from cleavage #{e.name}:\n#{e.description}",
-            :phys_relevance => "unknown",
-            :directness => 'indirect',
-    		:method => 'electronic annotation'
-         )
-         newevidence.evidencesource = e.evidencesource
-         newevidence.publications << e.publications
-         newevidence.evidencecodes << Evidencecode.find_or_create_by_name(:name => 'inferred from cleavage',
-    																	  :code => 'TOPCAT:0000001')
-         
-         cterm.evidences.include?(newevidence) ? 1 : cterm.evidences << newevidence
-         nterm.evidences.include?(newevidence) ? 1 : nterm.evidences << newevidence
-       end
-
-    end
+			if pos.to_i <= self.substrate.aalen.to_i-2
+				nt_idstring = "#{substrate.ac}-#{pos+1}-unknown"
+				nterm = self.nterm = Nterm.find_or_create_by_idstring(
+				  :idstring => nt_idstring,  
+				  :protein => self.substrate,
+				  :isoform => self.substrateisoform,
+				  :pos => pos,
+				  :terminusmodification => Terminusmodification.find_or_create_by_name('unknown'))
+			  
+			   nterm.evidences.include?(@newevidence) ? 1 : nterm.evidences << @newevidence
+			end
+         end
+      end
   end
   
+
+  def map_to_isoforms
+      mapping = self.substrate.isoform_crossmapping(self.pos,'centre')
+      
+      if mapping.present?  
+		  #generate "inferred from isoform" evidence
+		  @isoevidence = Evidence.find_or_create_by_name(:name => "inferred from #{self.externalid}",
+			:idstring => "inferred-isoform-#{self.externalid}",
+			:description => 'The stated informations has been inferred from an isoform by sequence similarity at the stated position.',
+			:phys_relevance => "unknown",
+			:directness => 'indirect',
+			:method => 'electronic annotation'
+		  )
+		  @isoevidence.evidencesource = Evidencesource.find_or_create_by_dbid(
+			:dbname => "TopFIND",
+			:dbid => self.externalid,
+			:dburl => "http://clipserve.clip.ubc.ca/topfind/proteins/#{self.substrate.ac}\##{self.externalid}"
+		  ) 	
+		  @isoevidence.evidencecodes << Evidencecode.find_or_create_by_name(:name => 'inferred from isoform by sequence similarity',																	:code => 'TopFIND:0000002')
+		  @isoevidence.save
+	  end
+	  
+      mapping.each_pair do |ac,pos|
+        matchprot = Protein.ac_is(ac).first
+        idstring = "P(#{self.protease.ac})-S(#{ac})at(#{pos})"
+        cleavage = Cleavage.find_or_create_by_idstring(
+            :idstring => idstring,
+            :protease_id => self.protease.id,
+            :substrate_id => matchprot.id,
+            :peptide => self.peptide,
+            :pos => pos
+          )
+        cleavage.evidences << @isoevidence unless cleavage.evidences.include?(@isoevidence)
+        matchprot.cleavages << cleavage unless matchprot.cleavages.include?(cleavage)
+      end
+  end
+
   def self.generate_csv(ids)
     FasterCSV.generate({:col_sep => "\t"}) do |csv|
       csv << ['topcat cleavage id','protease (uniprot ac)','substrate (uniprot ac)','p1 position','topcat evidence ids']

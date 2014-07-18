@@ -36,17 +36,6 @@
 
 
 
-<def tag="form" for="Crosscorrelation">
-  <form merge param="default">
-    <error-messages param/>
-    <field-list fields="name, email, desc, ntermini, ctermini, cleavagesites, ip" param/>
-    <div param="actions">
-      <submit label="#{ht 'crosscorrelations.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
-    </div>
-  </form>
-</def>
-
-
 
 <def tag="form" for="Cterm">
   <form merge param="default">
