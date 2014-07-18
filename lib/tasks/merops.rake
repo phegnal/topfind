@@ -13,11 +13,12 @@ task :import_merops_cleavages do
   @padded =1 
 
   #one evidence source for all MEROPS entries
-  @esource = find_or_create_by_dbname(
+  @esource = Evidencesource.find_or_create_by_dbname(
           :dbname => 'MEROPS',
           :dburl => 'http://merops.sanger.ac.uk/',
           :dbdesc => 'MEROPS the peptidase database'
         )
+  @esource.save      
 
 
   proteases.each_with_index do |@p,@pi|
@@ -34,16 +35,16 @@ task :import_merops_cleavages do
       substrates.each_with_index do |@s,@si|
         
         #don't add if protease and substrate species don't match
-        next unless @p.oss.present? && @s.oss.present?
-        next if @p.oss.first.name != @s.oss.first.name
+        next unless @p.species.present? && @s.species.present?
+        next if @p.species.name != @s.species.name
         
-        if @added < 6200
-        	print "#{@added}, "
-        	@added = @added.next
-        	next
-        end		
+        #if @added < 6200
+        #	print "#{@added}, "
+        #	@added = @added.next
+        #	next
+        #end		
        
-        puts "\t#{@pi}/#{@total}/#{@padded}/#{@added}-#{@ci}-#{@si}: #{@p.ac} -#{@p.name}  | #{@s.ac} - #{@s.name}"
+        puts "\t#{@pi}/#{@total}/#{@padded}/#{@added}-#{@ci}-#{@si}: #{@p.ac} - #{@p.name}  | #{@s.ac} - #{@s.name}"
 
         #for PICS based cleavages >> don't attribute it to a protein substrate but create only cleavagesite
         @c.cleavage_notes.present? ? notes = @c.cleavage_notes.lstrip : notes = ''
@@ -136,8 +137,9 @@ task :import_merops_cleavages do
         
         newcleavage.evidences.include?(newevidence) ? 1 : newcleavage.evidences << newevidence
         
-        newcleavage.process_termini
-        newcleavage.process_cleavagesite
+        #newcleavage.process_termini
+        #newcleavage.process_cleavagesite
+        newcleavage.map_to_isoforms
         
         @added = @added.next
       end
@@ -159,7 +161,7 @@ task :import_merops_inhibitions do
   @mpadded =1 
 
   #one evidence source for all MEROPS entries
-  @esource = find_or_create_by_dbname(
+  @esource = Evidencesource.find_or_create_by_dbname(
           :dbname => 'MEROPS',
           :dburl => 'http://merops.sanger.ac.uk/',
           :dbdesc => 'MEROPS the peptidase database'

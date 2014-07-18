@@ -10,24 +10,24 @@ task :import_uniprot do
   puts "biomart connected"
   case ARGV[1]
     when 'human' 
-       io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot/uniprot_sprot_human.dat.gz")
-      #io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_human.dat.txt")
+      # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot/uniprot_sprot_human.dat.gz")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A9606+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
       @mart = biomart.datasets["hsapiens_gene_ensembl"]
     when 'mouse'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_rodents.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_mouse.dat.txt") 
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A10090+keyword%3A1185%29+AND+reviewed%3Ayes.txt") 
       @mart = biomart.datasets["mmusculus_gene_ensembl"] 
     when 'arabidopsis'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_plants.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_arabidopsis.dat.txt")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A3702+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
     when 'arabidopsis-trembl'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_trembl_plants.dat.gz")
     when 'ecoli'
-      # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_bacteria.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_ecoli.dat.txt")
+      # io = Zlib::GzipReader.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot_sprot_bacteria.dat.gz")
+      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/uniprot-%28organism%3A83333+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
     when 'yeast'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_fungi.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_yeast.dat.txt")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A559292+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
       @mart = biomart.datasets["scerevisiae_gene_ensembl"]
   end
   puts "done"
@@ -56,22 +56,6 @@ task :import_uniprot do
   )
   @evidence.save
 
-  #generate "inferred from isoform" evidence
-  @isoevidence = Evidence.find_or_create_by_name(:name => 'inferred from isoform',
-    :idstring => 'isoform-ECO:0000041',
-    :description => 'The stated informations has been inferred from an isoform by sequence similarity at the stated position.',
-    :phys_relevance => 'unknown',
-    :method => 'electronic annotation'
-  )
-
-  @isoevidence.evidencesource = Evidencesource.find_or_create_by_dbname(
-    :dbname => 'TopFIND',
-    :dburl => 'http://clipserve.clip.ubc.ca/topfind',
-    :dbdesc => ''
-  ) 	
-  @isoevidence.evidencecodes << Evidencecode.code_is('ECO:0000041').first
-  @isoevidence.save
-
   @evidencesimilarity = Evidence.find_or_create_by_name(:name => 'inferred from uniprot (by similarity)',
     :idstring => 'uniprot-ECO:0000041',
     :description => 'The stated informations has been extracted from the UniprotKB database and is based on similarity.',
@@ -94,7 +78,7 @@ task :import_uniprot do
        next
       end 
     
-    exit if i == 40
+    exit if i == 1000
     
     orgs = entry.os.map {|os| os['os']}
 
@@ -482,7 +466,6 @@ task :import_isoforms do
   require 'zlib'
 
   @evidence = Evidence.name_is('inferred from uniprot').first
-  @iso_evidence = Evidence.name_is('inferred from isoform').first
 
   Bio::FlatFile.open(ARGV[1]).each_with_index do |entry,i|
     # if i == 1 
@@ -511,12 +494,14 @@ task :import_isoforms do
         :chromosome => canonical_protein.chromosome,
         :band => canonical_protein.band,
         :species_id => canonical_protein.species_id)
-        
-      isoform.drs << Dr.new(:db_name   => 'Ensembl', 
+      
+      if canonical_protein.drs.db_name_is('Ensembl').present?  
+        isoform.drs << Dr.new(:db_name   => 'Ensembl', 
                           :protein_name => '', 
                           :content1   => '', 
                           :content2   => canonical_protein.drs.db_name_is('Ensembl').first.content2, 
-                          :content3   => '')	
+                          :content3   => '')
+        end	
 
       isoform.proteinnames << Proteinname.find_or_create_by_full(:full => fullname, :short => short_isoform_name, :recommended => true)
       
@@ -545,16 +530,6 @@ end
 desc "cross map termini between isoforms"
 task :cross_map_termini do
   require "#{RAILS_ROOT}/config/environment"
-  
-  @iso_evidence = Evidence.find_or_create_by_name(:name => 'inferred from isoform',
-    :idstring => 'uniprot-ECO:0000041',
-    :description => 'The stated information has been inferred from an isoform by local sequence similarity.',
-    :phys_relevance => 'unknown',
-    :method => 'electronic annotation'
-  )
-  
-  @iso_evidence.evidencecodes << Evidencecode.code_is('ECO:0000041').first
-  @iso_evidence.save
   
   Protein.all.each do |p|
   	p.nterms.each do |n|
