@@ -187,7 +187,7 @@ task :import_merops_inhibitions do
       proteases.each_with_index do |@p,@pi|
         
         # don't add if inhibited protease and inhibitor species don't match
-        next if @mp.oss.first.name != @p.oss.first.name
+        next if @mp.species.name != @p.species.name
         @i.conditions.present? ? conditions = @i.conditions.lstrip : conditions = ''   
         
         
@@ -234,7 +234,7 @@ task :import_merops_inhibitions do
         end
         
         newevidence.evidencesource = @esource
-        newevidence.evidencecodes.include?(ecode) ? 1 : newevidence.evidencecodes << @ecode
+        newevidence.evidencecodes.include?(@ecode) ? 1 : newevidence.evidencecodes << @ecode
         newinhibition.evidences.include?(newevidence) ? 1 : newinhibition.evidences << newevidence
 
         @added = @added.next
