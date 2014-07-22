@@ -726,33 +726,27 @@ class ProteinsController < ApplicationController
     @q[:sql_id] = @q[:protein].id
     @q[:all_names] = Searchname.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
     @q[:short_names] = Proteinname.find(:all, :conditions => ['protein_id = ? AND recommended = ?', @q[:sql_id], 1]).uniq
-
-    @q[:location] = @q[:sequence].index(@q[:pep]) #fix here
-
-    p @q[:location]
+    @q[:location] = @q[:sequence].index(@q[:pep])
     @q[:location_1] = @q[:location] + 1
-    @q[:location_range] = ((@q[:location] - @nterminal)..(@q[:location] + @cterminal)).to_a
-  
+    @q[:location_range] = ((@q[:location] - @nterminal)..(@q[:location] + @cterminal)).to_a  
+    @q[:upstream] = if @q[:location] < 10
+      @q[:sequence][0, @q[:location]]
+    else
+      @q[:sequence][@q[:location] - 10, 10]
+       end
     @q[:nterms] = Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
-    @q[:cleavages] = Cleavage.find(:all, :conditions => ["nterm_id = ?", @q[:nterms].id])
-      
-    @q[:proteases] = @q[:cleavages].collect {|a| Protein.find(:first, :conditions => ["id = ?", a.protease_id])} #might not work as a line
-  
-    @q[:domains] = Ft.find(:all, :conditions => ["protein_id = ?",  @q[:protein].id]) #array
-
-   
+    @q[:cleavages] = Cleavage.find(:all, :conditions => ["nterm_id = ?", @q[:nterms].id])      
+    @q[:proteases] = @q[:cleavages].collect {|a| Protein.find(:first, :conditions => ["id = ?", a.protease_id])} 
+    @q[:domains] = Ft.find(:all, :conditions => ["protein_id = ?",  @q[:protein].id]) 
     @q[:evidence_nterms] = Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', @q[:nterms].id])
-
-    @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.evidence_id } #array
-    
+    @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.evidence_id } #array    
     @q[:evidences] = @q[:evidence_ids].collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])}
     @q[:chr] = if @chromosome 
       [@q[:protein].chromosome, @q[:protein].band] 
     end
-    p @q
     @mainarray << @q
 }
-    p @mainarray#prints whole data structure
+   # p @mainarray#prints whole data structure
 =begin
     @input = @input1.collect{|a| a.split("\s")} #array of arrays [accession, peptide]  
     @accessions = @input.collect{|b| b.fetch(0)}
