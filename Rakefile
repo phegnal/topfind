@@ -8,7 +8,7 @@ require 'rake/testtask'
 begin
   require 'rake/rdoctask'
 rescue
-  require 'rdoc/task'
+#  require 'rdoc/task'
 end
 
 require 'tasks/rails'

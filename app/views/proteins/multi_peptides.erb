@@ -18,10 +18,10 @@
  
  <p>Information available<br>
  <%= check_box_tag(:spec)%> Species <br>
- <%= check_box_tag(:chromosome)%> Chromosome <br>
- <%= check_box_tag(:band)%> Band <br>
+ <%= check_box_tag(:chromosome)%> Chromosome and Band<br>
  <%= check_box_tag(:domain)%> Domain <br>
  <%= check_box_tag(:isoform)%> Isoform <br>
+ <%= check_box_tag(:evidence)%> Evidences <br>
  </p>
  
 Number of Amino Acids <b>N-terminal</b> to retrieve information for (leave blank for 0, up to 10)<br>
@@ -32,7 +32,8 @@ Number of Amino Acids <b>C-Terminal</b> to retrieve information for (leave blank
 
 <%= submit_tag("Process into table") %>
 <%end%>
-
+<!--
 <%form_tag(:action => "multi_export", :method => "get") do %>
 <%= submit_tag("Process into exportable form")%>
 <%end%>
+-->

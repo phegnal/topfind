@@ -4,6 +4,7 @@
 	<thead>
 	 <tr>
 		<th>Accession</th>
+		<th>Protein Name</th>
 		<th>All Names</th>
 		<%if @spec%>
 		<th>Species</th>
@@ -11,83 +12,91 @@
 		
 		
 		<%if @chromosome%>
-		<th>Chr</th>
+		<th>Chr<br>Band</th>
 		<%end%>
 		
-		<%if @band%>
-		<th>Band</th>
-		<%end%>
-		
-		
-		<%if @isoform%>	
-		<th>Isoforms</th>
-		<%end%>
+	
+
 		<th>Sequence</th>
 		<th>Pos</th>
 		
 		<th>Proteases</th>	
 	
-		<%if @domain%>
-		<th>Domain</th>
+		<%if @evidence%>
+		<th>Evidences</th>
 		<%end%>
 
-		<th>Evidences</th>
+		<%if @domain%>
+		<th>Domain Before</th>
+		<th>Domain<br>At</th>
+		<th>Domain<br>After</th>
+		<%end%>
+
 	</tr>
 	</thead>
 
 	<tbody>
-	<% @accessions.each_index do |i|%>
+	<% @mainarray.each_index do |i|%>
 	<tr>	
-		<td><a href="http://clipserve.clip.ubc.ca/topfind/proteins/<%= @accessions.fetch(i)%>"><%= @accessions.fetch(i)%></a></td>
+		<% q = @mainarray.fetch(i)%>
+		<td><a href="http://clipserve.clip.ubc.ca/topfind/proteins/<%= q[:acc]%>"><%= q[:acc]%></a></td>
 
-		<td><% @all_names.fetch(i).each do |s|%>
+		<td><% q[:short_names].each do |s|%>
+			<%= s.full%><br>
+			<%= s.short%><br>
+			<%end%></td>
+		<td><% q[:all_names].each do |s|%>
 			<%= s.name%><br>
 			<%end%></td>
-		<%if @spec%>
-			<td><%if @species_ids.fetch(i) == 1%>
-				<%= "Human"%>
-				<%elsif  @species_ids.fetch(i) == 2%>
-				<%= "Mouse"%>
-				<%elsif  @species_ids.fetch(i) == 3%>
-				<%= "E. coli"%>
-				<%elsif  @species_ids.fetch(i) == 4%>
-				<%= "Yeast"%>
-				<%elsif  @species_ids.fetch(i) == 5%>
-				<%= "Arabidopsis"%>
-				<%end%>
-			</td>
-		<%end%>
-		<%if @chromosome%>
-			<td><%= @proteins.fetch(i).chromosome%></td>
-		<%end%>
-		<%if @band%>
-			<td><%= @proteins.fetch(i).band%></td>
-		<%end%>
 	
-		<%if @isoform%>
-			<td><%q = @isoforms.fetch(i)%>
-				<%q.each do |s|%>
-				<%= s%><br>					
-				<%end %><br>
-			</td>
+		<%if @spec%>
+			<td><%= q[:species]%></td>
 		<%end%>
 
-		<td><%= @upstreams.fetch(i)%>|<%= @peptides.fetch(i)%></td>
-		<td><%= @locations.fetch(i).succ%></td>
-		<td><% @proteases.fetch(i).each do |s|%>
+		<%if @chromosome%>
+			<td><% q[:chr].each do |a|%>
+				<%= a%><br>
+				<%end%></td>
+		<%end%>
+		
+
+		<td><%= q[:upstream]%> | <%= q[:pep]%></td>
+		<td><%= q[:location].succ%></td>
+		<td><% q[:proteases].each do |s|%>
 			<%= s%><br>
 			<%end%></td>
-		
-		<td><%@evidences_2.fetch(i).each do |s|%>
+
+		<%if @evidence%>
+		<td><%q[:evidences].each do |s|%>
 			<%= s.name%><br>
 			<%end%>
+		<%end%>
 
 	<%if @domain%>
-			<td><%q = @domains.fetch(i)%>		
-				<%indexx = 0%>
-				<%while indexx < @accessions.size%>
-				<%q.each do |r|%>
-				<%if @locations.fetch(i) >= r.from.to_i && @locations.fetch(i) <= r.to.to_i %>
+
+			<td><%indexx = 0%>
+				<%while indexx < @mainarray.size%>
+				<%q[:domains].uniq.each do |r|%>
+				<%if q[:location] <= r.to.to_i %>
+				<%= r.name%><br>
+				<%end%>
+				<%indexx += 1%>
+				<%end end%></td>
+
+			<td><%indexx = 0%>
+				<%while indexx < @mainarray.size%>
+				<%q[:domains].each do |r|%>
+				<%if (q[:location] - @nterminal) >= r.from.to_i && (q[:location] + @cterminal) <= r.to.to_i %>
+				<%= r.name%><br>
+				<%end%>
+				<%indexx += 1%>
+				<%end end%></td>
+
+
+			<td><%indexx = 0%>
+				<%while indexx < @mainarray.size%>
+				<%q[:domains].each do |r|%>
+				<%if q[:location] >= r.from.to_i%>
 				<%= r.name%><br>
 				<%end%>
 				<%indexx += 1%>
@@ -103,5 +112,5 @@
 	
 
 </table>
-
+-->
 
