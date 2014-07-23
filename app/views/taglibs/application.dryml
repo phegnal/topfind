@@ -604,7 +604,7 @@
 				<p class="help">Please upload a comma seperated (csv) or excel file including a header line. You can contribute five kinds of data:
 				<ol>
 					<li><strong>proteases cleaving a native protein</strong><br/>
-						please provide the data in the follwoing order using the headerline: <i>protease,position,substrate</i><br/>
+						please provide the data in the following order using the headerline: <i>protease,position,substrate</i><br/>
 						<ul>
 						<li><strong>protease: </strong>UniProt ID: <i>Q9BYF1</i></li>
 						<li><strong>position: </strong>cleavage site position in the form: <i>222-223</i></li>
@@ -612,35 +612,35 @@
 						</ul>
 					</li>
 					<li><strong>proteases cleaving a peptide</strong><br/>
-						please provide the data in the folloing order using the headerline: <i>protease,peptide</i><br/>
+						please provide the data in the following order using the headerline: <i>protease,peptide</i><br/>
 						<ul>
 						<li><strong>protease: </strong>UniProt ID: <i>Q9BYF1</i></li>
 						<li><strong>peptide: </strong>peptide sequence with the cleavage site indicated by a colon: <i>GA:GQCVFA</i></li>
 						</ul>
 					</li>
 					<li><strong>proteases inhibited by protein inhibitors</strong><br/>
-						please provide the data in the folloing order using the headerline: <i>protease,inhibitor</i><br/>
+						please provide the data in the following order using the headerline: <i>protease,inhibitor</i><br/>
 						<ul>
 						<li><strong>protease: </strong>UniProt ID: <i>Q9BYF1</i></li>
 						<li><strong>peptide: </strong>UniProt ID: <i>Q9BYF1</i></li>
 						</ul>
 					</li>
 					<li><strong>protein N-termini</strong><br/>
-						please provide the data in the folloing order using the headerline: <i>protein,position,modification,confidence,confidence_type</i><br/>
+						please provide the data in the following order using the headerline: <i>protein,position,modification,confidence,confidence_type</i><br/>
 						<ul>
 						<li><strong>protein: </strong>UniProt ID: <i>Q9BYF1</i></li>
 						<li><strong>position: </strong>first amino acid relative to UniProt full length protein sequence: <i>222</i></li>
-						<li><strong>modification: </strong>name of the modification of the first amino acid according to TopFIND <a href="/modifications">modifications</a>: <i>acteylation</i> or <i>N-acetylaspartate</i> </li>
+						<li><strong>modification: </strong>name of the modification of the first amino acid according to TopFIND (link: <a href="/topfind/terminusmodifications">modifications</a> - use the filter on the right to find a modification): <i>acteylation</i> or <i>N-acetylaspartate</i></li>
 						<li><strong>confidence: </strong>a confidence measurement if applicable  (e.g. when based on peptide identification by mass spectrometry)</li>
 						<li><strong>confidence type: </strong>The type of the confidence value given (any of: 'unknown','probability','MASCOT score','X! Tandem score','PeptideProphet probability')</li>
 						</ul>
 					</li>
 					<li><strong>protein C-termini</strong><br/>
-						please provide the data in the folloing order using the headerline: <i>protein,position,modification,confidence,confidence_type</i><br/>
+						please provide the data in the following order using the headerline: <i>protein,position,modification,confidence,confidence_type</i><br/>
 						<ul>
 						<li><strong>protein: </strong>UniProt ID: <i>Q9BYF1</i></li>
 						<li><strong>position: </strong>last amino acid relative to UniProt full length protein sequence: <i>221</i></li>
-						<li><strong>modification: </strong>name of the modification of the last amino acid according to TopFIND <a href="/modifications">modifications</a>: <i>acteylation</i> or <i>N-acetylaspartate</i></li>
+						<li><strong>modification: </strong>name of the modification of the last amino acid according to TopFIND (link: <a href="/topfind/terminusmodifications">modifications</a> - use the filter on the right to find a modification): <i>acteylation</i> or <i>N-acetylaspartate</i></li>
 						<li><strong>confidence: </strong>a confidence measurement if applicable (e.g. when based on peptide identification by mass spectrometry)</li>
 						<li><strong>confidence type: </strong>The type of the confidence value given (any of: 'unknown','probability','MASCOT score','X! Tandem score','PeptideProphet probability')</li>
 						</ul>

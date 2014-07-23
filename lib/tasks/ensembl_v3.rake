@@ -168,7 +168,7 @@ namespace :ensembl_v3 do
         fasta[ensg].each{|p|
           ensp = p[0]
           seq = p[1] 
-          seq.gsub(/X/, '\w') ## TODO Maybe here i should remove the "X" and replace it with wildcard?
+          seq.gsub(/X/, '\w') ## TODO  should i remove the "X" and replace it with wildcard?
           if seq.length >= seqCutoff
             genes[ensg].each{|topf|
               fullSeq = topf[0]
@@ -180,7 +180,7 @@ namespace :ensembl_v3 do
               when 1 
                 pos =  fullSeq.index(/#{current_seq}/)
                 if not pos.nil? and not pos == 0
-                  nters << [ensg, ensp, pos, topf[1], topf[2]]
+                  nters << [ensg, ensp, pos, topf[1], topf[2]] # THIS IS WHERE I COULD ADD THE Met removal (TODO)
                 end
               when 0
                 errorFile << "  N #{ensp} #{ensg} #{topf[2]}...... not matched - ignored \n"
