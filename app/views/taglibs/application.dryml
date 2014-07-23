@@ -227,8 +227,31 @@
 
 <def tag="inverse-cleavage">
   <% c=this %>
+  <%= "<a name='#{c.externalid}' />"%>
   <h4><a href="#{url_for this.protease}"><view:protease.recname/></a> <span class="morelink">(<a this class="popup" rel="#overlay">more...</a>)</span></h4>
-  <table:evidences fields="evidencecodes,evidencesource,lab,name,directness,phys_relevance" class="evidencetable" /> 
+  <table:evidences fields="evidencecodes,evidencesource,lab,name,directness,phys_relevance" class="evidencetable"  >
+		  	       <evidencesource-view:>
+		  	         <if test="&this">
+          		   	   <a href="#{this.dburl}"><%=this.dbname%></a>
+          		   	 </if>
+         		   </evidencesource-view:> 
+         		   <name-view:>
+         		     <if test="&this_parent.publications">
+          		  	   <a href="#{this_parent.publications.first.url}"><%=this_parent.name%></a> 
+          		     </if>
+         		     <else>
+						 <if test="&this_parent.evidencesource">
+						   <a href="#{this_parent.evidencesource.dburl}"><%=this_parent.name%></a> 
+						 </if>
+						 <else>
+						   <%=this%> 
+						 </else>
+					  </else>
+         		   </name-view:> 
+        		 <evidencecodes-view:>
+	    			<%= this.*.name.join(', ')%>
+	    		 </evidencecodes-view:>	
+	</table:evidences> 
 </def>
 
 <def tag="cleavages" attrs="species">
@@ -241,6 +264,7 @@
 
 <def tag="cleavage">
   <% c=this %>
+  <%= "<a name='#{c.externalid}' />"%>
   <if test="&c.substrate">
 	  <div class='position'>
 	    <span class="boxlabel"><%="#{c.pos} <span class='shortseq'>(#{c.cleavagesite.try(:short_seq)})</span>"%></span>
@@ -249,7 +273,29 @@
   	  <section class="rightinfo">
 		  <div class='details'>  
 	  		<h4>Evidence: <span class="morelink">(<a this class="popup" rel="#overlay">more...</a>)</span></h4>
-		    <table:evidences fields="evidencecodes,evidencesource,lab,name,directness,phys_relevance" class="evidencetable" />
+		    <table:evidences fields="evidencecodes,evidencesource,lab,name,directness,phys_relevance" class="evidencetable" >
+		  	       <evidencesource-view:>
+		  	         <if test="&this">
+          		   	   <a href="#{this.dburl}"><%=this.dbname%></a>
+          		   	 </if>
+         		   </evidencesource-view:>  
+         		   <name-view:>
+         		     <if test="&this_parent.publications">
+          		  	   <a href="#{this_parent.publications.first.url}"><%=this_parent.name%></a> 
+          		     </if>
+         		     <else>
+						 <if test="&this_parent.evidencesource">
+						   <a href="#{this_parent.evidencesource.dburl}"><%=this_parent.name%></a> 
+						 </if>
+						 <else>
+						   <%=this%> 
+						 </else>
+					  </else>
+         		   </name-view:>
+        		 <evidencecodes-view:>
+	    			<%= this.*.name.join(', ')%>
+	    		 </evidencecodes-view:>	
+	    	</table:evidences>
 		  </div>
 	  </section>	  
 	  <div class="clear">&nbsp;</div> 
@@ -258,7 +304,8 @@
 
 <def tag="nterminus">
   <% t=this %>
-  <% t.terminusmodification.kw.to_s == 'unknown' ? mod = '' : mod = link_to("#{t.terminusmodification.kw.to_s.downcase}-", t.terminusmodification, :class=>"popup", :rel=> "#overlay")%>  
+  <%= "<a name='#{t.externalid}' />"%>
+  <% t.terminusmodification.kw.to_s == '' ? mod = '' : mod = "#{t.terminusmodification.kw.to_s.downcase}-"%>  
   <div class='position'>
     <span class="boxlabel"><%="<sup>#{mod}#{t.pos}</sup>#{@protein.sequence[t.pos-1,1]}#{@protein.sequence[t.pos..t.pos+4]}..."%></span>
     <br/><span class='bulletgraph' ><t.pos/>,<%=@protein.aalen%></span>
@@ -267,7 +314,25 @@
 	  <div class='details'>  
 	  	<h4>Evidence: <span class="morelink">(<a this class="popup" rel="#overlay">more...</a>)</span></h4> 
 	    <table:evidences fields="evidencecodes,evidencesource,lab,name,directness,phys_relevance,confidence" class="evidencetable">
-	    	<evidencecodes-view:>
+		  	       <evidencesource-view:>
+		  	         <if test="&this">
+          		   	   <a href="#{this.dburl}"><%=this.dbname%></a>
+          		   	 </if>
+         		   </evidencesource-view:> 
+         		   <name-view:>
+         		     <if test="&this_parent.publications">
+          		  	   <a href="#{this_parent.publications.first.url}"><%=this_parent.name%></a> 
+          		     </if>
+         		     <else>
+						 <if test="&this_parent.evidencesource">
+						   <a href="#{this_parent.evidencesource.dburl}"><%=this_parent.name%></a> 
+						 </if>
+						 <else>
+						   <%=this%> 
+						 </else>
+					  </else>
+         		   </name-view:>
+        <evidencecodes-view:>
 	    		<%= this.*.name.join(', ')%>
 	    	</evidencecodes-view:>
 	    	<confidence-view:>
@@ -297,7 +362,8 @@
   
 <def tag="cterminus">
   <% t=this %>
-  <% t.terminusmodification.kw.to_s == 'unknown' ? mod = '' : mod = link_to("-#{t.terminusmodification.kw.to_s.downcase}", t.terminusmodification, :class=>"popup", :rel=> "#overlay")%>
+  <%= "<a name='#{t.externalid}' />"%>
+  <% t.terminusmodification.kw.to_s == '' ? mod = '' : mod = "-#{t.terminusmodification.kw.to_s.downcase}"%>
   <div class='position'>
     <span class="boxlabel"><%="...#{@protein.sequence[t.pos-5..t.pos-1]}<sup>#{t.pos}#{mod}</sup>"%></span> 
     <br/><span class='bulletgraph' ><t.pos/>,<%=@protein.aalen%></span>
@@ -306,6 +372,24 @@
 	  <div class='details'>
 	  	<h4>Evidence: <span class="morelink">(<a this class="popup" rel="#overlay">more...</a>)</span></h4>  
 	    <table:evidences fields="evidencecodes,evidencesource,lab,name,directness,phys_relevance,confidence" class="evidencetable">
+		  	       <evidencesource-view:>
+		  	         <if test="&this">
+          		   	   <a href="#{this.dburl}"><%=this.dbname%></a>
+          		   	 </if>
+         		   </evidencesource-view:>  
+         		   <name-view:>
+         		     <if test="&this_parent.publications">
+          		  	   <a href="#{this_parent.publications.first.url}"><%=this_parent.name%></a> 
+          		     </if>
+         		     <else>
+						 <if test="&this_parent.evidencesource">
+						   <a href="#{this_parent.evidencesource.dburl}"><%=this_parent.name%></a> 
+						 </if>
+						 <else>
+						   <%=this%> 
+						 </else>
+					  </else>
+         		   </name-view:>
 	    	<evidencecodes-view:>
 	    		<%= this.*.name.join(', ')%>
 	    	</evidencecodes-view:>

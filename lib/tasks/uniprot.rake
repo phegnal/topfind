@@ -10,24 +10,24 @@ task :import_uniprot do
   puts "biomart connected"
   case ARGV[1]
     when 'human' 
-      # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_human.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_human.dat.txt")
+      # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot/uniprot_sprot_human.dat.gz")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A9606+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
       @mart = biomart.datasets["hsapiens_gene_ensembl"]
     when 'mouse'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_rodents.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_mouse.dat.txt") 
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A10090+keyword%3A1185%29+AND+reviewed%3Ayes.txt") 
       @mart = biomart.datasets["mmusculus_gene_ensembl"] 
     when 'arabidopsis'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_plants.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_arabidopsis.dat.txt")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A3702+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
     when 'arabidopsis-trembl'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_trembl_plants.dat.gz")
     when 'ecoli'
-      # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_bacteria.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_ecoli.dat.txt")
+      # io = Zlib::GzipReader.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot_sprot_bacteria.dat.gz")
+      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/uniprot-%28organism%3A83333+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
     when 'yeast'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_fungi.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_yeast.dat.txt")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A559292+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
       @mart = biomart.datasets["scerevisiae_gene_ensembl"]
   end
   puts "done"
@@ -37,7 +37,9 @@ task :import_uniprot do
     @updated = 0
     
     
+  #create a Terminusmodifciation of kind 'unknown' to be used as default
   Terminusmodification.find_or_create_by_name(:name => "unknown", :nterm => true, :cterm => true, :display => true)  
+
 
   #generate or select "inferred from uniprot" evidence
   @evidence = Evidence.find_or_create_by_name(:name => 'inferred from uniprot',
@@ -49,11 +51,10 @@ task :import_uniprot do
   @evidence.evidencecodes << Evidencecode.code_is('ECO:0000203').first
   @evidence.evidencesource = Evidencesource.find_or_create_by_dbname(
     :dbname => 'UniProtKB',
-    :dburl => 'www.uniprot.org',
+    :dburl => 'http://www.uniprot.org',
     :dbdesc => 'Uniprot/SWISSprot'
   )
   @evidence.save
-
 
   @evidencesimilarity = Evidence.find_or_create_by_name(:name => 'inferred from uniprot (by similarity)',
     :idstring => 'uniprot-ECO:0000041',
@@ -64,7 +65,7 @@ task :import_uniprot do
   @evidencesimilarity.evidencecodes << Evidencecode.code_is('ECO:0000041').first
   @evidencesimilarity.evidencesource = Evidencesource.find_or_create_by_dbname(
     :dbname => 'UniprotKB',
-    :dburl => 'www.uniprot.org',
+    :dburl => 'http://www.uniprot.org',
     :dbdesc => 'Uniprot/SWISSprot'
   )
   @evidencesimilarity.save
@@ -76,6 +77,8 @@ task :import_uniprot do
        puts "#{i} - "
        next
       end 
+    
+    exit if i == 1000
     
     orgs = entry.os.map {|os| os['os']}
 
@@ -184,6 +187,9 @@ task :import_uniprot do
     p.proteinnames << temp unless p.proteinnames.include?(temp)
     print "."
 
+
+
+
     entry.accessions.each do |ac|
       temp = Ac.find_or_create_by_name(:name => ac)
       p.acs << temp unless p.acs.include?(temp)
@@ -284,10 +290,13 @@ task :import_uniprot do
       print "."
   
       entry.cc.each do |k, v|
+
         [entry.cc(k)].flatten.each do |value|
           temp = Cc.new(:topic => k, 
                           :contents => value) 
         end
+
+
       end
   
       print "."
@@ -343,7 +352,7 @@ task :import_uniprot do
     	#cterms    
     	  cterm = chain.cterm
     	  unless cterm
-	          cft = p.fts.matchfrom(chain.to).name_is('MOD_RES').first
+	          cft = p.fts.matchfrom(chain.to).name_is('MOD_RES').first if p.fts.matchfrom(chain.to).present?
 	          cft ? cmodname = cft.description.delete('.').split(';')[0] : cmodname = 'unknown'
 	          cmod = Terminusmodification.cterm_is(true).name_is(cmodname).first
       		  cmod = Terminusmodification.name_is('unknown').first if cmod.blank?    	  	 
@@ -355,8 +364,9 @@ task :import_uniprot do
     	#nterms    
    	  	  nterm = chain.nterm
     	  unless nterm
-	          nft = p.fts.matchfrom(chain.from).name_is('MOD_RES').first
+	          nft = p.fts.matchfrom(chain.from).name_is('MOD_RES').first if p.fts.matchfrom(chain.from).present?
 	          nft ? nmodname = nft.description.delete('.').split(';')[0] : nmodname = 'unknown'
+              nmodname = 'acetylation' if nmodname.include?('acetyl')
 	          nmod = Terminusmodification.nterm_is(true).name_is(nmodname).first
             nmod = Terminusmodification.name_is('unknown').first if nmod.blank?    	  	 
 	          nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-#{chain.from}-#{nmod.name}",:protein_id => p.id, :pos => chain.from, :terminusmodification => nmod )
@@ -370,9 +380,10 @@ task :import_uniprot do
     p.fts.name_is('INIT_MET').each do |ft|
       nft = p.fts.matchfrom(ft.from).name_is('MOD_RES').first
       nft ? nmodname = nft.description.delete('.').split(';')[0] : nmodname = 'unknown'
+      nmodname = 'acetylation' if nmodname.include?('acetyl')
       nmod = Terminusmodification.nterm_is(true).name_is(nmodname).first  
       nmod = Terminusmodification.name_is('unknown').first if nmod.blank?  	  	 
-      nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-#{ft.from}-#{nmod.name}",:protein_id => p.id, :pos => ft.from, :terminusmodification => nmod )
+      nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-2-#{nmod.name}",:protein_id => p.id, :pos => ft.from, :terminusmodification => nmod )
       
       if ft.description.include?('similarity')
       	nterm.evidences << @evidencesimilarity unless nterm.evidences.include?(@evidencesimilarity)
@@ -390,6 +401,7 @@ task :import_uniprot do
     p.fts.id_in(ftids).each do |ft|
       nft = p.fts.matchfrom(ft.to.to_i+1).name_is('MOD_RES').first
       nft ? nmodname = nft.description.delete('.').split(';')[0] : nmodname = 'unknown'
+      nmodname = 'acetylation' if nmodname.include?('acetyl')
       nmod = Terminusmodification.nterm_is(true).name_is(nmodname).first 
       nmod = Terminusmodification.name_is('unknown').first if nmod.blank?   	  	 
       nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-#{ft.to.to_i+1}-#{nmod.name}",:protein_id => p.id, :pos => ft.to.to_i+1, :terminusmodification => nmod )
@@ -407,6 +419,7 @@ task :import_uniprot do
     p.fts.description_like('Removed').name_is('SIGNAL').each do |ft|
       nft = p.fts.matchfrom(ft.to.to_i+1).name_is('MOD_RES').first
       nft ? nmodname = nft.description.delete('.').split(';')[0] : nmodname = 'unknown'
+      nmodname = 'acetylation' if nmodname.include?('acetyl')
       nmod = Terminusmodification.nterm_is(true).name_is(nmodname).first
       nmod = Terminusmodification.name_is('unknown').first if nmod.blank?    	  	 
       nterm = Nterm.find_or_create_by_idstring(:idstring => "#{p.ac}-#{ft.to.to_i+1}-#{nmod.name}",:protein_id => p.id, :pos => ft.to.to_i+1, :terminusmodification => nmod )
@@ -451,21 +464,61 @@ task :import_isoforms do
   require "#{RAILS_ROOT}/config/environment"
   require 'bio'
   require 'zlib'
-  
+
+  @evidence = Evidence.name_is('inferred from uniprot').first
 
   Bio::FlatFile.open(ARGV[1]).each_with_index do |entry,i|
     # if i == 1 
     #   break
     # end
-    protein_ac = entry.accessions.first.split('-')[0]  
-    protein = Protein.find_by_ac(protein_ac)
+    isoform_ac = entry.accessions.first
+    isoform_num = entry.accessions.first.split('-')[1]
+    fullname = entry.identifiers.description.split(' OS=')[0]
+    short_canonical_name = entry.identifiers.sp.split(' ')[0]
+    short_isoform_name = short_canonical_name.gsub('_',"-Isoform#{isoform_num}_") 
+
+    canonical_protein_ac = isoform_ac.split('-')[0]  
+    canonical_protein = Protein.find_by_ac(canonical_protein_ac)
     @imported = 0
     
-    if protein
-      Isoform.find_or_create_by_ac(:protein => protein, 
+    if canonical_protein
+      Isoform.find_or_create_by_ac(:protein => canonical_protein, 
                   :ac => entry.accessions.first, 
-                  :name => entry.identifiers.description.split(' OS=')[0], 
+                  :name => fullname, 
                   :sequence => entry.aaseq)
+
+      isoform = Protein.find_or_create_by_ac(:ac => isoform_ac,
+        :name => short_isoform_name, 
+    	:sequence => entry.aaseq,
+        :aalen => entry.aalen,
+        :chromosome => canonical_protein.chromosome,
+        :band => canonical_protein.band,
+        :species_id => canonical_protein.species_id)
+      
+      if canonical_protein.drs.db_name_is('Ensembl').present?  
+        isoform.drs << Dr.new(:db_name   => 'Ensembl', 
+                          :protein_name => '', 
+                          :content1   => '', 
+                          :content2   => canonical_protein.drs.db_name_is('Ensembl').first.content2, 
+                          :content3   => '')
+        end	
+
+      isoform.proteinnames << Proteinname.find_or_create_by_full(:full => fullname, :short => short_isoform_name, :recommended => true)
+      
+	  #add N and C termin for sequence start and end
+    	#Cterm
+    	cmod = Terminusmodification.name_is('unknown').first    	  	 
+		cterm = Cterm.find_or_create_by_idstring(:idstring => "#{isoform.ac}-#{entry.aalen}-#{cmod.name}",:protein_id => isoform.id, :pos => entry.aalen, :terminusmodification => cmod )
+	    cterm.evidences << @evidence unless cterm.evidences.include?(@evidence)
+	    isoform.cterms << cterm	unless isoform.cterms.include?(cterm)
+	    
+		#Nterm
+    	nmod = Terminusmodification.name_is('unknown').first    	  	 
+		nterm = Nterm.find_or_create_by_idstring(:idstring => "#{isoform.ac}-1-#{nmod.name}",:protein_id => isoform.id, :pos => 1, :terminusmodification => nmod )
+	    nterm.evidences << @evidence unless nterm.evidences.include?(@evidence)
+	    isoform.nterms << nterm	unless isoform.nterms.include?(nterm)
+    	  
+        
       @imported = @imported.next
     end
 
@@ -473,6 +526,18 @@ task :import_isoforms do
   end
 end
 
+
+desc "cross map termini between isoforms"
+task :cross_map_termini do
+  require "#{RAILS_ROOT}/config/environment"
+  
+  Nterm.all.each do |n|
+    n.map_to_isoforms
+  end
+  Cterm.all.each do |c|
+    c.map_to_isoforms
+  end
+end
 
 desc "delete all uniprot data"
 task :prune_uniprot do
@@ -516,16 +581,17 @@ end
 
 
 
-desc "import tissues from tislist.dat"
+desc "import tissues from uniprot"
 task :import_tislist do
   require "#{RAILS_ROOT}/config/environment"
   require 'bio'
   require 'zlib'
-  io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/ontologies/uniprot/tislist.dat.gz")
+  # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/ontologies/uniprot/tislist.dat.gz")
+  filename = "#{RAILS_ROOT}/source_data/tisslist.txt"
     @skipped = 0
     @added = 0
 
-  a = Bio::FlatFile.new(Bio::SPTR,io)
+  a = Bio::FlatFile.open(Bio::SPTR,filename)
   a.each do |e|
    tsid = e.get('ID').delete('ID    ').delete('.')
    ac = e.get('AC').delete('AC    ').delete('.')
@@ -546,7 +612,7 @@ task :import_ptmlist do
   require "#{RAILS_ROOT}/config/environment"
   require 'bio'
   require 'zlib'
-  filename = "#{RAILS_ROOT}/databases/ontologies/uniprot/ptmlist.txt"
+  filename = "#{RAILS_ROOT}/source_data/ptmlist.txt"
     @skipped = 0
     @added = 0
 	
@@ -604,7 +670,7 @@ task :import_keywlist do
   require "#{RAILS_ROOT}/config/environment"
   require 'bio'
   require 'zlib'
-  filename = "#{RAILS_ROOT}/databases/ontologies/uniprot/keywlist.txt"
+  filename = "#{RAILS_ROOT}/source_data/keywlist.txt"
     @skipped = 0
     @added = 0
 		   
@@ -637,11 +703,14 @@ task :import_keywlist do
 end 
 
 desc "import uniprot evidence codes from evidence_code.obo"
+
+
+
 task :import_evidencecodes do
   require "#{RAILS_ROOT}/config/environment"
   require 'bio'  
   
-  filename = "#{RAILS_ROOT}/databases/ontologies/uniprot/evidence_code.obo"
+  filename = "#{RAILS_ROOT}/source_data/evidence_code.obo"
   
   @term = Hash.new
   
@@ -907,7 +976,7 @@ task :import_uniprot_gene_names do
 end
 
 
-desc "write meropscodes from drs to protein itself"
+desc "populate searchnames table with a set of searchable names and ids"
 task :populate_searchnames do
   require "#{RAILS_ROOT}/config/environment"
 
@@ -944,8 +1013,15 @@ task :write_meropscodes do
 
   Protein.drs_db_name_is('MEROPS').each do |p|
     merdrs = p.drs.db_name_is('MEROPS')
-    code = merdrs.first.protein_name if merdrs.present?
-    mer = Merops.find_by_code(code) if merdrs.present?
+
+    #select protease entry for multi domain protease / inhibitors 
+    merdr = merdrs.first
+    if merdrs.count >> 1 && merdr.protein_name.match(/^I/)
+      merdrs.map {|x| merdr = x unless x.protein_name.match(/^I/)}
+    end
+      
+    code = merdr.protein_name if merdr.present?
+    mer = Merops.find_by_code(code) if merdr.present?
     fam = mer.family if mer.present?
     subfam = mer.subfamily if mer.present?
     Protein.find(p.id).update_attributes(:meropscode => code,:meropsfamily => fam,:meropssubfamily => subfam) if mer.present?

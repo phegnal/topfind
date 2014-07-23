@@ -11,6 +11,16 @@ task :import_merops_cleavages do
   puts "starting import of #{@total} proteases"
   @added = 1 
   @padded =1 
+
+  #one evidence source for all MEROPS entries
+  @esource = Evidencesource.find_or_create_by_dbname(
+          :dbname => 'MEROPS',
+          :dburl => 'http://merops.sanger.ac.uk/',
+          :dbdesc => 'MEROPS the peptidase database'
+        )
+  @esource.save      
+
+
   proteases.each_with_index do |@p,@pi|
     # get the merops id for the protein from the drs table
     @merid = @p.drs.find_by_db_name('MEROPS').protein_name
@@ -25,16 +35,16 @@ task :import_merops_cleavages do
       substrates.each_with_index do |@s,@si|
         
         #don't add if protease and substrate species don't match
-        next unless @p.oss.present? && @s.oss.present?
-        next if @p.oss.first.name != @s.oss.first.name
+        next unless @p.species.present? && @s.species.present?
+        next if @p.species.name != @s.species.name
         
-        if @added < 6200
-        	print "#{@added}, "
-        	@added = @added.next
-        	next
-        end		
+        #if @added < 6200
+        #	print "#{@added}, "
+        #	@added = @added.next
+        #	next
+        #end		
        
-        puts "\t#{@pi}/#{@total}/#{@padded}/#{@added}-#{@ci}-#{@si}: #{@p.ac} -#{@p.name}  | #{@s.ac} - #{@s.name}"
+        puts "\t#{@pi}/#{@total}/#{@padded}/#{@added}-#{@ci}-#{@si}: #{@p.ac} - #{@p.name}  | #{@s.ac} - #{@s.name}"
 
         #for PICS based cleavages >> don't attribute it to a protein substrate but create only cleavagesite
         @c.cleavage_notes.present? ? notes = @c.cleavage_notes.lstrip : notes = ''
@@ -109,20 +119,15 @@ task :import_merops_cleavages do
           e.lab = elab
           e.directness = 'unknown'
         end
+        newevidence.save
 
         
         if epub.present?
         	newevidence.publications.include?(epub) ? 1 : newevidence.publications << epub 
         end
         
-        esource = Evidencesource.find_or_create_by_dbid(
-          :dbid => @merid,
-          :dbname => 'MEROPS',
-          :dburl => texturl,
-          :dbdesc => ''
-        )
-        
-        newevidence.evidencesource = esource
+        newevidence.evidencesource = @esource
+        newevidence.save
               
         if merevidence == 'experimental'
           ecode = Evidencecode.find_or_create_by_code(:name => 'inferred from experiment', :code => 'ECO:0000006')
@@ -136,6 +141,7 @@ task :import_merops_cleavages do
         
         newcleavage.process_termini
         newcleavage.process_cleavagesite
+        newcleavage.map_to_isoforms
         
         @added = @added.next
       end
@@ -155,6 +161,19 @@ task :import_merops_inhibitions do
   @total = merproteins.count  
   @added = 1 
   @mpadded =1 
+
+  #one evidence source for all MEROPS entries
+  @esource = Evidencesource.find_or_create_by_dbname(
+          :dbname => 'MEROPS',
+          :dburl => 'http://merops.sanger.ac.uk/',
+          :dbdesc => 'MEROPS the peptidase database'
+        )
+        
+  @ecode = Evidencecode.find_or_create_by_code(:code =>'ECO:0000203', 
+    :name => "inferred from electronic annotation",
+    :definition => "Used for annotations that depend directly on computation or automated transfer of annotations from a database, particularly when the analysis is performed internally and not published. A key feature that distinguishes this evidence code from others is that it is not made by a curator; use IEA when no curator has checked the specific annotation to verify its accuracy. The actual method used (BLAST search, Swiss-Prot keyword mapping, etc.) doesn't matter." 
+  )  
+
   merproteins.each_with_index do |@mp,@mpi|
     # get the merops id for the protein from the dbxref table
     @merid = @mp.drs.db_name_equals('MEROPS').first.protein_name
@@ -170,7 +189,7 @@ task :import_merops_inhibitions do
       proteases.each_with_index do |@p,@pi|
         
         # don't add if inhibited protease and inhibitor species don't match
-        next if @mp.oss.first.name != @p.oss.first.name
+        next if @mp.species.name != @p.species.name
         @i.conditions.present? ? conditions = @i.conditions.lstrip : conditions = ''   
         
         
@@ -216,21 +235,8 @@ task :import_merops_inhibitions do
         	newevidence.publications.include?(epub) ? 1 : newevidence.publications << epub 
         end
         
-        esource = Evidencesource.find_or_create_by_dbid(
-          :dbid => @merid,
-          :dbname => 'MEROPS',
-          :dburl => texturl,
-          :dbdesc => ''
-        )
-        
-        newevidence.evidencesource = esource
-        
-        ecode = Evidencecode.find_or_create_by_code(:code =>'ECO:0000203', 
-          :name => "inferred from electronic annotation",
-          :definition => "Used for annotations that depend directly on computation or automated transfer of annotations from a database, particularly when the analysis is performed internally and not published. A key feature that distinguishes this evidence code from others is that it is not made by a curator; use IEA when no curator has checked the specific annotation to verify its accuracy. The actual method used (BLAST search, Swiss-Prot keyword mapping, etc.) doesn't matter." 
-        )
-        newevidence.evidencecodes.include?(ecode) ? 1 : newevidence.evidencecodes << ecode
-        
+        newevidence.evidencesource = @esource
+        newevidence.evidencecodes.include?(@ecode) ? 1 : newevidence.evidencecodes << @ecode
         newinhibition.evidences.include?(newevidence) ? 1 : newinhibition.evidences << newevidence
 
         @added = @added.next

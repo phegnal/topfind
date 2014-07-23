@@ -204,21 +204,21 @@ class ProteinsController < ApplicationController
   end     
   
   def show
-    
+    id = params[:id]
     #convert request into :id, :isoform, chain
-    @iso = nil
-    @chain = nil
-    if params[:id].include?('-')
-      id = params[:id].split('-').first
-      # @iso = Isoform.ac_is(params[:id]).first     
-    else
-      id = params[:id]
-      # @chain = Chain.name_is(params[:chain]).first  
-    end
+#    @iso = nil
+#    @chain = nil
+#    if params[:id].include?('-')
+#      id = params[:id].split('-').first
+#      # @iso = Isoform.ac_is(params[:id]).first     
+#    else
+#      id = params[:id]
+#      # @chain = Chain.name_is(params[:chain]).first  
+#    end
     
-    if params.key?(:chain)      
-      # @chain = Chain.name_is(params[:chain]).first 
-    end
+#    if params.key?(:chain)      
+#      # @chain = Chain.name_is(params[:chain]).first 
+#    end
      
    
     # hobo_show @protein = Protein.id_or_ac_or_name_is(id).first  
@@ -287,7 +287,7 @@ class ProteinsController < ApplicationController
     @filter_tissues = evidences.*.tissues.flatten.uniq.*.name.uniq
     @filter_sources = evidences.*.evidencesource.flatten.compact.uniq.*.dbname.uniq
     labs = evidences.*.lab
-    labs.present? ? @filter_labs = labs.flatten.uniq.compact.sort : @filtere_labs = labs
+    labs.present? ? @filter_labs = labs.flatten.uniq.compact.sort : @filter_labs = labs
     @filter_evidences = evidences.*.name.uniq
     @filter_gocomponents = evidences.*.gocomponents.flatten.uniq.*.name.uniq
     @filter_methodologies = evidences.*.methodology.uniq
@@ -301,8 +301,9 @@ class ProteinsController < ApplicationController
 
   def filter
     @params = params
+    id = params[:id]
     #remove isofrom from ac
-    id = params[:id].split('-').first
+#    id = params[:id].split('-').first
     hobo_show @protein = Protein.id_or_ac_or_name_is(id).first  
     ids = nil
     params[:ppi].present? ? @ppi = params[:ppi] : @ppi = false
@@ -428,7 +429,7 @@ class ProteinsController < ApplicationController
     @filter_tissues = evidences.*.tissues.flatten.uniq.*.name.sort
     @filter_sources = evidences.*.evidencesource.flatten.compact.uniq.*.dbname.sort
     labs = evidences.*.lab
-    labs.present? ? @filter_labs = labs.flatten.uniq.compact.sort : @filtere_labs = labs
+    labs.present? ? @filter_labs = labs.flatten.uniq.compact.sort : @filter_labs = labs
     @filter_evidences = evidences.*.name.sort
     @filter_gocomponents = evidences.*.gocomponents.flatten.uniq.*.name.sort
     @filter_methodologies = evidences.*.methodology.uniq
@@ -441,8 +442,9 @@ class ProteinsController < ApplicationController
   
   def apiget
     @params = params
+    id = params[:id]
     #remove isofrom from ac
-    id = params[:id].split('-').first
+    #id = params[:id].split('-').first
     @protein = Protein.id_or_ac_or_name_is(id).first  
     ids = nil
     

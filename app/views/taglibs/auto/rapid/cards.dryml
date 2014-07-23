@@ -40,14 +40,6 @@
   </card>
 </def>
 
-<def tag="card" for="Crosscorrelation">
-  <card class="crosscorrelation" param="default" merge>
-    <header: param>
-      <h4 param="heading"><a><name/></a></h4>
-    </header:>
-  </card>
-</def>
-
 <def tag="card" for="Cterm">
   <card class="cterm" param="default" merge>
     <header: param>

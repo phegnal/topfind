@@ -80,6 +80,9 @@ class Import < ActiveRecord::Base
           )  
         newcleavage.evidences << self.evidence
         self.update_attributes(:cleavages_imported => self.cleavages_imported.next) 
+        newcleavage.process_termini
+        newcleavage.process_cleavagesite
+        newcleavage.map_to_isoforms
       end     
     end
   end  
@@ -164,6 +167,7 @@ class Import < ActiveRecord::Base
         cterm.evidences << self.evidence
         #cterm.cterm2evidences.evidence_id_is(input[:evidence_id]).first.update_attributes(:confidence => confidence, :confidence_type => confidence_type) 
         self.update_attributes(:cterms_imported => self.cterms_imported.next)
+        cterm.map_to_isoforms
       end 
     end    
   end
@@ -195,6 +199,7 @@ class Import < ActiveRecord::Base
         nterm.evidences << self.evidence 
         #nterm.nterm2evidences.evidence_id_is(input[:evidence_id]).first.update_attributes(:confidence => confidence, :confidence_type => confidence_type)
         self.update_attributes(:nterms_imported => self.nterms_imported.next)
+        nterm.map_to_isoforms
       end 
     end 
   end

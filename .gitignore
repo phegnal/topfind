@@ -1,7 +1,6 @@
-<<<<<<< HEAD
 Rakefile
 app/models/merops.rb
-=======
+
 # Compiled source #
 ###################
 *.com
@@ -54,6 +53,7 @@ capybara-*.html
 /public/system
 /coverage/
 /spec/tmp
+/app/views/taglibs/auto/*
 **.orig
 rerun.txt
 pickle-email-*.html
@@ -77,4 +77,7 @@ Gemfile.lock, .ruby-version, .ruby-gemset
 /config/environments/
 /config/environment.rb
 /config/database.yml
->>>>>>> 0512bacfaedc485639c8b97d94bcf1a8b0b0ba6d
+/databases/topfind_users*
+/source_data/*
+/databases/*
+/public/*.html
