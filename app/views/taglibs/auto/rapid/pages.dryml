@@ -9,6 +9,7 @@
     <nav-item with="&Cleavage"><ht key="cleavages.nav_item">Cleavages</ht></nav-item>
     <nav-item with="&Cleavagesite"><ht key="cleavagesites.nav_item">Cleavagesites</ht></nav-item>
     <nav-item with="&Cterm"><ht key="cterms.nav_item">Cterms</ht></nav-item>
+    <nav-item with="&Documentation"><ht key="documentations.nav_item">Documentations</ht></nav-item>
   </navigation>
 </def>
 
@@ -371,9 +372,6 @@
 
   </page>
 </def>
-
-
-
 
 
 
