@@ -739,29 +739,22 @@ class ProteinsController < ApplicationController
     @q[:nterms] = Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
     @q[:cleavages] = Cleavage.find(:all, :conditions => ["nterm_id = ?", @q[:nterms].id])      
     @q[:proteases] = @q[:cleavages].collect {|a| Protein.find(:first, :conditions => ["id = ?", a.protease_id])} 
+    @q[:nterms_before] = Nterm.find(:all, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], (@q[:location_1] - @nterminal)..@q[:location_1]])
+    p @q[:nterms_before]
     @q[:domains] = Ft.find(:all, :conditions => ["protein_id = ?",  @q[:protein].id]) 
     @q[:evidence_nterms] = Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', @q[:nterms]])
     @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.evidence_id } #array    
     @q[:evidences] = @q[:evidence_ids].collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])}
     @q[:evidence_source_ids] = @q[:evidences].collect {|a| a.evidencesource_id}
- 
     @q[:evidence_sources] = @q[:evidence_source_ids].collect {|b| Evidencesource.find(:first, :conditions => ['id = ?', b])}
-   # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
+    #@q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
     p @q[:evidence_sources]
    #p @q[:source_names]
-=begin
-   @evidence_nterms = Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", @pep_nterms])
-    @evidence_ids = @evidence_nterms.collect {|c| c.evidence_id}
-    @evidences_1 = @evidence_ids.collect {|f| Evidence.find(:first, :conditions => ["id = ?", f])}
-
-=end
     @q[:chr] = if @chromosome 
       [@q[:protein].chromosome, @q[:protein].band] 
     end
     @q[:transmem] = @q[:domains].delete_if {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
-
-    @mainarray << @q
-    
+    @mainarray << @q    
 }
 
 # Nik's code - Stats
