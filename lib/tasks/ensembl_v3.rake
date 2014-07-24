@@ -96,10 +96,10 @@ namespace :ensembl_v3 do
       genes.each_value{|v|
         l = l + v.length
       }
-      f << speciesName + " - TopFIND: ENSGs: " + genes.length.to_s + ", entries (ENSG-Id pairs): #{l.to_s} \n"
+      f << speciesName + " - TopFIND: IDs: " + genes.length.to_s + ", ENSG-Id pairs: #{l.to_s} \n"
     end
 
-    p "TopFIND done"
+    p "TopFIND query done"
 
     #####
     ##### PARSE ENSEMBL FASTA FILES
@@ -132,10 +132,10 @@ namespace :ensembl_v3 do
       fasta.each_value{|v|
         l = l + v.length
       }
-      f << speciesName + " - Ensembl from TopFIND: ENSGs: #{fasta.keys.length.to_s} , ENSPs #{l.to_s} \n"
+      f << speciesName + " - Ensembl file read. Intersection with TopFIND: ENSGs: #{fasta.keys.length.to_s} , ENSPs #{l.to_s} \n"
     end
 
-    p "Ensembl done"
+    p "Ensembl file done"
 
 
 
@@ -220,6 +220,7 @@ namespace :ensembl_v3 do
       f << "N-termini matches missed: #{missedNTer} multiple: #{multipleNTer} \n"
       f << "C-termini matches missed: #{missedCTer} multiple: #{multipleCTer} \n"
       
+      # MAP TO ISOFORMS
       nter_iso_args = {:entries => nmap2isoforms, :species_id => speciesId, :file => f, :seqCutoff => seqCutoff}
       Rake::Task["ensembl_v3:isoform_ntermini"].execute(args=nter_iso_args)
       
@@ -329,8 +330,8 @@ namespace :ensembl_v3 do
     isoforms.each_value{|v|
       l = l + v.length
     }
-    f << " isoforms: TopFIND: retrieved ENSGs: #{isoforms.length} isoforms: #{l.to_s} \n"
-    p "TopFIND done"
+    f << " TopFIND query for isoforms: retrieved Isoforms: #{isoforms.length} ENSG-Isoform pairs: #{l.to_s} \n"
+    p "TopFIND isoform query done"
     
     
     #####
