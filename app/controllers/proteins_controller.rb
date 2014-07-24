@@ -740,13 +740,28 @@ class ProteinsController < ApplicationController
     @q[:cleavages] = Cleavage.find(:all, :conditions => ["nterm_id = ?", @q[:nterms].id])      
     @q[:proteases] = @q[:cleavages].collect {|a| Protein.find(:first, :conditions => ["id = ?", a.protease_id])} 
     @q[:domains] = Ft.find(:all, :conditions => ["protein_id = ?",  @q[:protein].id]) 
-    @q[:evidence_nterms] = Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', @q[:nterms].id])
+    @q[:evidence_nterms] = Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', @q[:nterms]])
     @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.evidence_id } #array    
     @q[:evidences] = @q[:evidence_ids].collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])}
+    @q[:evidence_source_ids] = @q[:evidences].collect {|a| a.evidencesource_id}
+ 
+    @q[:evidence_sources] = @q[:evidence_source_ids].collect {|b| Evidencesource.find(:first, :conditions => ['id = ?', b])}
+   # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
+    p @q[:evidence_sources]
+   #p @q[:source_names]
+=begin
+   @evidence_nterms = Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", @pep_nterms])
+    @evidence_ids = @evidence_nterms.collect {|c| c.evidence_id}
+    @evidences_1 = @evidence_ids.collect {|f| Evidence.find(:first, :conditions => ["id = ?", f])}
+
+=end
     @q[:chr] = if @chromosome 
       [@q[:protein].chromosome, @q[:protein].band] 
     end
+    @q[:transmem] = @q[:domains].delete_if {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
+
     @mainarray << @q
+    
 }
 
 # Nik's code - Stats
@@ -774,55 +789,6 @@ listCleavages.uniq.each{|p|
     p FishersExactTest.new().calculate(listCleavageProtease, dbCleavageProtease, listCleavageTotal - listCleavageProtease, dbCleavageTotal - dbCleavageProtease)
 }
 
-
-
-
-
-   # p @mainarray#prints whole data structure
-=begin
-    @input = @input1.collect{|a| a.split("\s")} #array of arrays [accession, peptide]  
-    @accessions = @input.collect{|b| b.fetch(0)}
-    @peptides = @input.collect{|b| b.fetch(1).gsub(/[^[:upper:]]+/, "")}
-    @proteins = @accessions.collect{|a| Protein.find(:first, :conditions => ["ac = ?", a])} 
-    @sequences = @proteins.collect {|p| p.sequence}
-    @species_ids = @proteins.collect {|p|  if p.species_id == 1
-      "Human"
-    elsif p.species_id == 2
-      "Mouse"
-    elsif p.species_id == 3
-      "E. Coli"
-    elsif p.species_id == 4
-      "Yeast"
-    elsif p.species_id == 5
-      "Arabidopsis"
-    end}
-    @sql_ids = @proteins.collect {|p| p.id}
-    @all_names = @sql_ids.collect {|q| Searchname.find(:all, :conditions => ['protein_id = ?', q])}
-    @short_names = @sql_ids.collect {|s| Proteinname.find(:all, :conditions => ['protein_id = ? AND recommended = ?', s, 1]).uniq}
-    @locations = Array.new(@accessions.size) {|s| if @sequences.fetch(s).index(@peptides.fetch(s)) != nil
-      @sequences.fetch(s).index(@peptides.fetch(s))
-    else 0
-      end}
-    @locations_1 = @locations.collect {|l| l + 1}  
-    @locations_range = @locations.collect {|m| ((m - @nterminal)..(m + @cterminal)).to_a.delete_if {|n| n < 0}}
-    @upstreams = Array.new(@accessions.size) {|e| if @locations.fetch(e) < 10
-      @sequences.fetch(e)[0, @locations.fetch(e)]
-    else
-      @sequences.fetch(e)[@locations.fetch(e) - 10, 10]
-       end}
-    @pep_nterms = Array.new(@accessions.size) {|a| if Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @sql_ids.fetch(a), @locations_1.fetch(a)]) != nil
-      Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @sql_ids.fetch(a), @locations_1.fetch(a)])
-      else "Not Available"
-        end}
-    @pep_cleavages = @pep_nterms.collect { |b| Cleavage.find(:all, :conditions => ["nterm_id = ?", b.id])}     
-    @proteases = @pep_cleavages.collect { |c| c.collect { |d| Protein.find(:first, :conditions => ["id = ?", d.protease_id]) }} 
-    @domains = @sql_ids.collect {|i| Ft.find(:all, :conditions => ["protein_id = ?", i])}
-    #@isoforms = @sql_ids.collect {|j| Isoform.find(:all, :conditions => ["protein_id = ?", j])} 
-    @evidences_nterms = @pep_nterms.collect {|k| Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", k.id])}
-    @evidences_ids = @evidences_nterms.collect {|l| l.collect { |m| m.evidence_id  }}
-    @evidences_2 = @evidences_ids.collect {|n| n.collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])  }}
-=end   
- 
 
   end
 
