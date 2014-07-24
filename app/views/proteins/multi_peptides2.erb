@@ -33,6 +33,11 @@
 		<th>Domain<br>After</th>
 		<%end%>
 
+		<th>Previously Observed</th>		
+		<th>Ensembl</th>
+		<th>TISdb</th>
+		<th>Modifications</th>
+		<th>Transmembrane</th>
 	</tr>
 	</thead>
 
@@ -106,7 +111,13 @@
 		
 			</td>
 
-
+			<td><%if q[:evidence_sources].include?('')%>
+				Yes<%end%></td>
+			<td><%if q[:evidence_sources].include?('TISdb')%>
+				Yes<%end%></td>
+			<td><%if q[:evidence_sources].include?('MEROPS')%>
+				Yes<%end%></td>
+			<td><%= q[:transmem].empty?%></td>
 
 	</tr><% end %>
 	</tbody>

@@ -741,13 +741,28 @@ class ProteinsController < ApplicationController
     @q[:cleavages] = Cleavage.find(:all, :conditions => ["nterm_id = ?", @q[:nterms].id])      
     @q[:proteases] = @q[:cleavages].collect {|a| Protein.find(:first, :conditions => ["id = ?", a.protease_id])} 
     @q[:domains] = Ft.find(:all, :conditions => ["protein_id = ?",  @q[:protein].id]) 
-    @q[:evidence_nterms] = Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', @q[:nterms].id])
+    @q[:evidence_nterms] = Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', @q[:nterms]])
     @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.evidence_id } #array    
     @q[:evidences] = @q[:evidence_ids].collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])}
+    @q[:evidence_source_ids] = @q[:evidences].collect {|a| a.evidencesource_id}
+ 
+    @q[:evidence_sources] = @q[:evidence_source_ids].collect {|b| Evidencesource.find(:first, :conditions => ['id = ?', b])}
+   # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
+    p @q[:evidence_sources]
+   #p @q[:source_names]
+=begin
+   @evidence_nterms = Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", @pep_nterms])
+    @evidence_ids = @evidence_nterms.collect {|c| c.evidence_id}
+    @evidences_1 = @evidence_ids.collect {|f| Evidence.find(:first, :conditions => ["id = ?", f])}
+
+=end
     @q[:chr] = if @chromosome 
       [@q[:protein].chromosome, @q[:protein].band] 
     end
+    @q[:transmem] = @q[:domains].delete_if {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
+
     @mainarray << @q
+    
 }
   
 # ENRICHMENT STATISTICS - needs Rserve to work!
@@ -755,7 +770,7 @@ class ProteinsController < ApplicationController
 # p es.getStatsArray
 # es.plotProteaseCounts("~/Desktop/y.pdf")
 
-   # p @mainarray#prints whole data structure
+
 =begin
     @input = @input1.collect{|a| a.split("\s")} #array of arrays [accession, peptide]  
     @accessions = @input.collect{|b| b.fetch(0)}
@@ -799,8 +814,6 @@ class ProteinsController < ApplicationController
     @evidences_ids = @evidences_nterms.collect {|l| l.collect { |m| m.evidence_id  }}
     @evidences_2 = @evidences_ids.collect {|n| n.collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])  }}
 =end   
- 
-
   end
 
 
