@@ -2,6 +2,7 @@ class ProteinsController < ApplicationController
  
   require 'graph/pathFinding'
   require 'graph/graph'
+  require 'enrichmentStats'
  
   hobo_model_controller
   
@@ -748,35 +749,11 @@ class ProteinsController < ApplicationController
     end
     @mainarray << @q
 }
-
-# Nik's code - Stats
-require "rubystats"
-listCleavages = @mainarray.collect{|h| h[:proteases].collect{|p| p}}.flatten
-# for each protease
-# count how often in the list, how often in the databse
-# database size (number of cleavages), list size (number n-termini)
-# Fisher exact test
-g_query = "select count(c.id) from cleavages c, proteins p where c.protease_id = p.id and p.species_id = 1;"
-dbCleavageTotal = 0
-ActiveRecord::Base.connection.execute(g_query).each{|y| dbCleavageTotal = y[0].to_i};
-listCleavageTotal = listCleavages.length
-
-p dbCleavageTotal
-p listCleavageTotal
-
-
-listCleavages.uniq.each{|p|
-    listCleavageProtease = listCleavages.count(p)
-    dbCleavageProtease = p.cleavages.length 
-    
-    # p.ac = {:listCount => listCleavageProtease, }
-      
-    p FishersExactTest.new().calculate(listCleavageProtease, dbCleavageProtease, listCleavageTotal - listCleavageProtease, dbCleavageTotal - dbCleavageProtease)
-}
-
-
-
-
+  
+# ENRICHMENT STATISTICS - needs Rserve to work!
+# es = EnrichmentStats.new(@mainarray)
+# p es.getStatsArray
+# es.plotProteaseCounts("~/Desktop/y.pdf")
 
    # p @mainarray#prints whole data structure
 =begin
