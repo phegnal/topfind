@@ -35,6 +35,11 @@ class EnrichmentStats
   end
   
   
+  def getStatsArray
+    return @@statsArray
+  end
+  
+  
   def plotProteaseCounts(path)
     @@r.assign("counts", @@statsArray.collect{|x| x[:list]})
     @@r.assign("countsNam", @@statsArray.collect{|x| x[:p].name})
@@ -43,9 +48,6 @@ class EnrichmentStats
     @@r.void_eval("barplot(sort(counts, decreasing = T), las = 2, col = 'blue', ylab = 'Cleavages in the list')")
     @@r.void_eval('dev.off()')
   end
-  
-  def getStatsArray
-    return @@statsArray
-  end
+
   
 end
