@@ -740,8 +740,8 @@ class ProteinsController < ApplicationController
     @q[:nterms] = Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
     @q[:cleavages] = Cleavage.find(:all, :conditions => ["nterm_id = ?", @q[:nterms].id])      
     @q[:proteases] = @q[:cleavages].collect {|a| Protein.find(:first, :conditions => ["id = ?", a.protease_id])} 
-    @q[:nterms_before] = Nterm.find(:all, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], (@q[:location_1] - @nterminal)..@q[:location_1]])
-    p @q[:nterms_before]
+    #@q[:nterms_before] = Nterm.find(:all, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], (@q[:location_1] - @nterminal)..@q[:location_1]])
+    #p @q[:nterms_before]
     @q[:domains] = Ft.find(:all, :conditions => ["protein_id = ?",  @q[:protein].id]) 
     @q[:evidence_nterms] = Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', @q[:nterms]])
     @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.evidence_id } #array    

@@ -8,7 +8,7 @@
 		<th>Protein Name</th>
 		<th>All Names</th>
 		<%if @spec%>
-		<th>Species</th>
+		<th>Species</th>↓
 		<%end%>
 		
 		
@@ -19,7 +19,7 @@
 	
 
 		<th>Sequence</th>
-		<th>Pos</th>
+		<th>P<sub>1</sub>´</th>
 		
 		<th>Proteases</th>	
 	
@@ -55,7 +55,7 @@
 			<%= s.name%><br>
 			<%end%></td>
 	
-		<%if @spec%>
+		<%if @spec%>↓
 			<td><%= q[:species]%></td>
 		<%end%>
 
@@ -66,7 +66,7 @@
 		<%end%>
 		
 
-		<td><%= q[:upstream]%> | <%= q[:pep]%></td>
+		<td><%= q[:upstream]%> ↓ <%= q[:pep]%></td>
 		<td><%= q[:location].succ%></td>
 		<td><% q[:proteases].each do |s|%>
 			<%= s%><br>
@@ -112,11 +112,17 @@
 			</td>
 
 			<td><%if q[:evidence_source_ids].include?('')%>
-				Yes<%end%></td>
+				<%= 'Yes'%>
+				<%else%>
+				<%= 'No'%><%end%></td>
 			<td><%if q[:evidence_sources].include?('TISdb')%>
-				Yes<%end%></td>
+				<%= 'Yes'%>
+				<%else%>
+				<%= 'No'%><%end%></td>
 			<td><%if q[:evidence_sources].include?('MEROPS')%>
-				Yes<%end%></td>
+				<%= 'Yes'%>
+				<%else%>
+				<%= 'No'%><%end%></td>
 			<td><%= q[:transmem].empty?%></td>
 
 	</tr><% end %>
