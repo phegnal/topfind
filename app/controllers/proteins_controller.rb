@@ -699,6 +699,11 @@ class ProteinsController < ApplicationController
   end
 
   def multi_peptides2
+    
+    nr = Dir.entries("#{RAILS_ROOT}/public/explorer").collect{|x| x.to_i}.max + 1
+    dir = "#{RAILS_ROOT}/public/explorer/" + nr.to_s
+    Dir.mkdir(dir)
+    
     @all_input = params["all"] #string
     @input1 = @all_input.split("\n") #array 
     @chromosome = params['chromosome']
@@ -771,15 +776,11 @@ class ProteinsController < ApplicationController
         [@q[:protein].chromosome, @q[:protein].band] 
       end
       @q[:transmem] = @q[:domains].delete_if {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
-
       @mainarray << @q
-    
     }
     
     # ICELOGO
-    IceLogo.new().terminusIcelogo(Species.find(1), @mainarray.collect{|e| e[:upstream]+":"+e[:pep]}, "NikLogo.svg", 4)
-    # TODO copy Icelogo to the folder of analysis
-    
+    IceLogo.new().terminusIcelogo(Species.find(1), @mainarray.collect{|e| e[:upstream]+":"+e[:pep]}, "#{dir}/IceLogo.svg", 4)    
       
     # PATHFINDING
     if(@proteaseWeb == "1")
@@ -787,19 +788,19 @@ class ProteinsController < ApplicationController
         finder = PathFinding.new(Graph.new(params[:pw_org]), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal)
         @pw_paths = finder.find_all_paths(params[:pw_protease],  @mainarray.collect{|x|  {:id => x[:acc], :pos => x[:location]} })
         @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
-        pdfPath = finder.make_graphviz(".", @pw_gnames)
+        # TODO install graphviz for this to work
+        # pdfPath = finder.make_graphviz(dir, @pw_gnames) # this saves the image but we need to define the path yet
       else 
         p "protease not found" if Protein.find_by_ac(params[:pw_protease].strip).nil?
         p "pathlength invalid" if params[:pw_maxPathLength].to_i <= 0
         # TODO put error message on html??
       end
     end
-    # TODO get protease web paths and put them in the analysis (and graphviz image also)
-    
+        
     # ENRICHMENT STATISTICS - needs Rserve to work!
     # es = EnrichmentStats.new(@mainarray)
-    # p es.getStatsArray
-    # es.plotProteaseCounts("~/Desktop/y.pdf") 
+    # es.getStatsArray.each{|x| p x[:p].name + "   " + x[:fetAdj].to_s}
+    # es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
   end
 
 end
