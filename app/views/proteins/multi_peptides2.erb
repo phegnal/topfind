@@ -33,11 +33,6 @@
 		<th>Domain<br>After</th>
 		<%end%>
 
-		<th>Previously Observed</th>		
-		<th>Ensembl</th>
-		<th>TISdb</th>
-		<th>Modifications</th>
-		<th>Transmembrane</th>
 	</tr>
 	</thead>
 
@@ -111,6 +106,7 @@
 		
 			</td>
 
+<<<<<<< HEAD
 			<td><%if q[:evidence_source_ids].include?('')%>
 				<%= 'Yes'%>
 				<%else%>
@@ -124,6 +120,9 @@
 				<%else%>
 				<%= 'No'%><%end%></td>
 			<td><%= q[:transmem].empty?%></td>
+=======
+
+>>>>>>> d831ecf0c75a2037c284a9b183ea07e22d5f373d
 
 	</tr><% end %>
 	</tbody>
