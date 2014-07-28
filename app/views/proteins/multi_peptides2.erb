@@ -32,6 +32,11 @@
 		<th>Domain<br>At</th>
 		<th>Domain<br>After</th>
 		<%end%>
+		
+		<%if @proteaseWeb%>
+		<th>Protease Web connections from protease to substrate</th>
+		<%end%>
+		
 
 	</tr>
 	</thead>
@@ -102,16 +107,24 @@
 				<%end%>
 				<%indexx += 1%>
 				<%end end%>
-		<%end%>
+		<%end%> <!-- end of domains -->
 		
 			</td>
+	
+	<%if @proteaseWeb%>
+	<td><%= @pw_paths[q[:acc] + "_"+ q[:location].to_s].collect{|path| 
+		path.collect{|node|
+			@pw_gnames[node[:id]].to_s
+		}.join(" -> ")		
+	}.join("<br>  ") %></td>
+	<%end%> <!-- end of protease web -->
 
 
-
-	</tr><% end %>
+	</tr>
+	<% end %> <!-- end of loop over all proteins-->
 	</tbody>
 	
 
 </table>
--->
+
 

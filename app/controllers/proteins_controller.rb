@@ -704,6 +704,7 @@ class ProteinsController < ApplicationController
     @chromosome = params['chromosome']
     @domain = params['domain']
     @isoform = params['isoform']
+    @proteaseWeb = params[:proteaseWeb]
     @spec = params['spec']
     @nterminal = params['nterminal'].to_i
     @cterminal = params['cterminal'].to_i
@@ -737,9 +738,20 @@ class ProteinsController < ApplicationController
       else
         @q[:sequence][@q[:location] - 10, 10]
       end
+      # TODO - you are only getting one Nterminus
       @q[:nterms] = Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
-      @q[:cleavages] = Cleavage.find(:all, :conditions => ["nterm_id = ?", @q[:nterms].id])      
-      @q[:proteases] = @q[:cleavages].collect {|a| Protein.find(:first, :conditions => ["id = ?", a.protease_id])} 
+      # TODO - error when Nterms not found (the next line fails)
+      # also, it actually should find N-termini in the cases I added, why doesn't it?
+      if not @q[:nterms].nil?
+        @q[:cleavages] = Cleavage.find(:all, :conditions => ["nterm_id = ?", @q[:nterms].id]) 
+      else
+        @q[:cleavages] = []
+      end
+      if not @q[:cleavages].nil?
+        @q[:proteases] = @q[:cleavages].collect {|a| Protein.find(:first, :conditions => ["id = ?", a.protease_id])} 
+      else
+        @q[:proteases] = []
+      end
       @q[:domains] = Ft.find(:all, :conditions => ["protein_id = ?",  @q[:protein].id]) 
       @q[:evidence_nterms] = Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', @q[:nterms]])
       @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.evidence_id } #array    
@@ -748,7 +760,7 @@ class ProteinsController < ApplicationController
  
       @q[:evidence_sources] = @q[:evidence_source_ids].collect {|b| Evidencesource.find(:first, :conditions => ['id = ?', b])}
       # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
-      p @q[:evidence_sources]
+      # p @q[:evidence_sources]
       #p @q[:source_names]
 
       # @evidence_nterms = Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", @pep_nterms])
@@ -764,8 +776,26 @@ class ProteinsController < ApplicationController
     
     }
     
+    # ICELOGO
     IceLogo.new().terminusIcelogo(Species.find(1), @mainarray.collect{|e| e[:upstream]+":"+e[:pep]}, "NikLogo.svg", 4)
-  
+    # TODO copy Icelogo to the folder of analysis
+    
+      
+    # PATHFINDING
+    if(@proteaseWeb == "1")
+      if(not Protein.find_by_ac(params[:pw_protease].strip).nil? and params[:pw_maxPathLength].to_i > 0)
+        finder = PathFinding.new(Graph.new(params[:pw_org]), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal)
+        @pw_paths = finder.find_all_paths(params[:pw_protease],  @mainarray.collect{|x|  {:id => x[:acc], :pos => x[:location]} })
+        @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
+        pdfPath = finder.make_graphviz(".", @pw_gnames)
+      else 
+        p "protease not found" if Protein.find_by_ac(params[:pw_protease].strip).nil?
+        p "pathlength invalid" if params[:pw_maxPathLength].to_i <= 0
+        # TODO put error message on html??
+      end
+    end
+    # TODO get protease web paths and put them in the analysis (and graphviz image also)
+    
     # ENRICHMENT STATISTICS - needs Rserve to work!
     # es = EnrichmentStats.new(@mainarray)
     # p es.getStatsArray

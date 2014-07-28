@@ -1,7 +1,7 @@
 <table border="0">
 <% @sortet_subs.each do |target| -%>
 	<tr>
-	<td><b><%= "#{@gnames[target[:id]]}(#{target[:id]})"%></b></td>
+	<td><b><%= "#{@gnames[target.split("_")[0]]}(#{target.split("_")[0]})"%></b></td>
 	</tr>
 	<% @allPaths[target].each do |path| %>
 		<tr>

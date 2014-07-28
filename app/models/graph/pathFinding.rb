@@ -32,10 +32,10 @@ class PathFinding
     if not Protein.find_by_ac(start).nil?
       targets.each{|target|
         res = find_all_paths_for_one(start, target)
-        @allPaths[target] = res.clone
+        @allPaths[target[:id]+"_"+target[:pos].to_s] = res.clone
       }
     else
-      targets.each{|target| @allPaths[target] = [{:id => "Start protease not found", :pos => 0}] }
+      targets.each{|target| @allPaths[target[:id]+"_"+target[:pos].to_s] = [{:id => "Start protease not found", :pos => 0}] }
     end
     return @allPaths
   end
