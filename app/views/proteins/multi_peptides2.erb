@@ -75,41 +75,38 @@
 		<%if @evidence%>
 		<td><%q[:evidences].each do |s|%>
 			<%= s.name%><br>
-			<%end%>
+			<%end%></td>
 		<%end%>
 
 	<%if @domain%>
 
-			<td><%indexx = 0%>
-				<%while indexx < @mainarray.size%>
+			<td>
+				<!--domains before  -->
 				<%q[:domains].uniq.each do |r|%>
-				<%if q[:location] <= r.to.to_i %>
+				<%if q[:location] <= r.from.to_i %>
 				<%= r.name%><br>
-				<%end%>
-				<%indexx += 1%>
-				<%end end%></td>
+				<%end%><%end%>
+				</td>
 
-			<td><%indexx = 0%>
-				<%while indexx < @mainarray.size%>
+			<td>
+				<!--domains at  -->
 				<%q[:domains].each do |r|%>
-				<%if (q[:location] - @nterminal) >= r.from.to_i && (q[:location] + @cterminal) <= r.to.to_i %>
+				<%if (q[:location] - @nterminal) >= r.from.to_i or (q[:location] + @cterminal) <= r.to.to_i %>
 				<%= r.name%><br>
-				<%end%>
-				<%indexx += 1%>
-				<%end end%></td>
+				<%end%><%end%>
+				</td>
 
 
-			<td><%indexx = 0%>
-				<%while indexx < @mainarray.size%>
+			<td>
+				<!--domains after  -->
 				<%q[:domains].each do |r|%>
-				<%if q[:location] >= r.from.to_i%>
+				<%if q[:location] >= r.to.to_i%>
 				<%= r.name%><br>
-				<%end%>
-				<%indexx += 1%>
-				<%end end%>
+				<%end%><%end%>
+				</td>
 		<%end%> <!-- end of domains -->
 		
-			</td>
+			
 	
 	<%if @proteaseWeb%>
 	<td><%= @pw_paths[q[:acc] + "_"+ q[:location].to_s].collect{|path| 

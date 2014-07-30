@@ -709,6 +709,7 @@ class ProteinsController < ApplicationController
     @chromosome = params['chromosome']
     @domain = params['domain']
     @isoform = params['isoform']
+    @evidence = params['evidence']
     @proteaseWeb = params[:proteaseWeb]
     @spec = params['spec']
     @nterminal = params['nterminal'].to_i
@@ -757,7 +758,10 @@ class ProteinsController < ApplicationController
       else
         @q[:proteases] = []
       end
+      # TODO i don't think this is getting anything?
       @q[:domains] = Ft.find(:all, :conditions => ["protein_id = ?",  @q[:protein].id]) 
+      p @q[:domains]
+      
       @q[:evidence_nterms] = Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', @q[:nterms]])
       @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.evidence_id } #array    
       @q[:evidences] = @q[:evidence_ids].collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])}
@@ -776,8 +780,10 @@ class ProteinsController < ApplicationController
         [@q[:protein].chromosome, @q[:protein].band] 
       end
       @q[:transmem] = @q[:domains].delete_if {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
+      print "."
       @mainarray << @q
     }
+    print "\n"
     
     # ICELOGO
     IceLogo.new().terminusIcelogo(Species.find(1), @mainarray.collect{|e| e[:upstream]+":"+e[:pep]}, "#{dir}/IceLogo.svg", 4)    
@@ -790,7 +796,7 @@ class ProteinsController < ApplicationController
         @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
         # TODO install graphviz for this to work
         # pdfPath = finder.make_graphviz(dir, @pw_gnames) # this saves the image but we need to define the path yet
-      else 
+      else
         p "protease not found" if Protein.find_by_ac(params[:pw_protease].strip).nil?
         p "pathlength invalid" if params[:pw_maxPathLength].to_i <= 0
         # TODO put error message on html??
@@ -801,6 +807,9 @@ class ProteinsController < ApplicationController
     # es = EnrichmentStats.new(@mainarray)
     # es.getStatsArray.each{|x| p x[:p].name + "   " + x[:fetAdj].to_s}
     # es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
+    
+    # the view multi_peptides2 currently fails when all options are selected, but the code to here works
+    p "DONE"
   end
   
   def trying_featurePanel
