@@ -11,6 +11,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'contribute', :controller => 'imports', :action => 'index'
   map.connect 'proteins/pw_input', :controller => 'proteins', :action => 'pw_input'
   map.connect 'proteins/pw_output', :controller => 'proteins', :action => 'pw_output'
+  map.connect 'proteins/trying_featurePanel', :controller => 'proteins', :action => 'trying_featurePanel'
   map.connect 'proteins/peptide', :controller => 'proteins', :action => 'peptide_search'
   map.connect 'proteins/peptide_search2', :controller => 'proteins', :action => 'peptide_search2'
   map.connect 'proteins/multi_peptides', :controller => 'proteins', :action => 'multi_peptides'

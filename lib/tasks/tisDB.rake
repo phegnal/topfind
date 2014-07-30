@@ -1,4 +1,4 @@
-namespace :tisDB_v2 do
+namespace :tisDB do
 
 
   # TEST TASK
@@ -25,7 +25,7 @@ namespace :tisDB_v2 do
     species = Species.all
     species.each{|s|
       p s.id
-      Rake::Task["tisDB_v2:ntermini_species"].execute(:species_id => s.id)
+      Rake::Task["tisDB:ntermini_species"].execute(:species_id => s.id)
     }
     
   end

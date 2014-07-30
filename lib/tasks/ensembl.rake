@@ -1,4 +1,4 @@
-namespace :ensembl_v3 do
+namespace :ensembl do
 
 
   # TEST TASK
@@ -26,7 +26,7 @@ namespace :ensembl_v3 do
     species.each{|s|
       p "\n #{s.id}"
       species_call_args = {:species_id => s.id, :enter2db => args[:enter2db]}
-      Rake::Task["ensembl_v3:ntermini_species"].execute(args=species_call_args)
+      Rake::Task["ensembl:ntermini_species"].execute(args=species_call_args)
     }
   end
 
@@ -222,7 +222,7 @@ namespace :ensembl_v3 do
       
       # MAP TO ISOFORMS
       nter_iso_args = {:entries => nmap2isoforms, :species_id => speciesId, :file => f, :seqCutoff => seqCutoff}
-      Rake::Task["ensembl_v3:isoform_ntermini"].execute(args=nter_iso_args)
+      Rake::Task["ensembl:isoform_ntermini"].execute(args=nter_iso_args)
       
       if enter2db
         ###
