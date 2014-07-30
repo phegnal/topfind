@@ -668,7 +668,7 @@ class ProteinsController < ApplicationController
 #      domains_descriptions = ["%protease%inhibitor%", "%proteinase%inhibitor%", "%inhibitor%"]
       @allPaths =  finder.get_domain_info(["SIGNAL", "PROPEP", "ACT_SITE", "TRANSMEM"], nil)
       @sortet_subs = @allPaths.keys.sort{|x, y| @allPaths[y].size <=> @allPaths[x].size}      # SORT OUTPUT
-      pdfPath = finder.make_graphviz(".", @gnames)
+      pdfPath = finder.make_graphviz("./public/explorer", @gnames)
       #Emailer.new().send(["NikolausFortelny@gmail.com"], nil)
     end 
   end
@@ -760,8 +760,8 @@ class ProteinsController < ApplicationController
       end
       # TODO i don't think this is getting anything?
       @q[:domains] = Ft.find(:all, :conditions => ["protein_id = ?",  @q[:protein].id]) 
-      p @q[:domains]
-      
+      p @q[:domains] # TODO 
+    
       @q[:evidence_nterms] = Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', @q[:nterms]])
       @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.evidence_id } #array    
       @q[:evidences] = @q[:evidence_ids].collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])}
@@ -808,7 +808,6 @@ class ProteinsController < ApplicationController
     # es.getStatsArray.each{|x| p x[:p].name + "   " + x[:fetAdj].to_s}
     # es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
     
-    # the view multi_peptides2 currently fails when all options are selected, but the code to here works
     p "DONE"
   end
   
