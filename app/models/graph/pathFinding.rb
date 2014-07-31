@@ -4,7 +4,6 @@ class PathFinding
 
   def initialize(graph, maxSteps, byPos, rangeLeft, rangeRight)
     @g = graph.graph_array()
-    @allPaths = Hash.new
     @maxSteps = maxSteps
     @byPos = byPos # defines whether the target has to be hit at exactly that position
     @rangeLeft = rangeLeft
@@ -18,6 +17,7 @@ class PathFinding
   ## target is an array of hashes, each has 
   ## => (1) id - uniprot AC
   ## => (2) pos - position
+  
   def find_all_paths_map2mouse(start, targets)
     mapper = MapMouseHuman.new()
     return find_all_paths(mapper.m4h(start), targets.collect{|hash| {:id => mapper.m4h(hash[:id]), :pos => hash[:pos]}})
@@ -28,47 +28,54 @@ class PathFinding
     return find_all_paths(mapper.h4m(start), targets.collect{|hash| {:id => mapper.h4m(hash[:id]), :pos => hash[:pos]}})
   end
 
+  # find paths from start protease to one target
+  def find_all_paths_for_one(start, target)
+    find_all_paths(start, [target])
+    return @allPaths[target[:id]+"_"+target[:pos].to_s]
+  end
+  
+  # find paths from start protease to all targets
   def find_all_paths(start, targets)
+    @allPaths = Hash.new
     if not Protein.find_by_ac(start).nil?
-      targets.each{|target|
-        res = find_all_paths_for_one(start, target)
-        @allPaths[target[:id]+"_"+target[:pos].to_s] = res.clone
-      }
+      targets.each{|t| @allPaths[t[:id]+"_"+t[:pos].to_s] = []}
+      # limit targets to those in the graph
+      graphids = (@g.keys + @g.values.collect{|s| s.collect{|x| x[:id]}}.flatten).uniq
+      targets2 = targets.select{|t| graphids.include? t[:id]}
+      # look for targets in the graph
+      find_all_for_targets({:id => start, :pos => -1}, targets2, [])
     else
       targets.each{|target| @allPaths[target[:id]+"_"+target[:pos].to_s] = [{:id => "Start protease not found", :pos => 0}] }
     end
     return @allPaths
   end
 
-  def find_all_paths_for_one(start, target)
-    @ListOfPaths = []
-    if not Protein.find_by_ac(target[:id]).nil?
-      find_path({:id => start, :pos => -1}, target, []) # starts with empty path
-    end
-    result = @ListOfPaths.clone
-    @ListOfPaths = []
-    return result
-  end
-
-  # current is also a hash as defined above 
-  def find_path(current, target, currentPath) # current vertex (recursive!), target(ultimate target), current path
+  # recursive method that goes through the graph and looks for all paths from start to targets
+  # call first time with currentPath = []
+  def find_all_for_targets(current, targets, currentPath)
     currentPath << current
     # look at successors of current
     successors = @g[current[:id]]
-    if(successors != nil && successors.class.to_s == "Array") then 
-      successors.each{|x|
-        by_pos_condition = @byPos ? (x[:id] == target[:id] && ((target[:pos]-@rangeLeft..target[:pos]+@rangeRight).to_a.include? x[:pos])) : (x[:id] == target[:id])
-        if(by_pos_condition) then # THIS IS WHERE POSITION COULD COME INTO PLAY! TODO
-          toSubmit = currentPath.clone # needs to be cloned!
-          toSubmit << x
-          @ListOfPaths << toSubmit # add one found path
-        elsif(!currentPath.include?(x) && currentPath.length < (@maxSteps-1)) then # continue the search from this node if the node is not in the path AND the path length is smaller than the maximal steps
-          find_path(x, target, currentPath)
+    if(successors != nil && successors.class.to_s == "Array")
+      successors.each{|s|
+        # find hits (targets that correspond to s)
+        hits = targets.select{|t| 
+          @byPos ? (s[:id] == t[:id] && ((t[:pos]-@rangeLeft..t[:pos]+@rangeRight).to_a.include? s[:pos])) : (s[:id] == t[:id])
+        }
+        toSubmit = currentPath.clone # needs to be cloned!
+        toSubmit << s
+        # add paths for the hits
+        hits.each{|t|  @allPaths[t[:id]+"_"+t[:pos].to_s] << toSubmit }
+        # continue the search from this node if the node is not in the path AND the path length is smaller than the maximal steps
+        if(!currentPath.include?(s) && currentPath.length < (@maxSteps-1)) 
+          # recursive call
+          find_all_for_targets(s, targets, currentPath)
         end
       }
     end
     # after analyzing all successors, go back up the path one step
     currentPath.pop
+    return @allPaths
   end
 
   def test
@@ -76,9 +83,7 @@ class PathFinding
   end
 
   def paths_gene_names()
-    proteins = (@allPaths.values.flatten + @allPaths.keys)
-    proteins = proteins.collect{|hash| hash[:id]}.uniq
-    return get_gene_names(proteins)
+    return get_gene_names( (@allPaths.values.flatten.collect{|hash| hash[:id]} + @allPaths.keys.collect{|k| k.split("_")[0]}).uniq)
   end
 
   def get_gene_names(proteins)
