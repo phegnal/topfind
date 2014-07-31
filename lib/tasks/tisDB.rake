@@ -16,7 +16,7 @@ namespace :tisDB do
   # calls update for each organism
   #
   desc "go through organisms and add N-termini for each from TISdb"
-  task :ntermini do
+  task :ntermini, [:enter2db] do |t, args|
     require "#{RAILS_ROOT}/config/environment"
     
     date = Time.new.strftime("%Y_%m_%d")
@@ -25,7 +25,8 @@ namespace :tisDB do
     species = Species.all
     species.each{|s|
       p s.id
-      Rake::Task["tisDB:ntermini_species"].execute(:species_id => s.id)
+      species_call_args = {:species_id => s.id, :enter2db => args[:enter2db]}
+      Rake::Task["tisDB:ntermini_species"].execute(args=species_call_args)
     }
     
   end
@@ -35,13 +36,18 @@ namespace :tisDB do
   # calls update for one organism
   #
   desc "nTermini from TISdb for one species"
-  task :ntermini_species, :species_id do |t, args|
+  task :ntermini_species, [:species_id, :enter2db] do |t, args|
 
     require "#{RAILS_ROOT}/config/environment"
 
     require "bio"
 
     ok = true
+
+    enter2db = args[:enter2db] || "f"
+    enter2db == "t" ? enter2db = true : enter2db = false
+    
+    p "Not adding entries to TopFIND DB because 2nd argument (enter2db) was not 't' but '#{args[:enter2db]}'"  if not enter2db 
 
     speciesId = args[:species_id]
     speciesName = Species.find(speciesId).name
@@ -196,34 +202,36 @@ namespace :tisDB do
         }
       }
       
-      p "adding #{nters.length} N termini"
-      
       errorFile.close
       outputFile << "N termini missed: #{missedNTer} multiple: #{multipleNTer} \n"
       outputFile << "#{nters.length} N-termini found \n"
+      outputFile << "#{nters.collect{|t| "#{t[3]}_#{t[2]}"}.uniq.length} unique N-termini will be added\n"
 
-      # # safe N-TERMINI in the database 
-      nters.each{|r| 
-        #p ("nter - " + r[0] + "  " + r[1].to_s + "  " +  r[2].to_s + "  " + r[3].to_s + " " + r[4])
-        # find or create evidence
-        @evidence = Evidence.find_or_create_by_name(:name => "inferred from TISdb",
-        :idstring => "TISdb-ECO:0000203",
-        :description => 'The stated informations has been extracted from the TISdb database.',
-        :phys_relevance => 'unknown',
-        :method => 'electronic annotation'
-        )
-        @evidence.evidencecodes << Evidencecode.code_is('ECO:0000203').first
-        @evidence.evidencesource = Evidencesource.find_or_create_by_dbname(
-        :dbname => 'TISdb',
-        :dburl => 'http://tisdb.human.cornell.edu/',
-        :dbdesc => 'TISdb'
-        )
-        @evidence.save
-        # find or create N-terminus
-        nmod = Terminusmodification.find_or_create_by_name(:name => "unknown", :nterm => true, :cterm => true, :display => true)  # 
-        nterm = Nterm.find_or_create_by_idstring(:idstring => "#{r[3]}-#{(r[2]+1).to_s}-#{nmod.name}",:protein_id => r[4], :pos => r[2]+1, :terminusmodification => nmod )
-        nterm.evidences << @evidence
-      }
+      if enter2db
+        p "adding #{nters.length} N termini"
+        # # safe N-TERMINI in the database 
+        nters.each{|r| 
+          #p ("nter - " + r[0] + "  " + r[1].to_s + "  " +  r[2].to_s + "  " + r[3].to_s + " " + r[4])
+          # find or create evidence
+          @evidence = Evidence.find_or_create_by_name(:name => "inferred from TISdb",
+          :idstring => "TISdb-ECO:0000203",
+          :description => 'The stated informations has been extracted from the TISdb database.',
+          :phys_relevance => 'unknown',
+          :method => 'electronic annotation'
+          )
+          @evidence.evidencecodes << Evidencecode.code_is('ECO:0000203').first
+          @evidence.evidencesource = Evidencesource.find_or_create_by_dbname(
+          :dbname => 'TISdb',
+          :dburl => 'http://tisdb.human.cornell.edu/',
+          :dbdesc => 'TISdb'
+          )
+          @evidence.save
+          # find or create N-terminus
+          nmod = Terminusmodification.find_or_create_by_name(:name => "unknown", :nterm => true, :cterm => true, :display => true)  # 
+          nterm = Nterm.find_or_create_by_idstring(:idstring => "#{r[3]}-#{(r[2]+1).to_s}-#{nmod.name}",:protein_id => r[4], :pos => r[2]+1, :terminusmodification => nmod )
+          nterm.evidences << @evidence
+        }
+      end
       
     end # end of OK if
     

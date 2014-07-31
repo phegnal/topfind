@@ -134,7 +134,7 @@ class PathFinding
       outputFile << "}"
       outputFile.close
     end
-    return "#{folder}/pw_graphviz.pdf" if system "dot #{folder}/pw_graphviz.txt -Tpdf -o #{folder}/pw_graphviz.pdf"
+    return "#{folder}/pw_graphviz.svg" if system "dot #{folder}/pw_graphviz.txt -Tsvg -o #{folder}/pw_graphviz.svg"
   end
   
 end

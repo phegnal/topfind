@@ -41,9 +41,7 @@ namespace :ensembl do
     enter2db = args[:enter2db] || "f"
     enter2db == "t" ? enter2db = true : enter2db = false
     
-    if not enter2db 
-      p "Not adding entries to TopFIND DB because 2nd argument (enter2db) was not 't' but '#{args[:enter2db]}'"
-    end
+    p "Not adding entries to TopFIND DB because 2nd argument (enter2db) was not 't' but '#{args[:enter2db]}'"  if not enter2db 
 
     require "#{RAILS_ROOT}/config/environment"
 
@@ -216,13 +214,17 @@ namespace :ensembl do
       errorFile.close
       
       f << "#{nters.length} N-termini found \n"
+      f << "#{nters.collect{|t| "#{t[4]}_#{t[2]}"}.uniq.length} unique N-termini will be added\n"
+      
       f << "#{cters.length} C-termini found \n"
+      f << "#{cters.collect{|t| "#{t[4]}_#{t[2]}"}.uniq.length} unique C-termini will be added\n"
+      
       f << "N-termini matches missed: #{missedNTer} multiple: #{multipleNTer} \n"
       f << "C-termini matches missed: #{missedCTer} multiple: #{multipleCTer} \n"
       
       # MAP TO ISOFORMS
-      nter_iso_args = {:entries => nmap2isoforms, :species_id => speciesId, :file => f, :seqCutoff => seqCutoff}
-      Rake::Task["ensembl:isoform_ntermini"].execute(args=nter_iso_args)
+      # nter_iso_args = {:entries => nmap2isoforms, :species_id => speciesId, :file => f, :seqCutoff => seqCutoff}
+      # Rake::Task["ensembl:isoform_ntermini"].execute(args=nter_iso_args)
       
       if enter2db
         ###
@@ -235,7 +237,7 @@ namespace :ensembl do
         :dbdesc => 'Ensembl'
         )
         p "adding #{nters.length} n-termini"
-      
+              
         ## safe N-TERMINI in the database 
         nters.each{|r| 
           #p ("nter - " + r[0] + "  " + r[1].to_s + "  " +  r[2].to_s + "  " + r[3].to_s + " " + r[4])

@@ -17,7 +17,6 @@ namespace :nik do
     require "#{RAILS_ROOT}/config/environment"
     
     date = Time.new.strftime("%Y_%m_%d")
-    output = File.new("#{date}_ntermini.txt", "w")
     x = {}
     
     # add signal/peptide removal?
@@ -60,6 +59,7 @@ namespace :nik do
     }
     
     # WRITE TO OUTPUT
+    output = File.new("#{date}_ntermini.txt", "w")
     # HEADER
     output << "ac\tpos\t"
     output << keys.join("\t")
@@ -72,9 +72,49 @@ namespace :nik do
         output << "\n"
       }
     }
-    
+    # close output
     output.close
+    
+    # WRITE SECOND OUTPUT MERGED FOR MANY POSITIONS
+    x.keys.each{|ac|
+      pos = x[ac].keys.sort{|a,b| a <=> b} 
+      groups =[]
+      group = []
+      s = -50
+      while(pos != []) do 
+        p group
+        p groups
+        p = pos.shift
+        if p <= (s + 1)
+          group << p
+        else
+          groups << group if group != []
+          group = [p]
+        end
+        s = p
+      end
+      groups << group
+    }
+    output2 = File.new("#{date}_ntermini2.txt", "w")
+    
+    output2.close
+    
     
   end
 
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
