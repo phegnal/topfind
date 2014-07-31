@@ -3,7 +3,7 @@
 <% form_tag(:action => "multi_peptides2", :method => "get") do %>
 <body bgcolor="aliceblue">
   <h1>
-    TopFIND-ER
+    TopFINDER
   </h1>
 
   <p>
@@ -12,11 +12,11 @@
   </p>
  
  <p>Information available<br>
- <%= check_box_tag(:spec)%> Species <br>
- <%= check_box_tag(:chromosome)%> Chromosome and Band<br>
- <%= check_box_tag(:domain)%> Domain <br>
- <%= check_box_tag(:isoform)%> Isoform <br>
- <%= check_box_tag(:evidence)%> Evidences <br>
+ <%= check_box_tag(:spec, "1", true)%> Species <br>
+ <%= check_box_tag(:chromosome, "1", true)%> Chromosome and Band<br>
+ <%= check_box_tag(:domain, "1", true)%> Domain <br>
+ <%= check_box_tag(:isoform, "1", true)%> Isoform <br>
+ <%= check_box_tag(:evidence, "1", true)%> Evidences <br>
  <%= check_box_tag(:proteaseWeb, "1", true)%> Protease web analysis with 
  	protease: <%= text_field_tag(:pw_protease, "P14091")  %>
 	max. path length <%= text_field_tag(:pw_maxPathLength, "4")  %>

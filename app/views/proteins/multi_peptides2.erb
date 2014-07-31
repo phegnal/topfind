@@ -8,23 +8,26 @@
 		<th>Protein Name</th>
 		<th>All Names</th>
 		<%if @spec%>
-		<th>Species</th>↓
+		<th>Species</th>
 		<%end%>
-		
-		
+
+
 		<%if @chromosome%>
 		<th>Chr<br>Band</th>
 		<%end%>
-		
-	
+
+
 
 		<th>Sequence</th>
-		<th>P<sub>1</sub>´</th>
-		
+		<th>P<sub>1</sub>′</th>
+
 		<th>Proteases</th>	
-	
+
 		<%if @evidence%>
-		<th>Evidences</th>
+		<th>Observed from Proteomics</th>
+		<th>From Alternative Translation</th>
+		<th>From Transcription</th>
+		<th>From Isoforms</th>
 		<%end%>
 
 		<%if @domain%>
@@ -32,11 +35,11 @@
 		<th>Domain<br>At</th>
 		<th>Domain<br>After</th>
 		<%end%>
-		
+
 		<%if @proteaseWeb%>
 		<th>Protease Web connections from protease to substrate</th>
 		<%end%>
-		
+
 
 	</tr>
 	</thead>
@@ -54,8 +57,8 @@
 		<td><% q[:all_names].each do |s|%>
 			<%= s.name%><br>
 			<%end%></td>
-	
-		<%if @spec%>↓
+
+		<%if @spec%>
 			<td><%= q[:species]%></td>
 		<%end%>
 
@@ -64,7 +67,7 @@
 				<%= a%><br>
 				<%end%></td>
 		<%end%>
-		
+
 
 		<td><%= q[:upstream]%> ↓ <%= q[:pep]%></td>
 		<td><%= q[:location].succ%></td>
@@ -74,43 +77,46 @@
 
 		<%if @evidence%>
 		<td><%q[:evidences].each do |s|%>
-			<%= s.name%><br>
-			<%end%>
+			<%= s.each do |t|%>
+			<%= t.name%><br>
+			<%end end%></td>
+	
+
+
+
+
 		<%end%>
 
 	<%if @domain%>
 
-			<td><%indexx = 0%>
-				<%while indexx < @mainarray.size%>
+			<td>
+				<!--domains before  -->
 				<%q[:domains].uniq.each do |r|%>
-				<%if q[:location] <= r.to.to_i %>
+				<%if q[:location] <= r.from.to_i %>
 				<%= r.name%><br>
-				<%end%>
-				<%indexx += 1%>
-				<%end end%></td>
+				<%end%><%end%>
+				</td>
 
-			<td><%indexx = 0%>
-				<%while indexx < @mainarray.size%>
+			<td>
+				<!--domains at  -->
 				<%q[:domains].each do |r|%>
-				<%if (q[:location] - @nterminal) >= r.from.to_i && (q[:location] + @cterminal) <= r.to.to_i %>
+				<%if (q[:location] - @nterminal) >= r.from.to_i or (q[:location] + @cterminal) <= r.to.to_i %>
 				<%= r.name%><br>
-				<%end%>
-				<%indexx += 1%>
-				<%end end%></td>
+				<%end%><%end%>
+				</td>
 
 
-			<td><%indexx = 0%>
-				<%while indexx < @mainarray.size%>
+			<td>
+				<!--domains after  -->
 				<%q[:domains].each do |r|%>
-				<%if q[:location] >= r.from.to_i%>
+				<%if q[:location] >= r.to.to_i%>
 				<%= r.name%><br>
-				<%end%>
-				<%indexx += 1%>
-				<%end end%>
+				<%end%><%end%>
+				</td>
 		<%end%> <!-- end of domains -->
-		
-			</td>
-	
+
+
+
 	<%if @proteaseWeb%>
 	<td><%= @pw_paths[q[:acc] + "_"+ q[:location].to_s].collect{|path| 
 		path.collect{|node|
@@ -119,34 +125,10 @@
 	}.join("<br>  ") %></td>
 	<%end%> <!-- end of protease web -->
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-			<td><%if q[:evidence_source_ids].include?('')%>
-				<%= 'Yes'%>
-				<%else%>
-				<%= 'No'%><%end%></td>
-			<td><%if q[:evidence_sources].include?('TISdb')%>
-				<%= 'Yes'%>
-				<%else%>
-				<%= 'No'%><%end%></td>
-			<td><%if q[:evidence_sources].include?('MEROPS')%>
-				<%= 'Yes'%>
-				<%else%>
-				<%= 'No'%><%end%></td>
-			<td><%= q[:transmem].empty?%></td>
-=======
-
->>>>>>> d831ecf0c75a2037c284a9b183ea07e22d5f373d
-
-	</tr><% end %>
-=======
 
 	</tr>
 	<% end %> <!-- end of loop over all proteins-->
->>>>>>> 93ac3b26e1a3ebabc0c7746c3abd73e0287ef478
 	</tbody>
-	
+
 
 </table>
-
-

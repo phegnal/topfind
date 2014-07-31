@@ -2181,6 +2181,126 @@
 
 
 
+<!-- ====== Protein Pages ====== -->
+
+<def tag="index-page" for="Protein">
+  <page merge title="#{ht 'proteins.index.title', :default=>['Proteins'] }">
+    <body: class="index-page protein" param/>
+
+    <content: param>
+      <header param="content-header">
+        <h2 param="heading">
+          <ht key="proteins.index.heading">
+            Proteins
+          </ht>
+        </h2>
+
+        <p param="count" if>
+          <ht key="proteins.collection.count" count="&this.size">
+            There <count prefix="are"/>
+          </ht>
+        </p>
+      </header>
+
+      <section param="content-body">
+        <a action="new" to="&model" param="new-link">
+          <ht key="proteins.actions.new">New Protein</ht>
+        </a>
+
+        <page-nav param="top-page-nav"/>
+
+        <collection param/>
+
+        <page-nav param="bottom-page-nav"/>
+
+
+      </section>
+    </content:>
+  </page>
+</def>
+
+
+<def tag="new-page" for="Protein">
+  <page merge title="#{ht 'proteins.new.title', :default=>[' New Protein'] }">
+    <body: class="new-page protein" param/>
+
+    <content: param>
+      <section param="content-header">
+        <h2 param="heading">
+          <ht key="proteins.new.heading">
+            New Protein
+          </ht>
+        </h2>
+      </section>
+
+      <section param="content-body">
+        <form param>
+          <submit: label="#{ht 'proteins.actions.create', :default=>['Create Protein']}"/>
+        </form>
+      </section>
+    </content:>
+  </page>
+</def>
+
+
+<def tag="show-page" for="Protein">
+  <page merge title="#{ht 'proteins.show.title', :default=>['Protein'] }">
+
+    <body: class="show-page protein" param/>
+
+    <content: param>
+          <header param="content-header">
+            <h2 param="heading">
+              <ht key="proteins.show.heading" name="&this.respond_to?(:name) ? this.name : ''">
+                <name/>
+              </ht>
+            </h2>
+
+            <record-flags fields="" param/>
+
+            <a action="edit" if="&can_edit?" param="edit-link">
+              <ht key="proteins.actions.edit" name="&this.respond_to?(:name) ? this.name : ''">
+                Edit Protein
+              </ht>
+            </a>
+          </header>
+
+          <section param="content-body">
+            <field-list fields="ac, data_class, molecular_type, entry_type, dt_create, dt_sequence, dt_annotation, definition, sequence, mw, crc64, aalen, chromosome, band, meropsfamily, meropssubfamily, meropscode, status, species" param/>
+          </section>
+    </content:>
+
+  </page>
+</def>
+
+
+<def tag="edit-page" for="Protein">
+  <page merge title="#{ht 'proteins.edit.title', :default=>['Edit Protein'] }">
+
+    <body: class="edit-page protein" param/>
+
+    <content:>
+      <section param="content-header">
+        <h2 param="heading">
+          <ht key="proteins.edit.heading" name="&this.respond_to?(:name) ? this.name : ''">
+            Edit <type-name/>
+          </ht>
+        </h2>
+        <delete-button label="#{ht 'proteins.actions.delete', :default=>['Remove This Protein']}" param/>
+      </section>
+
+      <section param="content-body">
+        <form param/>
+      </section>
+    </content:>
+
+  </page>
+</def>
+
+
+
+
+
 <!-- ====== Publication Pages ====== -->
 
 <def tag="index-page" for="Publication">

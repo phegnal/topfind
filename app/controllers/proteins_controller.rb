@@ -745,29 +745,32 @@ class ProteinsController < ApplicationController
         @q[:sequence][@q[:location] - 10, 10]
       end
       # TODO - you are only getting one Nterminus
-      @q[:nterms] = Nterm.find(:first, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
+      @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
       # TODO - error when Nterms not found (the next line fails)
       # also, it actually should find N-termini in the cases I added, why doesn't it?
       if not @q[:nterms].nil?
-        @q[:cleavages] = Cleavage.find(:all, :conditions => ["nterm_id = ?", @q[:nterms].id]) 
+        @q[:cleavages] = @q[:nterms].collect {|a| Cleavage.find(:all, :conditions => ["nterm_id = ?", a])} #array of arrays
       else
         @q[:cleavages] = []
       end
       if not @q[:cleavages].nil?
-        @q[:proteases] = @q[:cleavages].collect {|a| Protein.find(:first, :conditions => ["id = ?", a.protease_id])} 
+        @q[:proteases] = @q[:cleavages].collect {|a| a.collect {|b| Protein.find(:first, :conditions => ["id = ?", b.protease_id])}}
       else
         @q[:proteases] = []
       end
       # TODO i don't think this is getting anything?
       @q[:domains] = Ft.find(:all, :conditions => ["protein_id = ?",  @q[:protein].id]) 
-      p @q[:domains] # TODO 
+      #@q[:domains] # TODO 
     
-      @q[:evidence_nterms] = Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', @q[:nterms]])
-      @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.evidence_id } #array    
-      @q[:evidences] = @q[:evidence_ids].collect { |o| Evidence.find(:first, :conditions => ["id = ?", o])}
-      @q[:evidence_source_ids] = @q[:evidences].collect {|a| a.evidencesource_id}
+      @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b])} #array of arrays
+      @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.collect {|n| n.evidence_id}} #array of arrays
+      @q[:evidences] = @q[:evidence_ids].collect { |o| o.collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}} #array of arrays
+       @q[:evidences].each do |s|
+      p s.class
+      end
+      @q[:evidence_source_ids] = @q[:evidences].collect {|a| a.collect {|b| b.evidencesource_id}}
  
-      @q[:evidence_sources] = @q[:evidence_source_ids].collect {|b| Evidencesource.find(:first, :conditions => ['id = ?', b])}
+      @q[:evidence_sources] = @q[:evidence_source_ids].collect {|b| b.collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}}
       # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
       # p @q[:evidence_sources]
       #p @q[:source_names]
