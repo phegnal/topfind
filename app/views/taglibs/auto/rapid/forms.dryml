@@ -216,18 +216,6 @@
 
 
 
-<def tag="form" for="Protein">
-  <form merge param="default">
-    <error-messages param/>
-    <field-list fields="ac, name, data_class, molecular_type, entry_type, dt_create, dt_sequence, dt_annotation, definition, sequence, mw, crc64, aalen, chromosome, band, meropsfamily, meropssubfamily, meropscode, status, cleavages, inverse_cleavages, publications, species" param/>
-    <div param="actions">
-      <submit label="#{ht 'proteins.actions.save', :default=>['Save']}" param/><or-cancel param="cancel"/>
-    </div>
-  </form>
-</def>
-
-
-
 <def tag="form" for="Publication">
   <form merge param="default">
     <error-messages param/>
