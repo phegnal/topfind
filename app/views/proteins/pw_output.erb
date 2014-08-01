@@ -11,15 +11,17 @@
 			<% if(path_node[:pos] == -1) %>
 			<% elsif(path_node[:pos] == 0) %>
 			<td>
-				<%= "inh" %>
+				<%= "&#8594 inhibits &#8594" %>
 			</td>
 			<% else %>
 			<td>
+				<%= "&#8594 cleaves @#{path_node[:pos]}: [" %>
 				<%= path_node[:domains_left].join(" ") %>
-				<b><%= " #{path_node[:pos]} " %></b>
-				<%= path_node[:domains_hit].join(" ") %>
-				<b><%= " #{path_node[:pos]} " %></b>
+				<%= path_node[:domains_hit].join("-") %>
+				<%= "&#8595" %>
+				<%= path_node[:domains_hit].join("-") %>
 				<%= path_node[:domains_right].join(" ") %>
+				<%= "] &#8594"%>
 			</td>
 			<% end %>
 			<td><%= '<a href="http://clipserve.clip.ubc.ca/topfind/proteins/' + path_node[:id] + '">' + @gnames[path_node[:id]] + '</a>' %></td>
