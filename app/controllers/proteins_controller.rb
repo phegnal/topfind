@@ -799,7 +799,7 @@ class ProteinsController < ApplicationController
         @pw_paths = finder.find_all_paths(params[:pw_protease],  @mainarray.collect{|x|  {:id => x[:acc], :pos => x[:location]} })
         @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
         # TODO install graphviz for this to work
-        # pdfPath = finder.make_graphviz(dir, @pw_gnames) # this saves the image but we need to define the path yet
+        pdfPath = finder.make_graphviz(dir, @pw_gnames) # this saves the image but we need to define the path yet
       else
         p "protease not found" if Protein.find_by_ac(params[:pw_protease].strip).nil?
         p "pathlength invalid" if params[:pw_maxPathLength].to_i <= 0
@@ -807,12 +807,11 @@ class ProteinsController < ApplicationController
       end
     end
         
-    # # ENRICHMENT STATISTICS - needs Rserve to work!
-    # es = EnrichmentStats.new(@mainarray)
-    # # TODO print statsarray to file in dir
-    # es.getStatsArray.each{|x| p x[:p].name + "   " + x[:fetAdj].to_s}
-    # es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
-    # es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
+    # ENRICHMENT STATISTICS - needs Rserve to work!
+    es = EnrichmentStats.new(@mainarray)
+    es.printStatsArrayToFile("#{dir}/ProteaseStats.txt")
+    es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
+    es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
     
     p "DONE"
   end

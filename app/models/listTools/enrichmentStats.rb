@@ -23,7 +23,7 @@ class EnrichmentStats
         dbCleavageProtease = p.cleavages.length 
         fet = FishersExactTest.new().calculate(listCleavageProtease, dbCleavageProtease, listCleavageTotal - listCleavageProtease, dbCleavageTotal - dbCleavageProtease)
         @@statsArray << {
-          :p => p,
+          :protein => p,
           :list => listCleavageProtease, 
           :listPercent => listCleavageProtease.to_f/listCleavageTotal.to_f,
           :dbPercent => dbCleavageProtease.to_f/dbCleavageTotal.to_f,
@@ -37,13 +37,26 @@ class EnrichmentStats
     end
   end
   
+  def printStatsArrayToFile(path)
+    output = File.new(path, "w")
+    fields = @@statsArray[1].keys
+    output << fields.join("\t")
+    output << "\t\n"
+    @@statsArray.each{|x|
+      fields.each{|f|
+        output << x[f].to_s+"\t"
+      }
+      output << "\n"
+    }
+    output.close
+  end
   
   def getStatsArray
     return @@statsArray
   end
   
   def plotProteaseSubstrateHeatmap(path)
-    proteases = @@statsArray.collect{|x| x[:p].name}
+    proteases = @@statsArray.collect{|x| x[:protein].name}
     matrix = []
     @@mainarray.each{|s| matrix << proteases.collect{|p| s[:proteases].flatten.collect{|x| x.name}.include? p }}
     matrix = matrix.collect{|a| a.collect{|x| if(x) then 1 else 0 end }}
@@ -70,7 +83,7 @@ class EnrichmentStats
   
   def plotProteaseCounts(path)
     @@r.assign("counts", @@statsArray.collect{|x| x[:list]})
-    @@r.assign("countsNam", @@statsArray.collect{|x| x[:p].name})
+    @@r.assign("countsNam", @@statsArray.collect{|x| x[:protein].name})
     @@r.void_eval("names(counts) <- countsNam")
     @@r.void_eval("pdf('#{path}')")
     @@r.void_eval("barplot(sort(counts, decreasing = T), las = 2, col = 'blue', ylab = 'Cleavages in the list')")
