@@ -754,6 +754,7 @@ class ProteinsController < ApplicationController
         @q[:cleavages] = []
       end
       if not @q[:cleavages].nil?
+        # TODO what about Cleavage.find(1).protease ?
         @q[:proteases] = @q[:cleavages].collect {|a| a.collect {|b| Protein.find(:first, :conditions => ["id = ?", b.protease_id])}}
       else
         @q[:proteases] = []
@@ -766,7 +767,7 @@ class ProteinsController < ApplicationController
       @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.collect {|n| n.evidence_id}} #array of arrays
       @q[:evidences] = @q[:evidence_ids].collect { |o| o.collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}} #array of arrays
        @q[:evidences].each do |s|
-      p s.class
+      # p s.class
       end
       @q[:evidence_source_ids] = @q[:evidences].collect {|a| a.collect {|b| b.evidencesource_id}}
  
@@ -789,8 +790,8 @@ class ProteinsController < ApplicationController
     print "\n"
     
     # ICELOGO
-    IceLogo.new().terminusIcelogo(Species.find(1), @mainarray.collect{|e| e[:upstream]+":"+e[:pep]}, "#{dir}/IceLogo.svg", 4)    
-      
+    IceLogo.new().terminusIcelogo(Species.find(1), @mainarray.collect{|e| e[:upstream]+":"+e[:pep]}, "#{dir}/IceLogo.svg", 4)
+
     # PATHFINDING
     if(@proteaseWeb == "1")
       if(not Protein.find_by_ac(params[:pw_protease].strip).nil? and params[:pw_maxPathLength].to_i > 0)
@@ -806,10 +807,12 @@ class ProteinsController < ApplicationController
       end
     end
         
-    # ENRICHMENT STATISTICS - needs Rserve to work!
+    # # ENRICHMENT STATISTICS - needs Rserve to work!
     # es = EnrichmentStats.new(@mainarray)
+    # # TODO print statsarray to file in dir
     # es.getStatsArray.each{|x| p x[:p].name + "   " + x[:fetAdj].to_s}
     # es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
+    # es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
     
     p "DONE"
   end
