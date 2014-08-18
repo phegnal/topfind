@@ -24,10 +24,13 @@
 		<th>Proteases</th>	
 
 		<%if @evidence%>
-		<th>Observed from Proteomics</th>
-		<th>From Alternative Translation</th>
-		<th>From Transcription</th>
-		<th>From Isoforms</th>
+		<th>Inferred from UniProt</th>
+		<th width='500%'>Observed from Proteomics</th>
+		<th>Alternative Transcription</th>
+		<%end%>
+
+		<%if @proteaseWeb%>
+		<th>Protease Web Connections</th>
 		<%end%>
 
 		<%if @domain%>
@@ -36,9 +39,7 @@
 		<th>Domain<br>After</th>
 		<%end%>
 
-		<%if @proteaseWeb%>
-		<th>Protease Web connections from protease to substrate</th>
-		<%end%>
+		
 
 
 	</tr>
@@ -72,58 +73,47 @@
 		<td><%= q[:upstream]%> ↓ <%= q[:pep]%></td>
 		<td><%= q[:location].succ%></td>
 		<td><% q[:proteases].each do |s|%>
-			<%= s%><br>
-			<%end%></td>
+			<% s.each do |a|%>
+				<%= a%><br>					
+			<%end end%></td>
 
 		<%if @evidence%>
-		<td><%q[:evidences].each do |s|%>
-			<%= s.each do |t|%>
-			<%= t.name%><br>
-			<%end end%></td>
-	
+		<td><%= q[:uniprot?]%></td>
+		<td><% q[:evidences_cleavages].each do |a|%>
+				<font size='1'><%= a%><br></font>
+			<%end%></td>
+		<td></td>
+			<%end%>
 
-
-
-
-		<%end%>
+		<%if @proteaseWeb%>
+		<td><font size='2'><span class="nowrap"><%= @pw_paths[q[:acc] + "_"+ q[:location].to_s].collect{|path| 
+			path.collect{|node|
+				@pw_gnames[node[:id]].to_s
+					}.join(" -> ")		
+			}.join("<br>  ") %></span></font></td>
+		<%end%> <!-- end of protease web -->
 
 	<%if @domain%>
-
 			<td>
 				<!--domains before  -->
-				<%q[:domains].uniq.each do |r|%>
-				<%if q[:location] <= r.from.to_i %>
+				<%q[:domains_before].uniq.each do |r|%>
 				<%= r.name%><br>
-				<%end%><%end%>
-				</td>
-
-			<td>
+				<%end%></td>
+		<td>
 				<!--domains at  -->
-				<%q[:domains].each do |r|%>
-				<%if (q[:location] - @nterminal) >= r.from.to_i or (q[:location] + @cterminal) <= r.to.to_i %>
+				<%q[:domains_at].uniq.each do |r|%>
 				<%= r.name%><br>
-				<%end%><%end%>
-				</td>
-
-
-			<td>
+				<%end%></td>
+		<td>
 				<!--domains after  -->
-				<%q[:domains].each do |r|%>
-				<%if q[:location] >= r.to.to_i%>
+				<%q[:domains_after].uniq.each do |r|%>
 				<%= r.name%><br>
-				<%end%><%end%>
-				</td>
+				<%end%></td>
 		<%end%> <!-- end of domains -->
 
 
 
-	<%if @proteaseWeb%>
-	<td><%= @pw_paths[q[:acc] + "_"+ q[:location].to_s].collect{|path| 
-		path.collect{|node|
-			@pw_gnames[node[:id]].to_s
-		}.join(" -> ")		
-	}.join("<br>  ") %></td>
-	<%end%> <!-- end of protease web -->
+	
 
 
 	</tr>

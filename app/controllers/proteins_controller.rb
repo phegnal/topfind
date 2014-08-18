@@ -744,7 +744,6 @@ class ProteinsController < ApplicationController
       else
         @q[:sequence][@q[:location] - 10, 10]
       end
-      # TODO - you are only getting one Nterminus
       @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
       # TODO - error when Nterms not found (the next line fails)
       # also, it actually should find N-termini in the cases I added, why doesn't it?
@@ -759,19 +758,19 @@ class ProteinsController < ApplicationController
       else
         @q[:proteases] = []
       end
-      # TODO i don't think this is getting anything?
-      @q[:domains] = Ft.find(:all, :conditions => ["protein_id = ?",  @q[:protein].id]) 
-      #@q[:domains] # TODO 
+      @q[:domains_all] = Ft.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
+      @q[:domains_before] = @q[:domains_all].drop_while {|a| @q[:location] > a.from.to_i}
+      @q[:domains_at] = @q[:domains_all].drop_while {|a| (@q[:location] - @nterminal) <= a.from.to_i or (@q[:location] + @cterminal) >= a.to.to_i}
+      @q[:domains_after] = @q[:domains_all].drop_while {|a| @q[:location] < a.to.to_i}
     
       @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b])} #array of arrays
       @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.collect {|n| n.evidence_id}} #array of arrays
       @q[:evidences] = @q[:evidence_ids].collect { |o| o.collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}} #array of arrays
-       @q[:evidences].each do |s|
-      # p s.class
-      end
+      @q[:evidences_cleavages] = @q[:evidences].flatten.collect{|a| a.to_s}.delete_if {|b| !b.include?'cleavage'}
       @q[:evidence_source_ids] = @q[:evidences].collect {|a| a.collect {|b| b.evidencesource_id}}
  
       @q[:evidence_sources] = @q[:evidence_source_ids].collect {|b| b.collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}}
+      @q[:uniprot?] = @q[:evidences].flatten.to_s.include?'inferred from uniprot'
       # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
       # p @q[:evidence_sources]
       #p @q[:source_names]
@@ -783,7 +782,7 @@ class ProteinsController < ApplicationController
       @q[:chr] = if @chromosome 
         [@q[:protein].chromosome, @q[:protein].band] 
       end
-      @q[:transmem] = @q[:domains].delete_if {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
+      @q[:transmem] = @q[:domains_all].delete_if {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
       print "."
       @mainarray << @q
     }
@@ -806,16 +805,16 @@ class ProteinsController < ApplicationController
         # TODO put error message on html??
       end
     end
-        
+=begin        
     # ENRICHMENT STATISTICS - needs Rserve to work!
     es = EnrichmentStats.new(@mainarray)
     es.printStatsArrayToFile("#{dir}/ProteaseStats.txt")
     es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
     es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
-    
+=end     
     p "DONE"
   end
-  
+ 
   def trying_featurePanel
     
     p = Protein.find(1)

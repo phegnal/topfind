@@ -1,14 +1,15 @@
 <%= @x %>
 
 <% form_tag(:action => "multi_peptides2", :method => "get") do %>
+<font face="ebrima">
 <body bgcolor="aliceblue">
   <h1>
-    TopFINDER
+    TopFINDer
   </h1>
 
   <p>
     <b> Protein Accessions and Peptide Sequences: </b> <br>
-    <%= text_area_tag(:all, "P07091 MMCNEFFEG\nP06870 IVGGWECEQHS\nP0A8M0 SVVPVADVLQGR\nP01019 VIHNESTCEQ\nP30990 KPRRPYIL\nP01042 SPFRSSRIGE")  %> <br>
+    <%= text_area_tag(:all, "P06870 IVGGWECEQHS\nP0A8M0 SVVPVADVLQGR\nP07091 MMCNEFFEG\nP01019 VIHNESTCEQ\nP30990 KPRRPYIL\nP01042 SPFRSSRIGE")  %> <br>
   </p>
  
  <p>Information available<br>
@@ -19,21 +20,22 @@
  <%= check_box_tag(:evidence, "1", true)%> Evidences <br>
  <%= check_box_tag(:proteaseWeb, "1", true)%> Protease web analysis with 
  	protease: <%= text_field_tag(:pw_protease, "P14091")  %>
-	max. path length <%= text_field_tag(:pw_maxPathLength, "4")  %>
-	organism: 
+	max. path length <%= text_field_tag(:pw_maxPathLength, "4")  %><br>
+	     organism: 
 	<%= radio_button_tag :pw_org, "human", true %> human
 	<%= radio_button_tag :pw_org, "mouse" %> mouse
 	<br>
  </p>
  
 Number of Amino Acids <b>N-terminal</b> to retrieve information for (leave blank for 0, up to 10)<br>
-    <%= text_field_tag(:nterminal, "2")  %> <br><br>
+    <%= text_field_tag(:nterminal, "3")  %> <br><br>
 
 Number of Amino Acids <b>C-Terminal</b> to retrieve information for (leave blank for 0, up to 10)<br>
     <%= text_field_tag(:cterminal, "3")  %> <br><br>
 
 <%= submit_tag("Process into table") %>
 <%end%>
+</font>
 <!--
 <%form_tag(:action => "multi_export", :method => "get") do %>
 <%= submit_tag("Process into exportable form")%>
