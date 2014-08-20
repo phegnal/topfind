@@ -24,7 +24,7 @@ task :import_uniprot do
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_trembl_plants.dat.gz")
     when 'ecoli'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot_sprot_bacteria.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/uniprot-%28organism%3A83333+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A83333+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
     when 'yeast'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_fungi.dat.gz")
       io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A559292+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
@@ -78,7 +78,7 @@ task :import_uniprot do
        next
       end 
     
-    exit if i == 1000
+    #exit if i == 1000
     
     orgs = entry.os.map {|os| os['os']}
 
@@ -786,24 +786,28 @@ task :import_uniprot_names do
   require "#{RAILS_ROOT}/config/environment"
   require 'bio'
   require 'zlib'
-    case ARGV[1]
+  case ARGV[1]
     when 'human' 
-      # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_human.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_human.dat.txt")
+      # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot/uniprot_sprot_human.dat.gz")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A9606+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
+      @mart = biomart.datasets["hsapiens_gene_ensembl"]
     when 'mouse'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_rodents.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_mouse.dat.txt") 
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A10090+keyword%3A1185%29+AND+reviewed%3Ayes.txt") 
+      @mart = biomart.datasets["mmusculus_gene_ensembl"] 
     when 'arabidopsis'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_plants.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_arabidopsis.dat.txt")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A3702+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
     when 'arabidopsis-trembl'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_trembl_plants.dat.gz")
     when 'ecoli'
-      # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_bacteria.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_ecoli.dat.txt")
+      # io = Zlib::GzipReader.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot_sprot_bacteria.dat.gz")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A83333+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
     when 'yeast'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_fungi.dat.gz")
-      io = File.open("#{RAILS_ROOT}/databases/topfind_update_1305/databases/130521_uniprot_yeast.dat.txt")  end
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A559292+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
+      @mart = biomart.datasets["scerevisiae_gene_ensembl"]
+  end
   puts "done"
     
     @skipped = 0
@@ -900,19 +904,17 @@ task :import_uniprot_gene_names do
   require "#{RAILS_ROOT}/config/environment"
   require 'bio'
   require 'zlib'
-  case ARGV[1]
+    case ARGV[1]
     when 'human' 
-      io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_human.dat.gz")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A9606+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
     when 'mouse'
-      io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_rodents.dat.gz") 
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A10090+keyword%3A1185%29+AND+reviewed%3Ayes.txt") 
     when 'arabidopsis'
-      io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_plants.dat.gz")
-    when 'arabidopsis-trembl'
-      io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_trembl_plants.dat.gz")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A3702+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
     when 'ecoli'
-      io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_bacteria.dat.gz")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A83333+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
     when 'yeast'
-      io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_fungi.dat.gz")
+      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A559292+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
   end
   puts "done"
     

@@ -428,12 +428,14 @@ class Analysis
 
     # @dbfetchSrv.wiredump_dev = STDOUT
     seqs = self.cleavagesites.*.try(:seq_x)
-    filename = "#{self.protein.name}_icelogo#{filter}.svg"
-    resp =  @dbfetchSrv.getStaticIceLogo({'lExperimentalSet' => seqs,'lSpecies' => self.protein.species,'lScoringType' => 'percentage', 'lYaxis' => 100,'lStartPosition'=>'-5','lPvalue' => 0.05,'lHeight'=>450,'lWidth'=>450})
-        open("#{RAILS_ROOT}/public/images/dynamic/#{filename}", "w") do |file|
-          file.write(resp.getStaticIceLogoReturn)  
-        end 
-   return  filename   
+    if seqs.count > 1
+		filename = "#{self.protein.name}_icelogo#{filter}.svg"
+		resp =  @dbfetchSrv.getStaticIceLogo({'lExperimentalSet' => seqs,'lSpecies' => self.protein.species,'lScoringType' => 'percentage', 'lYaxis' => 100,'lStartPosition'=>'-5','lPvalue' => 0.05,'lHeight'=>450,'lWidth'=>450})
+			open("#{RAILS_ROOT}/public/images/dynamic/#{filename}", "w") do |file|
+			  file.write(resp.getStaticIceLogoReturn)  
+			end 
+		return  filename 
+    end  
            
   end
   
