@@ -744,7 +744,6 @@ class ProteinsController < ApplicationController
       else
         @q[:sequence][@q[:location] - 10, 10]
       end
-      # TODO - you are only getting one Nterminus
       @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
       # TODO - error when Nterms not found (the next line fails)
       # also, it actually should find N-termini in the cases I added, why doesn't it?
@@ -754,23 +753,24 @@ class ProteinsController < ApplicationController
         @q[:cleavages] = []
       end
       if not @q[:cleavages].nil?
+        # TODO what about Cleavage.find(1).protease ?
         @q[:proteases] = @q[:cleavages].collect {|a| a.collect {|b| Protein.find(:first, :conditions => ["id = ?", b.protease_id])}}
       else
         @q[:proteases] = []
       end
-      # TODO i don't think this is getting anything?
-      @q[:domains] = Ft.find(:all, :conditions => ["protein_id = ?",  @q[:protein].id]) 
-      #@q[:domains] # TODO 
+      @q[:domains_all] = Ft.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
+      @q[:domains_before] = @q[:domains_all].drop_while {|a| @q[:location] > a.from.to_i}
+      @q[:domains_at] = @q[:domains_all].drop_while {|a| (@q[:location] - @nterminal) <= a.from.to_i or (@q[:location] + @cterminal) >= a.to.to_i}
+      @q[:domains_after] = @q[:domains_all].drop_while {|a| @q[:location] < a.to.to_i}
     
       @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b])} #array of arrays
       @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.collect {|n| n.evidence_id}} #array of arrays
       @q[:evidences] = @q[:evidence_ids].collect { |o| o.collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}} #array of arrays
-       @q[:evidences].each do |s|
-      p s.class
-      end
+      @q[:evidences_cleavages] = @q[:evidences].flatten.collect{|a| a.to_s}.delete_if {|b| !b.include?'cleavage'}
       @q[:evidence_source_ids] = @q[:evidences].collect {|a| a.collect {|b| b.evidencesource_id}}
  
       @q[:evidence_sources] = @q[:evidence_source_ids].collect {|b| b.collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}}
+      @q[:uniprot?] = @q[:evidences].flatten.to_s.include?'inferred from uniprot'
       # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
       # p @q[:evidence_sources]
       #p @q[:source_names]
@@ -782,15 +782,15 @@ class ProteinsController < ApplicationController
       @q[:chr] = if @chromosome 
         [@q[:protein].chromosome, @q[:protein].band] 
       end
-      @q[:transmem] = @q[:domains].delete_if {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
+      @q[:transmem] = @q[:domains_all].delete_if {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
       print "."
       @mainarray << @q
     }
     print "\n"
     
     # ICELOGO
-    IceLogo.new().terminusIcelogo(Species.find(1), @mainarray.collect{|e| e[:upstream]+":"+e[:pep]}, "#{dir}/IceLogo.svg", 4)    
-      
+    IceLogo.new().terminusIcelogo(Species.find(1), @mainarray.collect{|e| e[:upstream]+":"+e[:pep]}, "#{dir}/IceLogo.svg", 4)
+
     # PATHFINDING
     if(@proteaseWeb == "1")
       if(not Protein.find_by_ac(params[:pw_protease].strip).nil? and params[:pw_maxPathLength].to_i > 0)
@@ -798,22 +798,23 @@ class ProteinsController < ApplicationController
         @pw_paths = finder.find_all_paths(params[:pw_protease],  @mainarray.collect{|x|  {:id => x[:acc], :pos => x[:location]} })
         @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
         # TODO install graphviz for this to work
-        # pdfPath = finder.make_graphviz(dir, @pw_gnames) # this saves the image but we need to define the path yet
+        pdfPath = finder.make_graphviz(dir, @pw_gnames) # this saves the image but we need to define the path yet
       else
         p "protease not found" if Protein.find_by_ac(params[:pw_protease].strip).nil?
         p "pathlength invalid" if params[:pw_maxPathLength].to_i <= 0
         # TODO put error message on html??
       end
     end
-        
+=begin        
     # ENRICHMENT STATISTICS - needs Rserve to work!
-    # es = EnrichmentStats.new(@mainarray)
-    # es.getStatsArray.each{|x| p x[:p].name + "   " + x[:fetAdj].to_s}
-    # es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
-    
+    es = EnrichmentStats.new(@mainarray)
+    es.printStatsArrayToFile("#{dir}/ProteaseStats.txt")
+    es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
+    es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
+=end     
     p "DONE"
   end
-  
+ 
   def trying_featurePanel
     
     p = Protein.find(1)

@@ -104,7 +104,7 @@ class PathFinding
           feats = Protein.find_by_ac(target[:id]).fts
           f.concat(feats.find_all_by_name(domains_names)) if not domains_names.nil?
           f.concat(feats.find(:all, :conditions => [Array.new(domains_descriptions.length, "description LIKE ?").join(" OR "), domains_descriptions].flatten)) if not domains_descriptions.nil?
-          
+          f = f.sort{|x,y| x.from.to_i <=> y.from.to_i}
           target[:domains_left] = f.select{|x| x.to.to_i < target[:pos]}
           target[:domains_hit] = f.select{|x| x.from.to_i <= target[:pos] && x.to.to_i >= target[:pos]}
           target[:domains_right] = f.select{|x| x.from.to_i > target[:pos]}
