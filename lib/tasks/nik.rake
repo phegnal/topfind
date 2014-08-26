@@ -12,7 +12,7 @@ namespace :nik do
   # MASTER UPDATE TASK
   #
   # 
-  desc "go through organisms and add N-termini for each from TISdb"
+  desc "Read n termini from topfind and write them to file"
   task :nters do
     require "#{RAILS_ROOT}/config/environment"
     
@@ -76,51 +76,71 @@ namespace :nik do
     output.close
     
     p "Ntermini found, now starting to merge them by position"
-    
-    # write a program to read the file and to do this modification afterwards
-  #   l = line.split("\t")
-  #   newHash = {}
-  #   if i == 1
-  #   keys = l
-  # else
-  #   line = {}
-  #   key.each_index{|i| line[keys[i]] = l[i]}
-  #   newHash[line["ac"]] = {} if newHash[line["ac"]].nil?
-  #   newHash[line["ac"]][line["pos"]] =
+  end
     
     
+    
+  # TAKES ORIGINAL OUTPUT AND MERGES TERMINI
+  desc "Take N-termini file and merge with positions that are close"
+  task :merge_nters, [:file, :merge_distance] do |t, args|
+
+    # READ ORIGINAL OUTPUT
+    inputFile = File.new(args[:file], "r")
+    nterHash = {}
+    keys = []
+    i = 0
+    inputFile.each{|line|
+      l = line.rstrip.split("\t")
+      if i == 0 
+        keys = l
+      else
+        ac = l[0]
+        pos = l[1].to_i
+        nterHash[ac] = {} if nterHash[ac].nil?
+        nterHash[ac][pos] = {} if nterHash[ac][pos].nil?
+        l[2..(l.length-1)].each_index{|ind|
+          nterHash[ac][pos][keys[ind+2]] = (l[ind+2] == "true")
+        }
+      end
+      i += 1
+    }
+    inputFile.close()
+
     # GET SECOND OUTPUT MERGED FOR MANY POSITIONS
+    dist = args[:merge_distance].to_i
     nTerHash2 = {}
     nterHash.keys.each{|ac|
       nTerHash2[ac] = {}
-      pos = nterHash[ac].keys.sort{|a,b| a <=> b} 
-      current = nil # initiate with first protein
-      s = -50 # so that first run goes into else
+      pos = nterHash[ac].keys.sort{|a,b| a <=> b}
+      lastData = nil # initiate with first protein
+      lastPos = -50 # so that first run goes into else
       while(pos != []) do
-        p = pos.shift
-        if p <= (s + 3)
-          # merge entries
-          current.keys.each{|k| current[:k] = current[:k] or nterHash[ac][p][:k]}
-        else
-          # make new entry
-          nTerHash2[ac][p] = current if not current.nil? # the "if not" is for the first run
-          current = nterHash[ac][p]
+        currentPos = pos.shift
+        currentData = nterHash[ac][currentPos]
+        if currentPos <= (lastPos + dist) # merge entries if they are that close
+          lastData.keys.each{|k| lastData[k] = (lastData[k] or currentData[k])}
+        else # make new entry
+          nTerHash2[ac][lastPos] = lastData if not lastData.nil? # the "if not" is for the first run
+          lastData = nterHash[ac][currentPos]
         end
-        s = p
+        lastPos = currentPos
       end
+      nTerHash2[ac][lastPos] = lastData # the last left over row
     }
 
     # WRITE SECOND OUTPUT TO OUTPUT2
+    date = Time.new.strftime("%Y_%m_%d")
     output2 = File.new("#{date}_ntermini2.txt", "w")
     # HEADER
+    valKeys = keys[2..(keys.length-1)]
     output2 << "ac\tpos\t"
-    output2 << keys.join("\t")
+    output2 << valKeys.join("\t")
     output2 << "\n"
     # CONTENT
     nTerHash2.keys.each{|ac|
       nTerHash2[ac].keys.each{|pos|
         output2 << "#{ac}\t#{pos}\t"
-        output2 << keys.collect{|k| nTerHash2[ac][pos][k]}.join("\t")
+        output2 << valKeys.collect{|k| nTerHash2[ac][pos][k]}.join("\t")
         output2 << "\n"
       }
     }
