@@ -1,4 +1,10 @@
-<%= image_tag "pw_graphviz.svg" %>
+<% if @allPaths.values.select{|v| v.length > 0}.length == 0 %>
+	<%= "No Paths found" %>
+<% end %>
+
+<% if File.exist?("public/images/pw_graphviz.svg") %>
+	<%= image_tag "pw_graphviz.svg" %>
+<% end %>
 
 <table border="0">
 <% @sortet_subs.each do |target| -%>

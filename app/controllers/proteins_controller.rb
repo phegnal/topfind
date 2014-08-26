@@ -656,7 +656,8 @@ class ProteinsController < ApplicationController
       nwOrg = params["network_org"]
       listOrg = params["list_org"]
       # FIND PATHS
-      finder = PathFinding.new(Graph.new(nwOrg), maxLength, byPos, rangeLeft, rangeRight)
+      exclusion = ["P01023"]
+      finder = PathFinding.new(Graph.new(nwOrg, []), maxLength, byPos, rangeLeft, rangeRight)
       if(nwOrg == "mouse" && listOrg == "human") # nw is mouse and list is human
         @allPaths = finder.find_all_paths_map2mouse(start, targets)
       elsif(nwOrg == "human" && listOrg == "mouse")  # nw is human and list is mouse

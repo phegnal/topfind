@@ -118,14 +118,16 @@ class PathFinding
   # returns the file path for the graphviz file or nil if it didn't work
   #
   def make_graphviz(folder, gnames)
-  firstNode = @allPaths.values.select{|pathset| pathset != []}.collect{|pathset| pathset[0][0]}.uniq[0] # get first element of any path
-  if not firstNode.nil?   # WRITES Graphviz only if there was any path (so there was a first element somewhere)
-    nodestyles=["#{gnames[firstNode[:id]]} [style=filled fillcolor=turquoise];\n"]
-    edges = []
-    @allPaths.values.each{|pathset| pathset.each{|path|
-      nodestyles << "#{gnames[path[path.length-1][:id]]} [style=filled fillcolor=grey];\n"
-      (1..path.length-1).each{|i| edges << "#{gnames[path[i-1][:id]]} -> #{gnames[path[i][:id]]} [label=#{path[i][:pos] == 0 ? 'inh' : path[i][:pos]}];\n"
-      }}}
+    File.delete("#{folder}/pw_graphviz.txt") if File.exist?("#{folder}/pw_graphviz.txt")
+    File.delete("#{folder}/pw_graphviz.svg") if File.exist?("#{folder}/pw_graphviz.svg")
+    firstNode = @allPaths.values.select{|pathset| pathset != []}.collect{|pathset| pathset[0][0]}.uniq[0] # get first element of any path
+    if not firstNode.nil?   # WRITES Graphviz only if there was any path (so there was a first element somewhere)
+      nodestyles=["#{gnames[firstNode[:id]]} [style=filled fillcolor=turquoise];\n"]
+      edges = []
+      @allPaths.values.each{|pathset| pathset.each{|path|
+        nodestyles << "#{gnames[path[path.length-1][:id]]} [style=filled fillcolor=grey];\n"
+        (1..path.length-1).each{|i| edges << "#{gnames[path[i-1][:id]]} -> #{gnames[path[i][:id]]} [label=#{path[i][:pos] == 0 ? 'inh' : path[i][:pos]}];\n"
+        }}}
       outputFile = File.open("#{folder}/pw_graphviz.txt", "w")
       outputFile << "digraph G {\n"
       nodestyles.uniq.each{|e| outputFile << e}
@@ -134,7 +136,7 @@ class PathFinding
       outputFile << "}"
       outputFile.close
     end
-    return "#{folder}/pw_graphviz.svg" if system "dot #{folder}/pw_graphviz.txt -Tsvg -o #{folder}/pw_graphviz.svg"
+    system "dot #{folder}/pw_graphviz.txt -Tsvg -o #{folder}/pw_graphviz.svg" if File.exist?("#{folder}/pw_graphviz.txt")
+    if File.exist?("#{folder}/pw_graphviz.svg") then return "#{folder}/pw_graphviz.svg" else  return nil end
   end
-  
 end
