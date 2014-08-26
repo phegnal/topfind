@@ -648,7 +648,7 @@ class ProteinsController < ApplicationController
       # CLEAN UP INPUT
       start = params["start"].strip
       targets = params["targets"].split("\n").collect{|s| {:id => s.split("\s")[0], :pos => s.split("\s")[1].to_i}}
-      maxLength = params["maxLength"].to_i
+      @maxLength = params["maxLength"].to_i
       byPos = params["byPos"] == "yes"
       rangeLeft = params["rangeLeft"] == "" ? 0 : params["rangeLeft"].to_i
       rangeRight = params["rangeRight"] == "" ? 0 : params["rangeRight"].to_i
@@ -657,7 +657,7 @@ class ProteinsController < ApplicationController
       listOrg = params["list_org"]
       # FIND PATHS
       exclusion = ["P01023"]
-      finder = PathFinding.new(Graph.new(nwOrg, []), maxLength, byPos, rangeLeft, rangeRight)
+      finder = PathFinding.new(Graph.new(nwOrg, []), @maxLength, byPos, rangeLeft, rangeRight)
       if(nwOrg == "mouse" && listOrg == "human") # nw is mouse and list is human
         @allPaths = finder.find_all_paths_map2mouse(start, targets)
       elsif(nwOrg == "human" && listOrg == "mouse")  # nw is human and list is mouse
@@ -806,7 +806,7 @@ class ProteinsController < ApplicationController
     # PATHFINDING
     if(@proteaseWeb == "1")
       if(not Protein.find_by_ac(params[:pw_protease].strip).nil? and params[:pw_maxPathLength].to_i > 0)
-        finder = PathFinding.new(Graph.new(params[:pw_org]), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal)
+        finder = PathFinding.new(Graph.new(params[:pw_org], []), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal)
         @pw_paths = finder.find_all_paths(params[:pw_protease],  @mainarray.collect{|x|  {:id => x[:acc], :pos => x[:location]} })
         @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
         # TODO install graphviz for this to work
@@ -817,13 +817,12 @@ class ProteinsController < ApplicationController
         # TODO put error message on html??
       end
     end
-=begin        
+
     # ENRICHMENT STATISTICS - needs Rserve to work!
     es = EnrichmentStats.new(@mainarray)
     es.printStatsArrayToFile("#{dir}/ProteaseStats.txt")
     es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
     es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
-=end     
     p "DONE"
   end
   

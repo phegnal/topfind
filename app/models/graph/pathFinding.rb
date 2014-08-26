@@ -132,6 +132,19 @@ class PathFinding
       outputFile << "digraph G {\n"
       nodestyles.uniq.each{|e| outputFile << e}
       outputFile << "edge [style=bold  color=grey labelfontname=Arial];\n"
+      legend = <<EOS
+      subgraph cluster_1 {
+      		query_protease
+      		label = Legend;
+      		color=black;
+      		query_protease [style=filled fillcolor=turquoise];		
+      		list_member [style=filled fillcolor=grey];
+      		query_protease -> inhibitor [label=cleavage];
+      		inhibitor -> protease [label=inhibition, arrowhead = tee];
+      		protease -> list_member [label=cleavage];
+      }
+EOS
+      outputFile << legend
       edges.flatten.uniq.each{|e| outputFile << e}
       outputFile << "}"
       outputFile.close

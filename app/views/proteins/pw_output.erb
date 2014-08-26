@@ -11,6 +11,12 @@
 	<tr>
 	<td><b><%= "#{@gnames[target.split("_")[0]]}(#{target.split("_")[0]})"%></b></td>
 	</tr>
+	<tr>
+		<td> Protease </td> 
+		<% (@maxLength-1).times do |i| %>
+		 <td> interaction </td> <td> Protein </td>
+		<% end %>
+	</tr>
 	<% @allPaths[target].each do |path| %>
 		<tr>
 		<% path.each do |path_node| %>
