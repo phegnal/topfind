@@ -126,7 +126,7 @@ class PathFinding
       edges = []
       @allPaths.values.each{|pathset| pathset.each{|path|
         nodestyles << "#{gnames[path[path.length-1][:id]]} [style=filled fillcolor=grey];\n"
-        (1..path.length-1).each{|i| edges << "#{gnames[path[i-1][:id]]} -> #{gnames[path[i][:id]]} [label=#{path[i][:pos] == 0 ? 'inh' : path[i][:pos]}];\n"
+        (1..path.length-1).each{|i| edges << "#{gnames[path[i-1][:id]]} -> #{gnames[path[i][:id]]}" + (path[i][:pos] == 0 ? '[label=inh, arrowhead = tee]' : "[label=#{path[i][:pos]}];\n")
         }}}
       outputFile = File.open("#{folder}/pw_graphviz.txt", "w")
       outputFile << "digraph G {\n"
