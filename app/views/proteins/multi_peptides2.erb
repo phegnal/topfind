@@ -22,12 +22,15 @@
 		<th>Sequence</th>
 		<th>P<sub>1</sub>′</th>
 
-		<th>Proteases</th>	
+		
 
 		<%if @evidence%>
 		<th>Inferred from UniProt</th>
-		<th width='500%'>Observed from Proteomics</th>
-		<th>Alternative Transcription</th>
+		<th>Cleavages from Proteases (MEROPS)</th>	
+		<th>Ensembl</th>
+		<th>TISdb</th>
+		<th>From Isoforms (TopFIND)</th>
+		<th>Other Evidences</th>
 		<%end%>
 
 		<%if @proteaseWeb%>
@@ -67,19 +70,20 @@
 		<%end%>
 
 
-		<td><%= q[:upstream]%><%= q[:pep][0]%> ↓ <%= q[:pep]%></td>
+		<td><%= q[:upstream]%> ↓ <%= q[:pep]%></td>
 		<td><%= q[:location].succ%></td>
+		
+
+		<%if @evidence%>
+		<td><%= q[:uniprot?]%></td>
 		<td><% q[:proteases].each do |s|%>
 			<% s.each do |a|%>
 				<%= a%><br>	
 				<%end%>				
 			<%end%></td>
-
-		<%if @evidence%>
-		<td><%= q[:uniprot?]%></td>
-		<td><% q[:evidences_cleavages].each do |a|%>
-				<font size='1'><%= a%><br></font>
-			<%end%></td>
+		<td><%= q[:ensembl?]%></td>
+		<td><%= q[:tisdb?]%></td>
+		<td><%= q[:isoforms]%></td>
 		<%end%>
 
 		<%if @proteaseWeb%>
@@ -123,14 +127,14 @@
 <body>
 <br><br>
 
-
+<!--
 CSV<br><br>
 
 Accession\tProtein Name\tAll Names\t <%if @spec%>Species<%end%>\t<%if @chromosome%>Chr & Band<%end%>\tSequence\tP<sub>1</sub>′\tProteases\t<%if @evidence%>Inferred from UniProt\t Observed from Proteomics\t Alternative Transcription<%end%>\t<%if @proteaseWeb%>Protease Web Connections<%end%>\t<%if @domain%>Domain Before\tDomain At\tDomain After<%end%><br>
 <% @mainarray.each_index do |i|%>
 	<% q = @mainarray.fetch(i)%>
 	<%= q[:acc]%>\t<% q[:short_names].each do |s|%><%= s.full%><%= s.short%>;<%end%><% q[:all_names].each do |s|%><%= s.name%>;<%end%>
-	<%if @spec%><%= q[:species]%><%end%>\t<%if @chromosome%><% q[:chr].each do |a|%><%= a%><%end%><%end%>\t<%= q[:upstream]%> ↓ <%= q[:pep]%>\t<%= q[:location].succ%>\t><% q[:proteases].each do |s|%><% s.each do |a|%><%= a%>;<%end end%>\t<%if @evidence%><%= q[:uniprot?]%><% q[:evidences_cleavages].each do |a|%><%= a%>;<%end end%>\t<%if @proteaseWeb%><%= @pw_paths[q[:acc] + "_"+ q[:location].to_s].collect{|path| 
+	<%if @spec%><%= q[:species]%><%end%>\t<%if @chromosome%><% q[:chr].each do |a|%><%= a%><%end%><%end%>\t<%= q[:upstream]%> ↓ <%= q[:pep]%>\t<%= q[:location].succ%>\t><% q[:proteases].each do |s|%><% s.each do |a|%><%= a%>;<%end end%>\t<%if @evidence%><%= q[:uniprot?]%>;<%end%>\t<%if @proteaseWeb%><%= @pw_paths[q[:acc] + "_"+ q[:location].to_s].collect{|path| 
 			path.collect{|node|
 				@pw_gnames[node[:id]].to_s
 					}.join(" -> ")		
@@ -143,3 +147,4 @@ Accession\tProtein Name\tAll Names\t <%if @spec%>Species<%end%>\t<%if @chromosom
 					<%= r.name%>;<%end%>\t<%end%>
 	<%end%>
 </body>
+-->

@@ -715,7 +715,6 @@ class ProteinsController < ApplicationController
     @nterminal = params['nterminal'].to_i
     @cterminal = params['cterminal'].to_i
     @tpp = params['tpp']
-    p @tpp
     @mainarray = []
     @input1.each {|i|   
       @q = {}
@@ -774,15 +773,23 @@ class ProteinsController < ApplicationController
       @q[:domains_at] = @q[:domains_all].drop_while {|a| (@q[:location] - @nterminal) <= a.from.to_i || (@q[:location] + @cterminal) >= a.to.to_i}
       @q[:domains_after] = @q[:domains_all].drop_while {|a| @q[:location] < a.to.to_i}
       
-      @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b])} #array of arrays
-      @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.collect {|n| n.evidence_id}} #array of arrays
-      @q[:evidences] = @q[:evidence_ids].collect { |o| o.collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}} #array of arrays
-      @q[:evidences_cleavages] = @q[:evidences].flatten.collect{|a| a.to_s}.delete_if {|b| !b.include?'cleavage'}
-      @q[:evidence_source_ids] = @q[:evidences].collect {|a| a.collect {|b| b.evidencesource_id}}
- 
-      @q[:evidence_sources] = @q[:evidence_source_ids].collect {|b| b.collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}}
-      @q[:uniprot?] = @q[:evidences].flatten.to_s.include?'inferred from uniprot'
-      @q[:TISdb?] = 
+      @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b.id])}.flatten #array of arrays
+      @q[:evidence_ids] = @q[:evidence_nterms].collect {|n| n.evidence_id}.flatten #array
+      @q[:evidences] = @q[:evidence_ids].collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}.flatten
+      @q[:evidence_source_ids] = @q[:evidences].collect {|b| b.evidencesource_id}.compact
+      @q[:evidence_sources] = @q[:evidence_source_ids].collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}
+      
+      @q[:evidence_dbnames] = @q[:evidence_sources].collect {|a| a.dbname}
+    p @q[:evidence_dbnames]
+      p "aksldfjkalsdjf"
+      @q[:uniprot?] = @q[:evidence_dbnames].include?"UniProtKB"
+      #@q[:evidences_cleavages] = @q[:evidences].flatten.collect{|a| a.to_s}.delete_if {|b| !b.include?'cleavage'}
+
+      @q[:ensembl?] = @q[:evidence_dbnames].include?'Ensembl'
+      @q[:tisdb?] = @q[:evidence_dbnames].include?'TISdb'
+      @q[:isoforms] = @q[:evidence_dbnames].include?'TopFIND'
+      
+      
       # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
       # p @q[:evidence_sources]
       #p @q[:source_names]
@@ -826,102 +833,6 @@ class ProteinsController < ApplicationController
     p "DONE"
   end
   
-  def multi_export
-    @all_input = params["all"].strip #string
-    @input1 = @all_input.split("\n") #array 
-    @chromosome = params['chromosome']
-    @domain = params['domain']
-    @isoform = params['isoform']
-    @evidence = params['evidence']
-    @proteaseWeb = params[:proteaseWeb]
-    @spec = params['spec']
-    @nterminal = params['nterminal'].to_i
-    @cterminal = params['cterminal'].to_i
-
-    @mainarray = []
-    @input1.each {|i|   
-      @q = {}
-      @q[:acc] = i.split("\s").fetch(0)
-      @q[:pep] = if :peptide_format == "TPP"
-        i.split("\s").fetch(1)[1..-1].gsub(/[^[:upper:]]+/, "")
-         else
-        i.split("\s").fetch(1).gsub(/[^[:upper:]]+/, "")
-        end
-     
-      @q[:protein] = if Protein.find(:first, :conditions => ["ac = ?", @q[:acc]]) != nil
-        Protein.find(:first, :conditions => ["ac = ?", @q[:acc]])
-      else
-        
-      end
-      @q[:sequence] = @q[:protein].sequence
-      @q[:species] = if @q[:protein].species_id == 1
-        "Human"
-      elsif @q[:protein].species_id == 2
-        "Mouse"
-      elsif @q[:protein].species_id == 3
-        "E. Coli"
-      elsif @q[:protein].species_id == 4
-        "Yeast"
-      elsif @q[:protein].species_id == 5
-        "Arabidopsis"
-      end
-      @q[:sql_id] = @q[:protein].id
-      @q[:all_names] = Searchname.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
-      @q[:short_names] = Proteinname.find(:all, :conditions => ['protein_id = ? AND recommended = ?', @q[:sql_id], 1]).uniq
-      @q[:location] = @q[:sequence].index(@q[:pep])
-      @q[:location_1] = @q[:location] + 1
-      @q[:location_range] = ((@q[:location] - @nterminal)..(@q[:location] + @cterminal)).to_a  
-      @q[:upstream] = if @q[:location] < 10
-        @q[:sequence][0, @q[:location]]
-      else
-        @q[:sequence][@q[:location] - 10, 10]
-      end
-      @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
-      # TODO - error when Nterms not found (the next line fails)
-      # also, it actually should find N-termini in the cases I added, why doesn't it?
-      if not @q[:nterms].nil?
-        @q[:cleavages] = @q[:nterms].collect {|a| Cleavage.find(:all, :conditions => ["nterm_id = ?", a])} #array of arrays
-      else
-        @q[:cleavages] = []
-      end
-      if not @q[:cleavages].nil?
-        # TODO what about Cleavage.find(1).protease ?
-        @q[:proteases] = @q[:cleavages].collect {|a| a.collect {|b| Protein.find(:first, :conditions => ["id = ?", b.protease_id])}}
-      else
-        @q[:proteases] = []
-      end
-      @q[:domains_all] = Ft.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
-      @q[:domains_before] = @q[:domains_all].drop_while {|a| @q[:location] > a.from.to_i}
-      @q[:domains_at] = @q[:domains_all].drop_while {|a| (@q[:location] - @nterminal) <= a.from.to_i or (@q[:location] + @cterminal) >= a.to.to_i}
-      @q[:domains_after] = @q[:domains_all].drop_while {|a| @q[:location] < a.to.to_i}
-      
-      @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b])} #array of arrays
-      @q[:evidence_ids] = @q[:evidence_nterms].collect { |m| m.collect {|n| n.evidence_id}} #array of arrays
-      @q[:evidences] = @q[:evidence_ids].collect { |o| o.collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}} #array of arrays
-      @q[:evidences_cleavages] = @q[:evidences].flatten.collect{|a| a.to_s}.delete_if {|b| !b.include?'cleavage'}
-      @q[:evidence_source_ids] = @q[:evidences].collect {|a| a.collect {|b| b.evidencesource_id}}
- 
-      @q[:evidence_sources] = @q[:evidence_source_ids].collect {|b| b.collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}}
-      @q[:uniprot?] = @q[:evidences].flatten.to_s.include?'inferred from uniprot'
-      @q[:TISdb?] = 
-      # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
-      # p @q[:evidence_sources]
-      #p @q[:source_names]
-
-      # @evidence_nterms = Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", @pep_nterms])
-      # @evidence_ids = @evidence_nterms.collect {|c| c.evidence_id}
-      # @evidences_1 = @evidence_ids.collect {|f| Evidence.find(:first, :conditions => ["id = ?", f])}
-
-      @q[:chr] = if @chromosome 
-        [@q[:protein].chromosome, @q[:protein].band] 
-      end
-     # @q[:transmem] = @q[:domains_all].drop_while {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
-      print "."
-      @mainarray << @q
-    }
-    print "\n"
-    
-  end
 
   def trying_featurePanel
     
