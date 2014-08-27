@@ -81,4 +81,9 @@ Gemfile.lock, .ruby-version, .ruby-gemset
 /source_data/*
 /databases/*
 /public/*.html
+
+# EXPLORER AND PATHFINDER FILES
+###########################
 /public/explorer/*/
+/public/images/pw_graphviz.*
+/public/images/IceLogo.*

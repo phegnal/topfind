@@ -769,9 +769,12 @@ class ProteinsController < ApplicationController
         @q[:proteases] = []
       end
       @q[:domains_all] = Ft.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
-      @q[:domains_before] = @q[:domains_all].drop_while {|a| @q[:location] > a.from.to_i}
-      @q[:domains_at] = @q[:domains_all].drop_while {|a| (@q[:location] - @nterminal) <= a.from.to_i || (@q[:location] + @cterminal) >= a.to.to_i}
-      @q[:domains_after] = @q[:domains_all].drop_while {|a| @q[:location] < a.to.to_i}
+      @q[:domains_all] = @q[:domains_all].select{|d| !["HELIX", "STRAND", "TURN", "CONFLICT", "VARIANT", "VAR_SEQ"].include? d.name} # FILTER OUT SOME UNINFORMATIVE ONES
+      @q[:domains_before] = @q[:domains_all].select {|a| a.to.to_i < @q[:location_range].min}
+      @q[:domains_at] = @q[:domains_all].select {|a| 
+        (a.from.to_i <= @q[:location_range].min and a.to.to_i >= @q[:location_range].min)  || 
+        (a.from.to_i <= @q[:location_range].max and a.to.to_i >= @q[:location_range].max)}
+      @q[:domains_after] = @q[:domains_all].select {|a| a.from.to_i > @q[:location_range].max }
       
       @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b.id])}.flatten #array of arrays
       @q[:evidence_ids] = @q[:evidence_nterms].collect {|n| n.evidence_id}.flatten #array
