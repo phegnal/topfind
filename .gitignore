@@ -81,3 +81,4 @@ Gemfile.lock, .ruby-version, .ruby-gemset
 /source_data/*
 /databases/*
 /public/*.html
+/public/explorer/*/
