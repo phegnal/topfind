@@ -648,7 +648,7 @@ class ProteinsController < ApplicationController
       # CLEAN UP INPUT
       start = params["start"].strip
       targets = params["targets"].split("\n").collect{|s| {:id => s.split("\s")[0], :pos => s.split("\s")[1].to_i}}
-      @maxLength = params["maxLength"].to_i
+      maxLength = params["maxLength"].to_i
       byPos = params["byPos"] == "yes"
       rangeLeft = params["rangeLeft"] == "" ? 0 : params["rangeLeft"].to_i
       rangeRight = params["rangeRight"] == "" ? 0 : params["rangeRight"].to_i
@@ -656,8 +656,7 @@ class ProteinsController < ApplicationController
       nwOrg = params["network_org"]
       listOrg = params["list_org"]
       # FIND PATHS
-      exclusion = ["P01023"]
-      finder = PathFinding.new(Graph.new(nwOrg, []), @maxLength, byPos, rangeLeft, rangeRight)
+      finder = PathFinding.new(Graph.new(nwOrg), maxLength, byPos, rangeLeft, rangeRight)
       if(nwOrg == "mouse" && listOrg == "human") # nw is mouse and list is human
         @allPaths = finder.find_all_paths_map2mouse(start, targets)
       elsif(nwOrg == "human" && listOrg == "mouse")  # nw is human and list is mouse
@@ -776,32 +775,29 @@ class ProteinsController < ApplicationController
       @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b.id])}.flatten #array of arrays
       @q[:evidence_ids] = @q[:evidence_nterms].collect {|n| n.evidence_id}.flatten #array
       @q[:evidences] = @q[:evidence_ids].collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}.flatten
+      
+
       @q[:evidence_source_ids] = @q[:evidences].collect {|b| b.evidencesource_id}.compact
+      @q[:evidence_ids_nil] = @q[:evidences].collect {|b| b.evidencesource_id}
       @q[:evidence_sources] = @q[:evidence_source_ids].collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}
       
       @q[:evidence_dbnames] = @q[:evidence_sources].collect {|a| a.dbname}
-    p @q[:evidence_dbnames]
-      p "aksldfjkalsdjf"
       @q[:uniprot?] = @q[:evidence_dbnames].include?"UniProtKB"
-      #@q[:evidences_cleavages] = @q[:evidences].flatten.collect{|a| a.to_s}.delete_if {|b| !b.include?'cleavage'}
-
       @q[:ensembl?] = @q[:evidence_dbnames].include?'Ensembl'
       @q[:tisdb?] = @q[:evidence_dbnames].include?'TISdb'
       @q[:isoforms] = @q[:evidence_dbnames].include?'TopFIND'
-      
-      
-      # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
-      # p @q[:evidence_sources]
-      #p @q[:source_names]
-
-      # @evidence_nterms = Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", @pep_nterms])
-      # @evidence_ids = @evidence_nterms.collect {|c| c.evidence_id}
-      # @evidences_1 = @evidence_ids.collect {|f| Evidence.find(:first, :conditions => ["id = ?", f])}
-
+=begin    
+     @q[:all_methodologies] = @q[:evidences].each_index.select {|a| a.evidencesource_id.nil? && a.name}
+      p @q[:all_methodologies]
+      ensemblID = Evidencesource.find_by_dbname("Ensembl")
+      @q[:evidences].select{|e| e.evidence_sources_id == ensemblID}
+      @q[:evidences].each_index.select{|e| e.name ==~ /Inferred from cleavage-/}
+      @q[:methodologies] = false
+=end
       @q[:chr] = if @chromosome 
         [@q[:protein].chromosome, @q[:protein].band] 
       end
-     # @q[:transmem] = @q[:domains_all].drop_while {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
+    
       print "."
       @mainarray << @q
     }
@@ -813,7 +809,7 @@ class ProteinsController < ApplicationController
     # PATHFINDING
     if(@proteaseWeb == "1")
       if(not Protein.find_by_ac(params[:pw_protease].strip).nil? and params[:pw_maxPathLength].to_i > 0)
-        finder = PathFinding.new(Graph.new(params[:pw_org], []), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal)
+        finder = PathFinding.new(Graph.new(params[:pw_org]), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal)
         @pw_paths = finder.find_all_paths(params[:pw_protease],  @mainarray.collect{|x|  {:id => x[:acc], :pos => x[:location]} })
         @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
         # TODO install graphviz for this to work
@@ -823,13 +819,15 @@ class ProteinsController < ApplicationController
         p "pathlength invalid" if params[:pw_maxPathLength].to_i <= 0
         # TODO put error message on html??
       end
-    end
 
+    end
+=begin        
     # ENRICHMENT STATISTICS - needs Rserve to work!
     es = EnrichmentStats.new(@mainarray)
     es.printStatsArrayToFile("#{dir}/ProteaseStats.txt")
     es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
     es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
+=end     
     p "DONE"
   end
   
