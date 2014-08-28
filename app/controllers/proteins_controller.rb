@@ -208,19 +208,19 @@ class ProteinsController < ApplicationController
   def show
     id = params[:id]
     #convert request into :id, :isoform, chain
-#    @iso = nil
-#    @chain = nil
-#    if params[:id].include?('-')
-#      id = params[:id].split('-').first
-#      # @iso = Isoform.ac_is(params[:id]).first     
-#    else
-#      id = params[:id]
-#      # @chain = Chain.name_is(params[:chain]).first  
-#    end
+    #    @iso = nil
+    #    @chain = nil
+    #    if params[:id].include?('-')
+    #      id = params[:id].split('-').first
+    #      # @iso = Isoform.ac_is(params[:id]).first     
+    #    else
+    #      id = params[:id]
+    #      # @chain = Chain.name_is(params[:chain]).first  
+    #    end
     
-#    if params.key?(:chain)      
-#      # @chain = Chain.name_is(params[:chain]).first 
-#    end
+    #    if params.key?(:chain)      
+    #      # @chain = Chain.name_is(params[:chain]).first 
+    #    end
      
    
     # hobo_show @protein = Protein.id_or_ac_or_name_is(id).first  
@@ -305,7 +305,7 @@ class ProteinsController < ApplicationController
     @params = params
     id = params[:id]
     #remove isofrom from ac
-#    id = params[:id].split('-').first
+    #    id = params[:id].split('-').first
     hobo_show @protein = Protein.id_or_ac_or_name_is(id).first  
     ids = nil
     params[:ppi].present? ? @ppi = params[:ppi] : @ppi = false
@@ -666,7 +666,7 @@ class ProteinsController < ApplicationController
         @allPaths = finder.find_all_paths(start, targets)
       end
       @gnames = finder.paths_gene_names()                                                     # GENE NAMES FOR PROTEINS
-#      domains_descriptions = ["%protease%inhibitor%", "%proteinase%inhibitor%", "%inhibitor%"]
+      #      domains_descriptions = ["%protease%inhibitor%", "%proteinase%inhibitor%", "%inhibitor%"]
       @allPaths =  finder.get_domain_info(["SIGNAL", "PROPEP", "ACT_SITE", "TRANSMEM"], nil)
       @sortet_subs = @allPaths.keys.sort{|x, y| @allPaths[y].size <=> @allPaths[x].size}      # SORT OUTPUT
       pdfPath = finder.make_graphviz("./public/images/PathFINDer", @gnames)
@@ -747,66 +747,67 @@ class ProteinsController < ApplicationController
       else
         @q[:sequence].index(@q[:pep]) 
       end
-      @q[:location_1] = @q[:location] + 1
-      @q[:location_range] = ((@q[:location] - @nterminal)..(@q[:location] + @cterminal)).to_a  
-      @q[:upstream] = if @q[:location] < 10
-        @q[:sequence][0, @q[:location]]
-      else
-        @q[:sequence][@q[:location] - 10, 10]
-      end
-      @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
-      # TODO - error when Nterms not found (the next line fails)
-      # also, it actually should find N-termini in the cases I added, why doesn't it?
-      if not @q[:nterms].nil?
-        @q[:cleavages] = @q[:nterms].collect {|a| Cleavage.find(:all, :conditions => ["nterm_id = ?", a])} #array of arrays
-      else
-        @q[:cleavages] = []
-      end
-      if not @q[:cleavages].nil?
-        # TODO what about Cleavage.find(1).protease ?
-        @q[:proteases] = @q[:cleavages].collect {|a| a.collect {|b| Protein.find(:first, :conditions => ["id = ?", b.protease_id])}}
-      else
-        @q[:proteases] = []
-      end
-      @q[:domains_all] = Ft.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
-      @q[:domains_all] = @q[:domains_all].select{|d| !["HELIX", "STRAND", "TURN", "CONFLICT", "VARIANT", "VAR_SEQ"].include? d.name} # FILTER OUT SOME UNINFORMATIVE ONES
-      @q[:domains_before] = @q[:domains_all].select {|a| a.to.to_i < @q[:location_range].min}
-      @q[:domains_at] = @q[:domains_all].select {|a| 
-        (a.from.to_i <= @q[:location_range].min and a.to.to_i >= @q[:location_range].min)  || 
-        (a.from.to_i <= @q[:location_range].max and a.to.to_i >= @q[:location_range].max)}
-      @q[:domains_after] = @q[:domains_all].select {|a| a.from.to_i > @q[:location_range].max }
+      if not @q[:location].nil?
+        @q[:location_1] = @q[:location] + 1
+        @q[:location_range] = ((@q[:location] - @nterminal)..(@q[:location] + @cterminal)).to_a  
+        @q[:upstream] = if @q[:location] < 10
+          @q[:sequence][0, @q[:location]]
+        else
+          @q[:sequence][@q[:location] - 10, 10]
+        end
+        @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
+        # TODO - error when Nterms not found (the next line fails)
+        # also, it actually should find N-termini in the cases I added, why doesn't it?
+        @q[:cleavages] = Cleavage.find(:all, :conditions => ["substrate_id = ?", @q[:sql_id]])
+        if not @q[:cleavages].nil?
+          @q[:proteases] = @q[:cleavages].collect {|c| c.protease}
+        else
+          @q[:proteases] = []
+        end
+        @q[:domains_all] = Ft.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
+        @q[:domains_all] = @q[:domains_all].select{|d| !["HELIX", "STRAND", "TURN", "CONFLICT", "VARIANT", "VAR_SEQ"].include? d.name} # FILTER OUT SOME UNINFORMATIVE ONES
+        @q[:domains_before] = @q[:domains_all].select {|a| a.to.to_i < @q[:location_range].min}
+        @q[:domains_at] = @q[:domains_all].select {|a| 
+          (a.from.to_i <= @q[:location_range].min and a.to.to_i >= @q[:location_range].min)  || 
+          (a.from.to_i <= @q[:location_range].max and a.to.to_i >= @q[:location_range].max)
+        }
+        @q[:domains_after] = @q[:domains_all].select {|a| a.from.to_i > @q[:location_range].max }
       
-      @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b.id])}.flatten #array of arrays
-      @q[:evidence_ids] = @q[:evidence_nterms].collect {|n| n.evidence_id}.flatten #array
-      @q[:evidences] = @q[:evidence_ids].collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}.flatten
-      @q[:evidence_source_ids] = @q[:evidences].collect {|b| b.evidencesource_id}.compact
-      @q[:evidence_sources] = @q[:evidence_source_ids].collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}
+        @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b.id])}.flatten #array of arrays
+        @q[:evidence_ids] = @q[:evidence_nterms].collect {|n| n.evidence_id}.flatten #array
+        @q[:evidences] = @q[:evidence_ids].collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}.flatten
+        @q[:evidences] = @q[:evidences].select{|e| !e.nil?}
+        @q[:evidence_source_ids] = @q[:evidences].collect {|b| b.evidencesource_id}.compact
+        @q[:evidence_sources] = @q[:evidence_source_ids].collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}
       
-      @q[:evidence_dbnames] = @q[:evidence_sources].collect {|a| a.dbname}
-    p @q[:evidence_dbnames]
-      p "aksldfjkalsdjf"
-      @q[:uniprot?] = @q[:evidence_dbnames].include?"UniProtKB"
-      #@q[:evidences_cleavages] = @q[:evidences].flatten.collect{|a| a.to_s}.delete_if {|b| !b.include?'cleavage'}
+        @q[:evidence_dbnames] = @q[:evidence_sources].collect {|a| a.dbname}
+        # p @q[:evidence_dbnames]
+        # >       p "akldfjkalsdjf"
+        @q[:uniprot?] = @q[:evidence_dbnames].include?"UniProtKB"
+        #@q[:evidences_cleavages] = @q[:evidences].flatten.collect{|a| a.to_s}.delete_if {|b| !b.include?'cleavage'}
 
-      @q[:ensembl?] = @q[:evidence_dbnames].include?'Ensembl'
-      @q[:tisdb?] = @q[:evidence_dbnames].include?'TISdb'
-      @q[:isoforms] = @q[:evidence_dbnames].include?'TopFIND'
+        @q[:ensembl?] = @q[:evidence_dbnames].include?'Ensembl'
+        @q[:tisdb?] = @q[:evidence_dbnames].include?'TISdb'
+        @q[:isoforms] = @q[:evidence_dbnames].include?'TopFIND'
       
       
-      # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
-      # p @q[:evidence_sources]
-      #p @q[:source_names]
+        # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
+        # p @q[:evidence_sources]
+        #p @q[:source_names]
 
-      # @evidence_nterms = Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", @pep_nterms])
-      # @evidence_ids = @evidence_nterms.collect {|c| c.evidence_id}
-      # @evidences_1 = @evidence_ids.collect {|f| Evidence.find(:first, :conditions => ["id = ?", f])}
+        # @evidence_nterms = Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", @pep_nterms])
+        # @evidence_ids = @evidence_nterms.collect {|c| c.evidence_id}
+        # @evidences_1 = @evidence_ids.collect {|f| Evidence.find(:first, :conditions => ["id = ?", f])}
 
-      @q[:chr] = if @chromosome 
-        [@q[:protein].chromosome, @q[:protein].band] 
+        @q[:chr] = if @chromosome 
+          [@q[:protein].chromosome, @q[:protein].band] 
+        end
+        # @q[:transmem] = @q[:domains_all].drop_while {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
+        print "."
+        @mainarray << @q
+      else
+        p "NOT PROCESSED: #{@q[:acc]} at #{@q[:pep]}" 
       end
-     # @q[:transmem] = @q[:domains_all].drop_while {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
-      print "."
-      @mainarray << @q
     }
     print "\n"
     
@@ -844,10 +845,10 @@ class ProteinsController < ApplicationController
     panel = ''
     panel << "<div class='featurepanel' >"
     panel << "<div class='protein' style='width:#{p.aalen}px;'>&nbsp;"
-      (p.aalen/100).to_i.times do |i|
-        panel << "<div class='tickmark'>#{(i*100+100).to_s}</div>"
-      end
-      panel << "</div>"
+    (p.aalen/100).to_i.times do |i|
+      panel << "<div class='tickmark'>#{(i*100+100).to_s}</div>"
+    end
+    panel << "</div>"
     
     ## plot protein chains
     if p.fts.name_is('CHAIN').present?      
@@ -893,7 +894,7 @@ class ProteinsController < ApplicationController
         panel << "<a class='popup cterm #{ct.terminusmodification.kw.to_s.parameterize.to_s}' style='margin-left:#{ct.pos-23}px;' title='<strong>C-Terminus:</strong><br/><strong>position:</strong> #{ct.pos.to_s}<br/><strong>modification:</strong> #{ct.terminusmodification.name}<br/><strong>evidence:</strong> #{ct.evidences.*.evidencecodes.*.*.*.name.flatten.join(', ')}' href='/topfind/cterms/#{ct.id}' rel='#overlay'>C</a>" 
       end
       panel << "<div class='clear'>&nbsp;</div></div>"
-          end   
+    end   
 
     ## plot cleavages
     if p.inverse_cleavages.present?

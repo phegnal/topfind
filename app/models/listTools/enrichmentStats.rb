@@ -11,7 +11,7 @@ class EnrichmentStats
     @@r = Rserve::Connection.new
    
     if not mainarray.nil?
-      listCleavages = @@mainarray.collect{|h| h[:proteases]}.flatten
+      listCleavages = @@mainarray.collect{|h| h[:proteases].uniq}.flatten
 
       g_query = "select count(c.id) from cleavages c, proteins p where c.protease_id = p.id and p.species_id = 1;"
       dbCleavageTotal = 0
@@ -58,9 +58,17 @@ class EnrichmentStats
   def plotProteaseSubstrateHeatmap(path)
     proteases = @@statsArray.collect{|x| x[:protein].name}
     matrix = []
+    # in matrix each element is an array of true/false or 1/0 later in the order of the proteases
     @@mainarray.each{|s| matrix << proteases.collect{|p| s[:proteases].flatten.collect{|x| x.name}.include? p }}
     matrix = matrix.collect{|a| a.collect{|x| if(x) then 1 else 0 end }}
-    plotHeatmap(path, matrix, proteases, @@mainarray.collect{|p| p[:protein].name})
+    keepRows = (0..(matrix.length-1)).to_a.select{|row| matrix[row].sum > 0}
+    matrix2 = []
+    rownames = []
+    keepRows.each{|i|
+      matrix2 << matrix[i]
+      rownames << @@mainarray[i][:protein].name
+    }
+    plotHeatmap(path, matrix2, proteases, rownames)
   end
 
   def testHeatmap()
