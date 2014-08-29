@@ -719,8 +719,7 @@ class ProteinsController < ApplicationController
       @q = {}
       @q[:acc] = i.split("\s").fetch(0)
       @q[:pep] = i.split("\s").fetch(1).gsub(/[^[:upper:]]+/, "")
-      @q[:full_pep] = i.split("\s").fetch(1)
-     
+      @q[:full_pep] = i.split("\s").fetch(1)     
       @q[:protein] = if Protein.find(:first, :conditions => ["ac = ?", @q[:acc]]) != nil
         Protein.find(:first, :conditions => ["ac = ?", @q[:acc]])
       else
@@ -739,8 +738,8 @@ class ProteinsController < ApplicationController
         "Arabidopsis"
       end
       @q[:sql_id] = @q[:protein].id
-      @q[:all_names] = Searchname.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
-      @q[:short_names] = Proteinname.find(:all, :conditions => ['protein_id = ? AND recommended = ?', @q[:sql_id], 1]).uniq
+      @q[:all_names] = Searchname.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]]).uniq      
+      @q[:short_names] = Proteinname.find(:all, :conditions => ['protein_id = ? AND recommended = ?', @q[:sql_id], 1]).uniq     
       @q[:location] = if @tpp
         @q[:sequence].index(@q[:pep]) + 1
       else
@@ -754,8 +753,6 @@ class ProteinsController < ApplicationController
         @q[:sequence][@q[:location] - 10, 10]
       end
       @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
-      # TODO - error when Nterms not found (the next line fails)
-      # also, it actually should find N-termini in the cases I added, why doesn't it?
       if not @q[:nterms].nil?
         @q[:cleavages] = @q[:nterms].collect {|a| Cleavage.find(:all, :conditions => ["nterm_id = ?", a])} #array of arrays
       else
@@ -767,6 +764,8 @@ class ProteinsController < ApplicationController
       else
         @q[:proteases] = []
       end
+      @q[:chr] = [@q[:protein].chromosome, @q[:protein].band] 
+
       @q[:domains_all] = Ft.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
       @q[:domains_all] = @q[:domains_all].select{|d| !["HELIX", "STRAND", "TURN", "CONFLICT", "VARIANT", "VAR_SEQ"].include? d.name} # FILTER OUT SOME UNINFORMATIVE ONES
       @q[:domains_before] = @q[:domains_all].select {|a| a.to.to_i < @q[:location_range].min}
@@ -778,41 +777,59 @@ class ProteinsController < ApplicationController
       @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b.id])}.flatten #array of arrays
       @q[:evidence_ids] = @q[:evidence_nterms].collect {|n| n.evidence_id}.flatten #array
       @q[:evidences] = @q[:evidence_ids].collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}.flatten
-      
-
       @q[:evidence_source_ids] = @q[:evidences].collect {|b| b.evidencesource_id}.compact
       @q[:evidence_ids_nil] = @q[:evidences].collect {|b| b.evidencesource_id}
-      @q[:evidence_sources] = @q[:evidence_source_ids].collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}
-      
+      @q[:evidence_sources] = @q[:evidence_source_ids].collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}      
       @q[:evidence_dbnames] = @q[:evidence_sources].collect {|a| a.dbname}
-      @q[:uniprot?] = @q[:evidence_dbnames].include?"UniProtKB"
-      @q[:ensembl?] = @q[:evidence_dbnames].include?'Ensembl'
-      @q[:tisdb?] = @q[:evidence_dbnames].include?'TISdb'
-      @q[:isoforms] = @q[:evidence_dbnames].include?'TopFIND'
-=begin    
-     @q[:all_methodologies] = @q[:evidences].each_index.select {|a| a.evidencesource_id.nil? && a.name}
-      p @q[:all_methodologies]
-      ensemblID = Evidencesource.find_by_dbname("Ensembl")
-      @q[:evidences].select{|e| e.evidence_sources_id == ensemblID}
-      @q[:evidences].each_index.select{|e| e.name ==~ /Inferred from cleavage-/}
-      @q[:methodologies] = false
-=end
-      @q[:chr] = if @chromosome 
-        [@q[:protein].chromosome, @q[:protein].band] 
-      end
+        @q[:evidence_dbnames].each do |a|
+          a.downcase!
+        end
+      @q[:uniprot?] = @q[:evidence_dbnames].include?"uniprotkb"
+      @q[:ensembl?] = @q[:evidence_dbnames].include?'ensembl'
+      @q[:tisdb?] = @q[:evidence_dbnames].include?'tisdb'
+      @q[:isoforms] = @q[:evidence_dbnames].include?'topfind'
+    
+      @q[:all_methodologies] = @q[:evidences].select {|a| a.evidencesource_id.nil? && (a.name.include? 'cleavage')}
+      @q[:methodologies] = @q[:all_methodologies].collect {|s| s.methodology}.uniq
+
+      #CSV variables
+      @q[:all_names_csv] = @q[:all_names].collect {|a| a.name + ';'}
+      @q[:short_names_csv] = @q[:short_names].collect {|b| b.full + ';'}
+
+      
     
       print "."
       @mainarray << @q
+      q_csv = "#{@q[:acc]}\t#{@q[:full_pep]}\t#{@q[:short_names_csv]}\t#{@q[:all_names_csv]}\t" +
+      if @spec; "#{@q[:species]}\t" end +
+      if @chromosome; "#{@q[:chr]}\t" end +
+      "#{@q[:upstream]} ↓ #{@q[:pep]}\t#{@q[:location_1]}\t" +
+      
+      p q_csv
     }
     print "\n"
     
+    #CSV
+    first_line = "Accession\tInput Sequence\tRecommended Protein Name\tOther Names and IDs\t" +  
+      if @spec; "Species\t" end +
+      if @chromosome; "Chromosome & Band\t" end +
+      "P10 to P10′\tP1′ Position\t" +
+      if @evidence; "Canonical Start\tCleavingProteases\tAlternative Spliced Start\tAlternative Translation Initiation Start\tIsoform Start\tObserved N-terminus\t" end +
+      if @proteaseWeb; "Protease Web Connections\t" end +
+      if @domain; "N-terminal Features (Start to P1)\tFeatures At Position (P1')\tC-terminal Features" end
+
+    path = "#{dir}/FileName.csv"
+    output = File.new(path, "w") # "w" is for write (so it will make a new file and write to it)
+    output << first_line
+    output.close
+
     # ICELOGO
     IceLogo.new().terminusIcelogo(Species.find(1), @mainarray.collect{|e| e[:upstream]+":"+e[:pep]}, "#{dir}/IceLogo.svg", 4)
 
     # PATHFINDING
     if(@proteaseWeb == "1")
       if(not Protein.find_by_ac(params[:pw_protease].strip).nil? and params[:pw_maxPathLength].to_i > 0)
-        finder = PathFinding.new(Graph.new(params[:pw_org]), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal)
+        finder = PathFinding.new(Graph.new(params[:pw_org],[]), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal)
         @pw_paths = finder.find_all_paths(params[:pw_protease],  @mainarray.collect{|x|  {:id => x[:acc], :pos => x[:location]} })
         @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
         # TODO install graphviz for this to work

@@ -23,7 +23,7 @@
 		<th>P<sub>1</sub>′ Position</th> <!-- TODO change for C-termini! -->
 
 		<%if @evidence%>
-		<th>Cannonical Start</th>
+		<th>Canonical Start</th>
 		<th>Cleaving Proteases</th>	
 		<th>Alternative Spliced Start</th>
 		<th>Alternative Translation Initiation Start</th>
@@ -80,11 +80,7 @@
 		<td><%= q[:ensembl?]%></td>
 		<td><%= q[:tisdb?]%></td>
 		<td><%= q[:isoforms]%></td>
-<<<<<<< HEAD
-		<td><%= q[:methodologies]</td>
-=======
-		<td></td> <!-- Observed N-termini -->
->>>>>>> 0993cce8af273453a22a1cf3f43a64e383d29864
+		<td><%= q[:methodologies]%></td>
 		<%end%>
 
 		<%if @proteaseWeb%>
@@ -96,19 +92,16 @@
 		<%end%> <!-- end of protease web -->
 
 	<%if @domain%>
-			<td>
-				<!--domains before  -->
-				<%q[:domains_before].collect{|d| "#{d.name} (#{d.description})"}.uniq.each do |r|%>
+		<td>	<!--domains before  -->
+				<%q[:domains_before].collect{|d| "#{d.name}: #{d.description}"}.uniq.each do |r|%>
 				<%= r %><br>
 				<%end%></td>
-		<td>
-				<!--domains at  -->
-				<%q[:domains_at].collect{|d| "#{d.name} (#{d.description})"}.uniq.each do |r|%>
+		<td>	<!--domains at  -->
+				<%q[:domains_at].collect{|d| "#{d.name}: #{d.description}"}.uniq.each do |r|%>
 				<%= r %><br>
 				<%end%></td>
-		<td>
-				<!--domains after  -->
-				<%q[:domains_after].collect{|d| "#{d.name} (#{d.description})"}.uniq.each do |r|%>
+		<td>	<!--domains after  -->
+				<%q[:domains_after].collect{|d| "#{d.name}: #{d.description}"}.uniq.each do |r|%>
 				<%= r %><br>
 				<%end%></td>
 		<%end%> <!-- end of domains -->
@@ -117,13 +110,14 @@
 	</tbody>
 </table>
 
-<body>
+
 <br><br>
 
 <!--
 CSV<br><br>
 
-Accession\tProtein Name\tAll Names\t <%if @spec%>Species<%end%>\t<%if @chromosome%>Chr & Band<%end%>\tSequence\tP<sub>1</sub>′\tProteases\t<%if @evidence%>Inferred from UniProt\t Observed from Proteomics\t Alternative Transcription<%end%>\t<%if @proteaseWeb%>Protease Web Connections<%end%>\t<%if @domain%>Domain Before\tDomain At\tDomain After<%end%><br>
+Accession\tInput Sequence\tRecommended Protein Name\tOther Names and IDs\t<%if @spec%>Species<%end%>\t<%if @chromosome%>Chr & Band<%end%>\tP<sub>10</sub> to P<sub>10</sub>'\tP<sub>1</sub>′ Position\tCanonical Start\tCleaving Proteases\Alternative Spliced Start\tAlternative Translation Initiation Start\tIsoform Start\tObserved N-terminus\tProtease Web Connections\t>N-terminal Features <br>(Start to P<sub>1</sub>)\tFeatures At Position (P<sub>1</sub>')\tC-terminal Features <br>(P<sub>2</sub>' to End) 
+<br>
 <% @mainarray.each_index do |i|%>
 	<% q = @mainarray.fetch(i)%>
 	<%= q[:acc]%>\t<% q[:short_names].each do |s|%><%= s.full%><%= s.short%>;<%end%><% q[:all_names].each do |s|%><%= s.name%>;<%end%>
@@ -139,5 +133,5 @@ Accession\tProtein Name\tAll Names\t <%if @spec%>Species<%end%>\t<%if @chromosom
 				<%q[:domains_after].uniq.each do |r|%>
 					<%= r.name%>;<%end%>\t<%end%>
 	<%end%>
-</body>
+
 -->
