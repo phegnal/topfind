@@ -830,10 +830,11 @@ class ProteinsController < ApplicationController
     end
 
     # ENRICHMENT STATISTICS - needs Rserve to work!
-    es = EnrichmentStats.new(@mainarray)
+    es = EnrichmentStats.new(@mainarray, @mainarray[0][:protein].species_id) # TODO how to pick species?
     es.printStatsArrayToFile("#{dir}/ProteaseStats.txt")
     es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
     es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
+    es.vennDiagram("#{dir}/VennDiagram.pdf")
     p "DONE"
   end
   

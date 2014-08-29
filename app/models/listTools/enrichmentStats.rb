@@ -1,7 +1,7 @@
 class EnrichmentStats
   
   
-  def initialize(mainarray)
+  def initialize(mainarray, organism)
     
     require "rubystats"
     require 'rserve'
@@ -11,20 +11,21 @@ class EnrichmentStats
     @@r = Rserve::Connection.new
    
     if not mainarray.nil?
-      listCleavages = @@mainarray.collect{|h| h[:proteases].uniq}.flatten
+      proteases = @@mainarray.collect{|h| h[:proteases].uniq}.flatten
 
-      g_query = "select count(c.id) from cleavages c, proteins p where c.protease_id = p.id and p.species_id = 1;"
-      dbCleavageTotal = 0
+      g_query = "select count(distinct c.substrate_id, c.pos) from cleavages c, proteins p, proteins s where c.protease_id = p.id and c.substrate_id = s.id and p.species_id = #{organism} and s.species_id = #{organism};"
+      dbCleavageTotal = nil
       ActiveRecord::Base.connection.execute(g_query).each{|y| dbCleavageTotal = y[0].to_i};
-      listCleavageTotal = listCleavages.length
+      listCleavageTotal = @@mainarray.select{|h| h[:proteases].length > 0}.length
 
-      listCleavages.uniq.each{|p|
-        listCleavageProtease = listCleavages.count(p)
-        dbCleavageProtease = p.cleavages.length 
+      proteases.uniq.each{|p|
+        listCleavageProtease = proteases.count(p)
+        dbCleavageProtease = p.cleavages.select{|c| !c.substrate.nil?}.collect{|c| "#{c.substrate.name}_#{c.pos}"}.uniq.length 
         fet = FishersExactTest.new().calculate(listCleavageProtease, dbCleavageProtease, listCleavageTotal - listCleavageProtease, dbCleavageTotal - dbCleavageProtease)
         @@statsArray << {
           :protein => p,
-          :list => listCleavageProtease, 
+          :listCount => listCleavageProtease, 
+          :dbCount => dbCleavageProtease,
           :listPercent => listCleavageProtease.to_f/listCleavageTotal.to_f,
           :dbPercent => dbCleavageProtease.to_f/dbCleavageTotal.to_f,
           :fet => fet[:right]
@@ -90,11 +91,25 @@ class EnrichmentStats
   
   
   def plotProteaseCounts(path)
-    @@r.assign("counts", @@statsArray.collect{|x| x[:list]})
+    @@r.assign("counts", @@statsArray.collect{|x| x[:listCount]})
     @@r.assign("countsNam", @@statsArray.collect{|x| x[:protein].name})
     @@r.void_eval("names(counts) <- countsNam")
     @@r.void_eval("pdf('#{path}')")
     @@r.void_eval("barplot(sort(counts, decreasing = T), las = 2, col = 'blue', ylab = 'Cleavages in the list')")
+    @@r.void_eval('dev.off()')
+  end
+  
+  def vennDiagram(path)
+    @@r.void_eval("x = list()")
+    @@mainarray.each_with_index{|x, i|
+      @@r.assign("v", [x[:uniprot?], x[:isoforms], x[:proteases].length > 0, x[:ensembl?]])
+      @@r.void_eval("x[[#{i+1}]]=v")
+    }
+    @@r.void_eval("y = data.frame(do.call(rbind, x))")
+    @@r.void_eval("colnames(y) = c('Canonical', 'Isoform', 'Cleaved', 'Spliced')")
+    @@r.void_eval("library(gplots)")
+    @@r.void_eval("pdf('#{path}')")
+    @@r.void_eval("venn(y)")
     @@r.void_eval('dev.off()')
   end
 
