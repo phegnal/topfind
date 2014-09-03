@@ -7,8 +7,21 @@ class Graph
     else 
       @species_id = 2 
     end
+    @@excludeList = []
     graph_from_sql()
   end
+  
+  def initialize(species, excludedACs)
+    @g = {}
+    if(species == "human") 
+      @species_id = 1
+    else 
+      @species_id = 2 
+    end
+    @@excludeList = excludedACs
+    graph_from_sql()
+  end
+    
     
   def graph_array()
     return @g
@@ -32,12 +45,14 @@ class Graph
   # add edges to the graph g
   def add_edge(x, y, pos)
     # if graph doesn't have node, add it
-    if(!@g.has_key?(x)) then 
-      @g[x] = []
-    end
-    # if graph doesn't have edge, add it (this also is executed if the node was just added)
-    if(!@g[x].include? y) then
-      @g[x] << {:id => y, :pos => pos}
+    if not @@excludeList.include? x and not @@excludeList.include? y then
+      if(!@g.has_key?(x)) then 
+        @g[x] = []
+      end
+      # if graph doesn't have edge, add it (this also is executed if the node was just added)
+      if(!@g[x].include? y) then
+        @g[x] << {:id => y, :pos => pos}
+      end
     end
   end
     

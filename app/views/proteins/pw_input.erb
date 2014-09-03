@@ -1,33 +1,39 @@
 <page>
-	<% form_tag(:action => "pw_output", :method => "get") do %>
-	<p>
-		<b> Network from organism </b><br>
-		<%= radio_button_tag "network_org", "human", true %> human <br>
-		<%= radio_button_tag "network_org", "mouse" %> mouse
-	</p>
-	<p>
-		<b> Proteins are from organism </b> <br>
-		<%= radio_button_tag "list_org", "human", true %> human <br>
-		<%= radio_button_tag "list_org", "mouse" %> mouse <br>
-	</p>
-	<p>
-		<b> Protease UniProt ID </b><br>
-		<%= text_field_tag(:start, "P14091") %> <br>
-	</p>
-	<p>
-		<b> Substrate UniProt IDs and cleavage positions </b><br>
-		<%= text_area_tag(:targets, "P00734 314\nP17655 21\nP25774 31\nP09668 41\nP05120 122\nP10144 20\nP01019 40\nP01019 42\nQ9UBU3 50\nP05814 71\nQ9ULZ1 76\nP30990 157\nP01213 218\nP01042 387")  %> <br>
-	</p>
-	<p>
-		<b> Maximum path length </b><br>
-		<%= text_field_tag(:maxLength, "4")  %> <br>
-	</p>
-	<p>
-		<b> Find cleavages on substrates at the indicated position only </b><br>
-		<%= radio_button_tag "byPos", "yes", true %> yes with range from non-prime <%= text_field_tag(:rangeLeft, "3")  %> to prime <%= text_field_tag(:rangeRight, "3")  %> aminoacids<br>
-		<%= radio_button_tag "byPos", "no" %> no
-		<br>
-	</p>
-	<%= submit_tag("Process") %>
-	<% end %>
-</page>
+	
+	<font face="ebrima">
+		<h1>
+			PathFINDer
+		</h1>
+	
+		<% form_tag(:action => "pw_output", :method => "get") do %>
+		<p>
+			<b> Network from organism </b><br>
+			<%= radio_button_tag "network_org", "human", true %> human <br>
+			<%= radio_button_tag "network_org", "mouse" %> mouse
+		</p>
+		<p>
+			<b> Proteins are from organism </b> <br>
+			<%= radio_button_tag "list_org", "human", true %> human <br>
+			<%= radio_button_tag "list_org", "mouse" %> mouse <br>
+		</p>
+		<p>
+			<b> Protease UniProt ID </b><br>
+			<%= text_field_tag(:start, "P14091") %> <br>
+		</p>
+		<p>
+			<b> Substrate UniProt IDs and cleavage positions </b><br>
+			<%= text_area_tag(:targets, "P00734 314\nP17655 21\nP25774 31\nP09668 41\nP05120 122\nP10144 20\nP01019 40\nP01019 42\nQ9UBU3 50\nP05814 71\nQ9ULZ1 76\nP30990 157\nP01213 218\nP01042 387")  %> <br>
+		</p>
+		<p>
+			<b> Maximum path length </b><br>
+			<%= text_field_tag(:maxLength, "4")  %> <br>
+		</p>
+		<p>
+			<b> Find cleavages on substrates at the indicated position only </b><br>
+			<%= radio_button_tag "byPos", "yes", true %> yes with range from non-prime <%= text_field_tag(:rangeLeft, "3")  %> to prime <%= text_field_tag(:rangeRight, "3")  %> aminoacids<br>
+			<%= radio_button_tag "byPos", "no" %> no
+			<br>
+		</p>
+		<%= submit_tag("Process") %>
+		<% end %>
+	</page>

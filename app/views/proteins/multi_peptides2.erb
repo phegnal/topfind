@@ -2,123 +2,124 @@
 
 
 <table border="1" >
+	
+	<!-- HEADER -->
 	<thead>
-	 <tr>
-		<th>Accession</th>
-		<th>Protein Name</th>
-		<th>All Names</th>
-		<%if @spec%>
-		<th>Species</th>
-		<%end%>
-
-
-		<%if @chromosome%>
-		<th>Chr<br>Band</th>
-		<%end%>
-
-
-
-		<th>Sequence</th>
-		<th>P<sub>1</sub>′</th>
-
-		<th>Proteases</th>	
-
-		<%if @evidence%>
-		<th>Inferred from UniProt</th>
-		<th width='500%'>Observed from Proteomics</th>
-		<th>Alternative Transcription</th>
-		<%end%>
-
-		<%if @proteaseWeb%>
-		<th>Protease Web Connections</th>
-		<%end%>
-
-		<%if @domain%>
-		<th>Domain Before</th>
-		<th>Domain<br>At</th>
-		<th>Domain<br>After</th>
-		<%end%>
-
-		
-
-
-	</tr>
-	</thead>
-
-	<tbody>
-	<% @mainarray.each_index do |i|%>
-	<tr>	
-		<% q = @mainarray.fetch(i)%>
-		<td><a href="http://clipserve.clip.ubc.ca/topfind/proteins/<%= q[:acc]%>"><%= q[:acc]%></a></td>
-
-		<td><% q[:short_names].each do |s|%>
-			<%= s.full%><br>
-			<%= s.short%><br>
-			<%end%></td>
-		<td><% q[:all_names].each do |s|%>
-			<%= s.name%><br>
-			<%end%></td>
-
-		<%if @spec%>
-			<td><%= q[:species]%></td>
-		<%end%>
-
-		<%if @chromosome%>
-			<td><% q[:chr].each do |a|%>
-				<%= a%><br>
-				<%end%></td>
-		<%end%>
-
-
-		<td><%= q[:upstream]%> ↓ <%= q[:pep]%></td>
-		<td><%= q[:location].succ%></td>
-		<td><% q[:proteases].each do |s|%>
-			<% s.each do |a|%>
-				<%= a%><br>					
-			<%end end%></td>
-
-		<%if @evidence%>
-		<td><%= q[:uniprot?]%></td>
-		<td><% q[:evidences_cleavages].each do |a|%>
-				<font size='1'><%= a%><br></font>
-			<%end%></td>
-		<td></td>
+		<tr>
+			<th>Accession</th>		
+			<th>Input Sequence</th>
+			<th>Recommended Protein Name</th>
+			<th>Other Names and IDs</th>
+			<%if @spec%>
+			<th>Species</th>
 			<%end%>
 
-		<%if @proteaseWeb%>
-		<td><font size='2'><span class="nowrap"><%= @pw_paths[q[:acc] + "_"+ q[:location].to_s].collect{|path| 
-			path.collect{|node|
-				@pw_gnames[node[:id]].to_s
-					}.join(" -> ")		
-			}.join("<br>  ") %></span></font></td>
-		<%end%> <!-- end of protease web -->
 
-	<%if @domain%>
+			<%if @chromosome%>
+			<th>Chromosome<br>Band</th>
+			<%end%>
+
+			<th>P<sub>10</sub> to P<sub>10</sub>'</th>
+			<th>P<sub>1</sub>′ Position</th> <!-- TODO change for C-termini! -->
+
+			<%if @evidence%>
+			<th>Cannonical Start</th>
+			<th>Cleaving Proteases</th>	
+			<th>Alternative Spliced Start</th>
+			<th>Alternative Translation Initiation Start</th>
+			<th>Isoform Start</th>
+			<th>Observed N-terminus</th>
+			<%end%>
+
+			<%if @proteaseWeb%>
+			<th>Protease Web Connections</th>
+			<%end%>
+
+			<%if @domain%>
+			<th>N-terminal Features <br>(Start to P<sub>1</sub>)</th> <!-- TODO change for C-termini! -->
+			<th>Features At Position (P<sub>1</sub>')</th> <!-- TODO change for C-termini! -->
+			<th>C-terminal Features <br>(P<sub>2</sub>' to End)</th> <!-- TODO change for C-termini! -->
+			<%end%>
+		</tr>
+	</thead>
+
+	<!-- BODY -->
+	<tbody>
+		<% @mainarray.each_index do |i|%>
+		<tr>	
+			<% q = @mainarray.fetch(i)%>
+			<td><a href="http://clipserve.clip.ubc.ca/topfind/proteins/<%= q[:acc]%>"><%= q[:acc]%></a></td>
+			<td><%= q[:full_pep]%></td>
+			<td>
+				<% q[:short_names].collect{|s| s.full}.uniq.each do |s|%>
+				<%= s %><br>
+				<%end%>
+			</td>
+			<td>
+				<% q[:all_names].each do |s|%>
+				<%= s.name%><br>
+				<%end%>
+			</td>
+
+			<%if @spec%>
+			<td><%= q[:species]%></td>
+			<%end%>
+
+			<%if @chromosome%>
+			<td>
+				<% q[:chr].each do |a|%>
+				<%= a %>
+				<%end%>
+			</td>
+			<%end%>
+
+			<td><%= q[:upstream]%> &#8595 <%= q[:pep]%></td>
+			<td><%= q[:location].succ%></td>
+	
+			<%if @evidence%>
+			<td><%= q[:uniprot?]%></td>
+			<td>
+				<% q[:proteases].collect{|p| p.name}.uniq.each do |a| %>
+				<%= a %><br>
+				<%end%>
+			</td>
+			<td><%= q[:ensembl?]%></td>
+			<td><%= q[:tisdb?]%></td>
+			<td><%= q[:isoforms]%></td>
+			<td></td> <!-- Observed N-termini -->
+			<%end%> <!-- end of evidences -->
+
+			<%if @proteaseWeb%>
+			<td>
+				<font size='2'><span class="nowrap"><%= @pw_paths[q[:acc] + "_"+ q[:location].to_s].collect{|path| 
+					path.collect{|node|
+						@pw_gnames[node[:id]].to_s
+					}.join(" &#8594 ")		
+				}.join(";<br>  ") %></span></font>
+			</td>
+			<%end%> <!-- end of protease web -->
+
+			<%if @domain%>
 			<td>
 				<!--domains before  -->
-				<%q[:domains_before].uniq.each do |r|%>
-				<%= r.name%><br>
-				<%end%></td>
-		<td>
+				<%q[:domains_before].collect{|d| "#{d.name} (#{d.description})"}.uniq.each do |r|%>
+				<%= r %><br>
+				<%end%>
+			</td>
+			<td>
 				<!--domains at  -->
-				<%q[:domains_at].uniq.each do |r|%>
-				<%= r.name%><br>
-				<%end%></td>
-		<td>
+				<%q[:domains_at].collect{|d| "#{d.name} (#{d.description})"}.uniq.each do |r|%>
+				<%= r %><br>
+				<%end%>
+			</td>
+			<td>
 				<!--domains after  -->
-				<%q[:domains_after].uniq.each do |r|%>
-				<%= r.name%><br>
-				<%end%></td>
-		<%end%> <!-- end of domains -->
-
-
-
-	
-
-
-	</tr>
-	<% end %> <!-- end of loop over all proteins-->
+				<%q[:domains_after].collect{|d| "#{d.name} (#{d.description})"}.uniq.each do |r|%>
+				<%= r %><br>
+				<%end%>
+			</td>
+			<%end%> <!-- end of domains -->
+		</tr>
+		<% end %> <!-- end of loop over all proteins-->
 	</tbody>
-
-
 </table>
