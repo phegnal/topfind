@@ -794,6 +794,19 @@ class ProteinsController < ApplicationController
         @q[:isoforms] = @q[:evidence_dbnames].include?'TopFIND'
       
       
+        if @q[:domains_all].collect{|d| d.name}.include? "SIGNAL"
+        @q[:SignalLost] = !(@q[:domains_after].collect{|d| d.name}.include? "SIGNAL")
+      end
+      
+        if @q[:domains_all].collect{|d| d.name}.include? "PROPEP"
+        @q[:ProPeptideLost] = !(@q[:domains_after].collect{|d| d.name}.include? "PROPEP")
+      end
+      
+        if @q[:domains_all].collect{|d| d.name}.include? "TRANSMEM"
+        @q[:shed] = !(@q[:domains_after].collect{|d| d.name}.include? "TRANSMEM")
+      end
+        
+        
         # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
         # p @q[:evidence_sources]
         #p @q[:source_names]
