@@ -649,7 +649,7 @@ class ProteinsController < ApplicationController
       # CLEAN UP INPUT
       start = params["start"].strip
       targets = params["targets"].split("\n").collect{|s| {:id => s.split("\s")[0], :pos => s.split("\s")[1].to_i}}
-      @maxLength = params["maxLength"].to_i
+      maxLength = params["maxLength"].to_i
       byPos = params["byPos"] == "yes"
       rangeLeft = params["rangeLeft"] == "" ? 0 : params["rangeLeft"].to_i
       rangeRight = params["rangeRight"] == "" ? 0 : params["rangeRight"].to_i
@@ -657,8 +657,7 @@ class ProteinsController < ApplicationController
       nwOrg = params["network_org"]
       listOrg = params["list_org"]
       # FIND PATHS
-      exclusion = ["P01023"]
-      finder = PathFinding.new(Graph.new(nwOrg, []), @maxLength, byPos, rangeLeft, rangeRight)
+      finder = PathFinding.new(Graph.new(nwOrg), maxLength, byPos, rangeLeft, rangeRight)
       if(nwOrg == "mouse" && listOrg == "human") # nw is mouse and list is human
         @allPaths = finder.find_all_paths_map2mouse(start, targets)
       elsif(nwOrg == "human" && listOrg == "mouse")  # nw is human and list is mouse
@@ -721,8 +720,7 @@ class ProteinsController < ApplicationController
       @q = {}
       @q[:acc] = i.split("\s").fetch(0)
       @q[:pep] = i.split("\s").fetch(1).gsub(/[^[:upper:]]+/, "")
-      @q[:full_pep] = i.split("\s").fetch(1)
-     
+      @q[:full_pep] = i.split("\s").fetch(1)     
       @q[:protein] = if Protein.find(:first, :conditions => ["ac = ?", @q[:acc]]) != nil
         Protein.find(:first, :conditions => ["ac = ?", @q[:acc]])
       else
@@ -741,13 +739,76 @@ class ProteinsController < ApplicationController
         "Arabidopsis"
       end
       @q[:sql_id] = @q[:protein].id
-      @q[:all_names] = Searchname.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
-      @q[:short_names] = Proteinname.find(:all, :conditions => ['protein_id = ? AND recommended = ?', @q[:sql_id], 1]).uniq
+      @q[:all_names] = Searchname.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]]).uniq      
+      @q[:short_names] = Proteinname.find(:all, :conditions => ['protein_id = ? AND recommended = ?', @q[:sql_id], 1]).uniq     
       @q[:location] = if @tpp
         @q[:sequence].index(@q[:pep]) + 1
       else
         @q[:sequence].index(@q[:pep]) 
       end
+<<<<<<< HEAD
+      @q[:location_1] = @q[:location] + 1
+      @q[:location_range] = ((@q[:location] - @nterminal)..(@q[:location] + @cterminal)).to_a  
+      @q[:upstream] = if @q[:location] < 10
+        @q[:sequence][0, @q[:location]]
+      else
+        @q[:sequence][@q[:location] - 10, 10]
+      end
+      @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
+      if not @q[:nterms].nil?
+        @q[:cleavages] = @q[:nterms].collect {|a| Cleavage.find(:all, :conditions => ["nterm_id = ?", a])} #array of arrays
+      else
+        @q[:cleavages] = []
+      end
+      if not @q[:cleavages].nil?
+        # TODO what about Cleavage.find(1).protease ?
+        @q[:proteases] = @q[:cleavages].collect {|a| a.collect {|b| Protein.find(:first, :conditions => ["id = ?", b.protease_id])}}
+      else
+        @q[:proteases] = []
+      end
+      @q[:chr] = [@q[:protein].chromosome, @q[:protein].band] 
+
+      @q[:domains_all] = Ft.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
+      @q[:domains_all] = @q[:domains_all].select{|d| !["HELIX", "STRAND", "TURN", "CONFLICT", "VARIANT", "VAR_SEQ"].include? d.name} # FILTER OUT SOME UNINFORMATIVE ONES
+      @q[:domains_before] = @q[:domains_all].select {|a| a.to.to_i < @q[:location_range].min}
+      @q[:domains_at] = @q[:domains_all].select {|a| 
+        (a.from.to_i <= @q[:location_range].min and a.to.to_i >= @q[:location_range].min)  || 
+        (a.from.to_i <= @q[:location_range].max and a.to.to_i >= @q[:location_range].max)}
+      @q[:domains_after] = @q[:domains_all].select {|a| a.from.to_i > @q[:location_range].max }
+      
+      @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b.id])}.flatten #array of arrays
+      @q[:evidence_ids] = @q[:evidence_nterms].collect {|n| n.evidence_id}.flatten #array
+      @q[:evidences] = @q[:evidence_ids].collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}.flatten
+      @q[:evidence_source_ids] = @q[:evidences].collect {|b| b.evidencesource_id}.compact
+      @q[:evidence_ids_nil] = @q[:evidences].collect {|b| b.evidencesource_id}
+      @q[:evidence_sources] = @q[:evidence_source_ids].collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}      
+      @q[:evidence_dbnames] = @q[:evidence_sources].collect {|a| a.dbname}
+        @q[:evidence_dbnames].each do |a|
+          a.downcase!
+        end
+      @q[:uniprot?] = @q[:evidence_dbnames].include?"uniprotkb"
+      @q[:ensembl?] = @q[:evidence_dbnames].include?'ensembl'
+      @q[:tisdb?] = @q[:evidence_dbnames].include?'tisdb'
+      @q[:isoforms] = @q[:evidence_dbnames].include?'topfind'
+    
+      @q[:all_methodologies] = @q[:evidences].select {|a| a.evidencesource_id.nil? && (a.name.include? 'cleavage')}
+      @q[:methodologies] = @q[:all_methodologies].collect {|s| s.methodology}.uniq
+
+      #CSV variables
+      @q[:all_names_csv] = @q[:all_names].collect {|a| a.name + ';'}
+      @q[:short_names_csv] = @q[:short_names].collect {|b| b.full + ';'}
+
+      
+    
+      print "."
+      @mainarray << @q
+      q_csv = "#{@q[:acc]}\t#{@q[:full_pep]}\t#{@q[:short_names_csv]}\t#{@q[:all_names_csv]}\t" +
+      if @spec; "#{@q[:species]}\t" end +
+      if @chromosome; "#{@q[:chr]}\t" end +
+      "#{@q[:upstream]} ↓ #{@q[:pep]}\t#{@q[:location_1]}\t" +
+      
+      p q_csv
+=======
       if not @q[:location].nil?
         @q[:location_1] = @q[:location] + 1
         @q[:location_range] = ((@q[:location] - @nterminal)..(@q[:location] + @cterminal)).to_a  
@@ -824,9 +885,24 @@ class ProteinsController < ApplicationController
       else
         p "NOT PROCESSED: #{@q[:acc]} at #{@q[:pep]}" 
       end
+>>>>>>> 9d6d8a36ec57c676ab4888a399325a95c02b88bc
     }
     print "\n"
     
+    #CSV
+    first_line = "Accession\tInput Sequence\tRecommended Protein Name\tOther Names and IDs\t" +  
+      if @spec; "Species\t" end +
+      if @chromosome; "Chromosome & Band\t" end +
+      "P10 to P10′\tP1′ Position\t" +
+      if @evidence; "Canonical Start\tCleavingProteases\tAlternative Spliced Start\tAlternative Translation Initiation Start\tIsoform Start\tObserved N-terminus\t" end +
+      if @proteaseWeb; "Protease Web Connections\t" end +
+      if @domain; "N-terminal Features (Start to P1)\tFeatures At Position (P1')\tC-terminal Features" end
+
+    path = "#{dir}/FileName.csv"
+    output = File.new(path, "w") # "w" is for write (so it will make a new file and write to it)
+    output << first_line
+    output.close
+
     # ICELOGO
     seqs = @mainarray.select{|e| e[:location]>2 and !e[:ensembl?] and !e[:tisdb?] and !e[:isoforms]}
     IceLogo.new().terminusIcelogo(Species.find(1), seqs.collect{|e| e[:upstream]+":"+e[:pep]}, "#{dir}/IceLogo.svg", 4) if seqs.length > 0
@@ -838,7 +914,7 @@ class ProteinsController < ApplicationController
     # PATHFINDING
     if(@proteaseWeb == "1")
       if(not Protein.find_by_ac(params[:pw_protease].strip).nil? and params[:pw_maxPathLength].to_i > 0)
-        finder = PathFinding.new(Graph.new(params[:pw_org], []), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal)
+        finder = PathFinding.new(Graph.new(params[:pw_org],[]), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal)
         @pw_paths = finder.find_all_paths(params[:pw_protease],  @mainarray.collect{|x|  {:id => x[:acc], :pos => x[:location]} })
         @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
         pdfPath = finder.make_graphviz(dir, @pw_gnames) # this saves the image but we need to define the path yet
@@ -847,9 +923,21 @@ class ProteinsController < ApplicationController
         p "pathlength invalid" if params[:pw_maxPathLength].to_i <= 0
         # TODO put error message on html??
       end
-    end
 
+    end
+=begin        
     # ENRICHMENT STATISTICS - needs Rserve to work!
+<<<<<<< HEAD
+    es = EnrichmentStats.new(@mainarray, @mainarray[0][:protein].species_id) # TODO how to pick species?
+    es.printStatsArrayToFile("#{dir}/ProteaseStats.txt")
+    es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
+    es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
+<<<<<<< HEAD
+=end     
+=======
+    es.vennDiagram("#{dir}/VennDiagram.pdf")
+>>>>>>> 9d6d8a36ec57c676ab4888a399325a95c02b88bc
+=======
     if @mainarray.collect{|a| a[:proteases].length}.sum > 0 then
       es = EnrichmentStats.new(@mainarray, @mainarray[0][:protein].species_id) # TODO how to pick species?
       es.printStatsArrayToFile("#{dir}/ProteaseStats.txt")
@@ -857,6 +945,7 @@ class ProteinsController < ApplicationController
       es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
     end
   
+>>>>>>> 5d9c8e11a0c5ee01f1a4f10b77d1ba1cca180dd5
     p "DONE"
   end
   
