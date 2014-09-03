@@ -4,6 +4,7 @@ class ProteinsController < ApplicationController
   require 'graph/graph'
   require 'listTools/enrichmentStats'
   require 'listTools/iceLogo'
+  require 'listTools/venn'
   
   hobo_model_controller
   
@@ -755,11 +756,13 @@ class ProteinsController < ApplicationController
         else
           @q[:sequence][@q[:location] - 10, 10]
         end
-        @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
+        @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ?", @q[:sql_id]])
+        @q[:nterms] = @q[:nterms].select{|n| @q[:location_range].include? n.pos}
         # TODO - error when Nterms not found (the next line fails)
         # also, it actually should find N-termini in the cases I added, why doesn't it?
         @q[:cleavages] = Cleavage.find(:all, :conditions => ["substrate_id = ?", @q[:sql_id]])
         if not @q[:cleavages].nil?
+          @q[:cleavages] = @q[:cleavages].select{|c| @q[:location_range].include? c.pos}
           @q[:proteases] = @q[:cleavages].collect {|c| c.protease}
         else
           @q[:proteases] = []
@@ -812,7 +815,12 @@ class ProteinsController < ApplicationController
     print "\n"
     
     # ICELOGO
-    IceLogo.new().terminusIcelogo(Species.find(1), @mainarray.collect{|e| e[:upstream]+":"+e[:pep]}, "#{dir}/IceLogo.svg", 4)
+    seqs = @mainarray.select{|e| e[:location]>2 and !e[:ensembl?] and !e[:tisdb?] and !e[:isoforms]}
+    IceLogo.new().terminusIcelogo(Species.find(1), seqs.collect{|e| e[:upstream]+":"+e[:pep]}, "#{dir}/IceLogo.svg", 4) if seqs.length > 0
+    # IceLogo.new().terminusIcelogo(Species.find(1), @mainarray.select{|e| e[:proteases].collect{|p| p.ac}.include? "P33434"}.collect{|e| e[:upstream]+":"+e[:pep]}, "#{dir}/IceLogo_mmp2.svg", 4)
+    
+    # VENN DIAGRAM
+    Venn.new(@mainarray).vennDiagram("#{dir}/VennDiagram.pdf")
 
     # PATHFINDING
     if(@proteaseWeb == "1")
@@ -820,7 +828,6 @@ class ProteinsController < ApplicationController
         finder = PathFinding.new(Graph.new(params[:pw_org], []), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal)
         @pw_paths = finder.find_all_paths(params[:pw_protease],  @mainarray.collect{|x|  {:id => x[:acc], :pos => x[:location]} })
         @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
-        # TODO install graphviz for this to work
         pdfPath = finder.make_graphviz(dir, @pw_gnames) # this saves the image but we need to define the path yet
       else
         p "protease not found" if Protein.find_by_ac(params[:pw_protease].strip).nil?
@@ -830,11 +837,13 @@ class ProteinsController < ApplicationController
     end
 
     # ENRICHMENT STATISTICS - needs Rserve to work!
-    es = EnrichmentStats.new(@mainarray, @mainarray[0][:protein].species_id) # TODO how to pick species?
-    es.printStatsArrayToFile("#{dir}/ProteaseStats.txt")
-    es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
-    es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
-    es.vennDiagram("#{dir}/VennDiagram.pdf")
+    if @mainarray.collect{|a| a[:proteases].length}.sum > 0 then
+      es = EnrichmentStats.new(@mainarray, @mainarray[0][:protein].species_id) # TODO how to pick species?
+      es.printStatsArrayToFile("#{dir}/ProteaseStats.txt")
+      es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
+      es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
+    end
+  
     p "DONE"
   end
   
