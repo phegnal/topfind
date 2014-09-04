@@ -9,7 +9,7 @@ class Venn
   def vennDiagram(path)
     @@r.void_eval("x = list()")
     @@mainarray.each_with_index{|x, i|
-      @@r.assign("v", [x[:uniprot?], x[:isoforms], x[:proteases].length > 0, x[:ensembl?]])
+      @@r.assign("v", [x[:uniprot].length > 0, x[:isoforms].length > 0, x[:proteases].length > 0, x[:ensembl].length > 0])
       @@r.void_eval("x[[#{i+1}]]=v")
     }
     @@r.void_eval("y = data.frame(do.call(rbind, x))")

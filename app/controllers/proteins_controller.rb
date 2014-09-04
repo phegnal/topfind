@@ -720,12 +720,16 @@ class ProteinsController < ApplicationController
       @q = {}
       @q[:acc] = i.split("\s").fetch(0)
       @q[:pep] = i.split("\s").fetch(1).gsub(/[^[:upper:]]+/, "")
-      @q[:full_pep] = i.split("\s").fetch(1)     
+      @q[:full_pep] = i.split("\s").fetch(1)
       @q[:protein] = if Protein.find(:first, :conditions => ["ac = ?", @q[:acc]]) != nil
         Protein.find(:first, :conditions => ["ac = ?", @q[:acc]])
       else
-        
       end
+      
+      @q[:chr] = if @chromosome 
+        [@q[:protein].chromosome, @q[:protein].band] 
+      end
+      
       @q[:sequence] = @q[:protein].sequence
       @q[:species] = if @q[:protein].species_id == 1
         "Human"
@@ -740,75 +744,13 @@ class ProteinsController < ApplicationController
       end
       @q[:sql_id] = @q[:protein].id
       @q[:all_names] = Searchname.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]]).uniq      
-      @q[:short_names] = Proteinname.find(:all, :conditions => ['protein_id = ? AND recommended = ?', @q[:sql_id], 1]).uniq     
+      @q[:short_name] = Proteinname.find(:all, :conditions => ['protein_id = ? AND recommended = ?', @q[:sql_id], 1]).collect{|x| x.full}.uniq[0]     
       @q[:location] = if @tpp
         @q[:sequence].index(@q[:pep]) + 1
       else
-        @q[:sequence].index(@q[:pep]) 
+        @q[:sequence].index(@q[:pep])
       end
-<<<<<<< HEAD
-      @q[:location_1] = @q[:location] + 1
-      @q[:location_range] = ((@q[:location] - @nterminal)..(@q[:location] + @cterminal)).to_a  
-      @q[:upstream] = if @q[:location] < 10
-        @q[:sequence][0, @q[:location]]
-      else
-        @q[:sequence][@q[:location] - 10, 10]
-      end
-      @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ? AND pos = ?", @q[:sql_id], @q[:location_1]])
-      if not @q[:nterms].nil?
-        @q[:cleavages] = @q[:nterms].collect {|a| Cleavage.find(:all, :conditions => ["nterm_id = ?", a])} #array of arrays
-      else
-        @q[:cleavages] = []
-      end
-      if not @q[:cleavages].nil?
-        # TODO what about Cleavage.find(1).protease ?
-        @q[:proteases] = @q[:cleavages].collect {|a| a.collect {|b| Protein.find(:first, :conditions => ["id = ?", b.protease_id])}}
-      else
-        @q[:proteases] = []
-      end
-      @q[:chr] = [@q[:protein].chromosome, @q[:protein].band] 
 
-      @q[:domains_all] = Ft.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
-      @q[:domains_all] = @q[:domains_all].select{|d| !["HELIX", "STRAND", "TURN", "CONFLICT", "VARIANT", "VAR_SEQ"].include? d.name} # FILTER OUT SOME UNINFORMATIVE ONES
-      @q[:domains_before] = @q[:domains_all].select {|a| a.to.to_i < @q[:location_range].min}
-      @q[:domains_at] = @q[:domains_all].select {|a| 
-        (a.from.to_i <= @q[:location_range].min and a.to.to_i >= @q[:location_range].min)  || 
-        (a.from.to_i <= @q[:location_range].max and a.to.to_i >= @q[:location_range].max)}
-      @q[:domains_after] = @q[:domains_all].select {|a| a.from.to_i > @q[:location_range].max }
-      
-      @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b.id])}.flatten #array of arrays
-      @q[:evidence_ids] = @q[:evidence_nterms].collect {|n| n.evidence_id}.flatten #array
-      @q[:evidences] = @q[:evidence_ids].collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}.flatten
-      @q[:evidence_source_ids] = @q[:evidences].collect {|b| b.evidencesource_id}.compact
-      @q[:evidence_ids_nil] = @q[:evidences].collect {|b| b.evidencesource_id}
-      @q[:evidence_sources] = @q[:evidence_source_ids].collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}      
-      @q[:evidence_dbnames] = @q[:evidence_sources].collect {|a| a.dbname}
-        @q[:evidence_dbnames].each do |a|
-          a.downcase!
-        end
-      @q[:uniprot?] = @q[:evidence_dbnames].include?"uniprotkb"
-      @q[:ensembl?] = @q[:evidence_dbnames].include?'ensembl'
-      @q[:tisdb?] = @q[:evidence_dbnames].include?'tisdb'
-      @q[:isoforms] = @q[:evidence_dbnames].include?'topfind'
-    
-      @q[:all_methodologies] = @q[:evidences].select {|a| a.evidencesource_id.nil? && (a.name.include? 'cleavage')}
-      @q[:methodologies] = @q[:all_methodologies].collect {|s| s.methodology}.uniq
-
-      #CSV variables
-      @q[:all_names_csv] = @q[:all_names].collect {|a| a.name + ';'}
-      @q[:short_names_csv] = @q[:short_names].collect {|b| b.full + ';'}
-
-      
-    
-      print "."
-      @mainarray << @q
-      q_csv = "#{@q[:acc]}\t#{@q[:full_pep]}\t#{@q[:short_names_csv]}\t#{@q[:all_names_csv]}\t" +
-      if @spec; "#{@q[:species]}\t" end +
-      if @chromosome; "#{@q[:chr]}\t" end +
-      "#{@q[:upstream]} ↓ #{@q[:pep]}\t#{@q[:location_1]}\t" +
-      
-      p q_csv
-=======
       if not @q[:location].nil?
         @q[:location_1] = @q[:location] + 1
         @q[:location_range] = ((@q[:location] - @nterminal)..(@q[:location] + @cterminal)).to_a  
@@ -817,10 +759,35 @@ class ProteinsController < ApplicationController
         else
           @q[:sequence][@q[:location] - 10, 10]
         end
-        @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ?", @q[:sql_id]])
-        @q[:nterms] = @q[:nterms].select{|n| @q[:location_range].include? n.pos}
-        # TODO - error when Nterms not found (the next line fails)
-        # also, it actually should find N-termini in the cases I added, why doesn't it?
+        
+        # NTERMINI AND EVIDENCES
+        @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ?", @q[:sql_id]]).select{|n| @q[:location_range].include? n.pos}
+        @q[:evidences] =  @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b.id])}.flatten.collect{|n2e| n2e.evidence}
+        @q[:evidences] = @q[:evidences].select{|e| !e.nil?}
+        
+        @q[:uniprot] =[]
+        @q[:ensembl] =[]
+        @q[:tisdb] = []
+        @q[:isoforms] = []
+        @q[:otherEvidences] =[]
+        @q[:evidences].each{|e|
+          if e.evidencesource.nil?
+            if (e.name =~ /Inferred from cleavage\-/).nil?
+              @q[:otherEvidences] << e
+            end
+          elsif e.evidencesource.dbname == "UniProtKB"
+            @q[:uniprot] << e 
+          elsif e.evidencesource.dbname == "Ensembl"
+            @q[:ensembl] << e 
+          elsif e.evidencesource.dbname == "TISdb"
+            @q[:tisdb] << e 
+          elsif  e.evidencesource.dbname == "TopFIND"
+            @q[:isoforms] << e
+          else
+          end
+        }
+              
+        # CLEAVAGES
         @q[:cleavages] = Cleavage.find(:all, :conditions => ["substrate_id = ?", @q[:sql_id]])
         if not @q[:cleavages].nil?
           @q[:cleavages] = @q[:cleavages].select{|c| @q[:location_range].include? c.pos}
@@ -828,6 +795,8 @@ class ProteinsController < ApplicationController
         else
           @q[:proteases] = []
         end
+        
+        # DOMAINS
         @q[:domains_all] = Ft.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
         @q[:domains_all] = @q[:domains_all].select{|d| !["HELIX", "STRAND", "TURN", "CONFLICT", "VARIANT", "VAR_SEQ"].include? d.name} # FILTER OUT SOME UNINFORMATIVE ONES
         @q[:domains_before] = @q[:domains_all].select {|a| a.to.to_i < @q[:location_range].min}
@@ -836,72 +805,24 @@ class ProteinsController < ApplicationController
           (a.from.to_i <= @q[:location_range].max and a.to.to_i >= @q[:location_range].max)
         }
         @q[:domains_after] = @q[:domains_all].select {|a| a.from.to_i > @q[:location_range].max }
-      
-        @q[:evidence_nterms] = @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b.id])}.flatten #array of arrays
-        @q[:evidence_ids] = @q[:evidence_nterms].collect {|n| n.evidence_id}.flatten #array
-        @q[:evidences] = @q[:evidence_ids].collect {|p| Evidence.find(:first, :conditions => ["id = ?", p])}.flatten
-        @q[:evidences] = @q[:evidences].select{|e| !e.nil?}
-        @q[:evidence_source_ids] = @q[:evidences].collect {|b| b.evidencesource_id}.compact
-        @q[:evidence_sources] = @q[:evidence_source_ids].collect {|c| Evidencesource.find(:first, :conditions => ['id = ?', c])}
-      
-        @q[:evidence_dbnames] = @q[:evidence_sources].collect {|a| a.dbname}
-        # p @q[:evidence_dbnames]
-        # >       p "akldfjkalsdjf"
-        @q[:uniprot?] = @q[:evidence_dbnames].include?"UniProtKB"
-        #@q[:evidences_cleavages] = @q[:evidences].flatten.collect{|a| a.to_s}.delete_if {|b| !b.include?'cleavage'}
-
-        @q[:ensembl?] = @q[:evidence_dbnames].include?'Ensembl'
-        @q[:tisdb?] = @q[:evidence_dbnames].include?'TISdb'
-        @q[:isoforms] = @q[:evidence_dbnames].include?'TopFIND'
-      
-      
         if @q[:domains_all].collect{|d| d.name}.include? "SIGNAL"
-        @q[:SignalLost] = !(@q[:domains_after].collect{|d| d.name}.include? "SIGNAL")
-      end
-      
-        if @q[:domains_all].collect{|d| d.name}.include? "PROPEP"
-        @q[:ProPeptideLost] = !(@q[:domains_after].collect{|d| d.name}.include? "PROPEP")
-      end
-      
-        if @q[:domains_all].collect{|d| d.name}.include? "TRANSMEM"
-        @q[:shed] = !(@q[:domains_after].collect{|d| d.name}.include? "TRANSMEM")
-      end
-        
-        
-        # @q[:source_names] = @q[:evidence_sources].collect {|c| c.dbname}
-        # p @q[:evidence_sources]
-        #p @q[:source_names]
-
-        # @evidence_nterms = Nterm2evidence.find(:all, :conditions => ["nterm_id = ?", @pep_nterms])
-        # @evidence_ids = @evidence_nterms.collect {|c| c.evidence_id}
-        # @evidences_1 = @evidence_ids.collect {|f| Evidence.find(:first, :conditions => ["id = ?", f])}
-
-        @q[:chr] = if @chromosome 
-          [@q[:protein].chromosome, @q[:protein].band] 
+          @q[:SignalLost] = !(@q[:domains_after].collect{|d| d.name}.include? "SIGNAL")
         end
-        # @q[:transmem] = @q[:domains_all].drop_while {|a| (a.name != 'TRANSMEM') || (a.from < @q[:location_range].first) || (a.to > @q[:location_range].last)}
-        print "."
-        @mainarray << @q
+        if @q[:domains_all].collect{|d| d.name}.include? "PROPEP"
+          @q[:ProPeptideLost] = !(@q[:domains_after].collect{|d| d.name}.include? "PROPEP")
+        end
+        if @q[:domains_all].collect{|d| d.name}.include? "TRANSMEM"
+          @q[:shed] = !(@q[:domains_after].collect{|d| d.name}.include? "TRANSMEM")
+        end
+
       else
         p "NOT PROCESSED: #{@q[:acc]} at #{@q[:pep]}" 
       end
->>>>>>> 9d6d8a36ec57c676ab4888a399325a95c02b88bc
-    }
-    print "\n"
+      
+      print "."
+      @mainarray << @q
+    }    
     
-    #CSV
-    first_line = "Accession\tInput Sequence\tRecommended Protein Name\tOther Names and IDs\t" +  
-      if @spec; "Species\t" end +
-      if @chromosome; "Chromosome & Band\t" end +
-      "P10 to P10′\tP1′ Position\t" +
-      if @evidence; "Canonical Start\tCleavingProteases\tAlternative Spliced Start\tAlternative Translation Initiation Start\tIsoform Start\tObserved N-terminus\t" end +
-      if @proteaseWeb; "Protease Web Connections\t" end +
-      if @domain; "N-terminal Features (Start to P1)\tFeatures At Position (P1')\tC-terminal Features" end
-
-    path = "#{dir}/FileName.csv"
-    output = File.new(path, "w") # "w" is for write (so it will make a new file and write to it)
-    output << first_line
-    output.close
 
     # ICELOGO
     seqs = @mainarray.select{|e| e[:location]>2 and !e[:ensembl?] and !e[:tisdb?] and !e[:isoforms]}
@@ -925,19 +846,7 @@ class ProteinsController < ApplicationController
       end
 
     end
-=begin        
-    # ENRICHMENT STATISTICS - needs Rserve to work!
-<<<<<<< HEAD
-    es = EnrichmentStats.new(@mainarray, @mainarray[0][:protein].species_id) # TODO how to pick species?
-    es.printStatsArrayToFile("#{dir}/ProteaseStats.txt")
-    es.plotProteaseCounts("#{dir}/Protease_histogram.pdf")
-    es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
-<<<<<<< HEAD
-=end     
-=======
-    es.vennDiagram("#{dir}/VennDiagram.pdf")
->>>>>>> 9d6d8a36ec57c676ab4888a399325a95c02b88bc
-=======
+
     if @mainarray.collect{|a| a[:proteases].length}.sum > 0 then
       es = EnrichmentStats.new(@mainarray, @mainarray[0][:protein].species_id) # TODO how to pick species?
       es.printStatsArrayToFile("#{dir}/ProteaseStats.txt")
@@ -945,10 +854,69 @@ class ProteinsController < ApplicationController
       es.plotProteaseSubstrateHeatmap("#{dir}/ProteaseSubstrate_matrix.pdf")
     end
   
->>>>>>> 5d9c8e11a0c5ee01f1a4f10b77d1ba1cca180dd5
+  
+    # #CSV
+    path = "#{dir}/Full_Table.tsv"
+    output = File.new(path, "w")
+    output << "Accession\tInput Sequence\tRecommended Protein Name\tOther Names and IDs\t" +
+    if @spec; "Species" end +
+    if @chromosome; "\tChromosome & Band\t" end +
+    "P10 to P10′\tP1′ Position" +
+    if @evidence; "\tUniProt annotated start\tIsoform Start\tAlternative Spliced Start\tCleavingProteases\tOther terminus evidences\tAlternative Translation Start" end +
+    if @proteaseWeb; "\tProtease Web Connections" end +
+    if @domain; "\tN-terminal Features (Start to P1)\tFeatures At Position (P1')\tC-terminal Features (P2' to End)\tSignalpeptide lost\tPropeptide lost\tShed" end +
+    "\n"
+    
+    
+    @mainarray.each{|q|
+      output << "#{q[:acc]}\t#{q[:full_pep]}\t#{q[:short_name]}\t#{q[:all_names].collect{|s| s.name}.uniq.join(';')}" +
+      if @spec; "\t#{q[:species]}" end +
+      if @chromosome; "\t#{q[:chr].join('')}" end +
+      "\t#{q[:upstream]} | #{q[:pep]}\t#{q[:location_1]}"
+      if @evidence
+        output << (q[:uniprot].length > 0 ? "\tX" : "\t")
+        output << (q[:isoforms].length > 0 ? "\tX" : "\t") 
+        output << (q[:ensembl].length > 0 ? "\tX" : "\t")
+        output << ("\t" + q[:proteases].collect{|p| p.shortname}.join(';'))
+        output << ("\t" + q[:otherEvidences].collect{|e| e.methodology}.join(";"))
+        output << (q[:tisdb].length > 0 ? "\tX" : "\t")
+      end
+
+      if @proteaseWeb
+        output << "\t" + @pw_paths[q[:acc] + "_"+ q[:location].to_s].collect{|path| 
+          path.collect{|node|
+            @pw_gnames[node[:id]].to_s
+          }.join("->")		
+        }.join("; ")
+      end
+
+      if @domain
+        output << "\t" + q[:domains_before].collect{|d| "#{d.name} (#{d.description})"}.uniq.join(";")
+        output << "\t" + q[:domains_at].collect{|d| "#{d.name} (#{d.description})"}.uniq.join(";")
+        output << "\t" + q[:domains_after].collect{|d| "#{d.name} (#{d.description})"}.uniq.join(";")
+        output << "\t"
+        output << "X" if !q[:SignalLost].nil? & q[:SignalLost]
+        output << "\t"
+        output << "X" if !q[:ProPeptideLost].nil? & q[:ProPeptideLost]
+        output << "\t"
+        output << "X" if !q[:shed].nil? & q[:shed] 
+      end
+      output << "\n"
+    }
+    output.close
+  
     p "DONE"
   end
   
+
+
+
+
+
+
+
+
+
 
   def trying_featurePanel
     
