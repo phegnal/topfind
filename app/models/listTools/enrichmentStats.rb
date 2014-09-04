@@ -102,7 +102,7 @@ class EnrichmentStats
     @@r.void_eval("psMat <- do.call(rbind, psMat)")
     @@r.void_eval("colnames(psMat) <- proteaseNames")
     @@r.void_eval("rownames(psMat) <- substrateNames")
-    @@r.void_eval("pdf('#{path}')")
+    @@r.void_eval("svg('#{path}.svg')")
     @@r.void_eval("heatmap(psMat, scale = 'none', col=c('black', 'red'))")
     @@r.void_eval('dev.off()')
   end
@@ -112,7 +112,7 @@ class EnrichmentStats
     @@r.assign("counts", @@statsArray.collect{|x| x[:listCount]})
     @@r.assign("countsNam", @@statsArray.collect{|x| x[:protein].shortname})
     @@r.void_eval("names(counts) <- countsNam")
-    @@r.void_eval("pdf('#{path}')")
+    @@r.void_eval("svg('#{path}.svg')")
     @@r.void_eval("barplot(sort(counts, decreasing = T), las = 2, col = 'blue', ylab = 'Cleavages in the list')")
     @@r.void_eval('dev.off()')
   end
