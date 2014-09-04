@@ -2,32 +2,59 @@ class Emailer
   def initialize()
   end
   
-  def send(recipients, attachments)
+  def sendTopFINDer(recipient, attachment)
     require 'net/smtp'
 
-    # recipients needs to be an array!
-    if recipients.class == String
-      recipients = [recipients]
-    end
     sender = "topfind.clip@gmail.com"
 
-message = <<MESSAGE_END
-From: TopFIND <#{sender}>
-To: #{recipients.join(", ")}
-Subject: test email
+    marker = "AUNIQUEMARKER12345"
 
-This is an automated message send to you from the TopFIND database. Attached are some documents related to your analysis.
+
+part1 = <<MESSAGE_END
+From: TopFIND <#{sender}>
+To: #{recipient}
+Subject: TopFINDer results
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary=#{marker}
+--#{marker}
+MESSAGE_END
+
+part2 =<<EOF
+Content-Type: text/plain
+Content-Transfer-Encoding:8bit
+This is an automated message send to you from the TopFIND database. Attached are results of your TopFINDer analysis.
 
 Have a nice day!
 
 The TopFIND Team
-MESSAGE_END
+--#{marker}
+EOF
 
-    smtp = Net::SMTP.new 'smtp.gmail.com', 587
-    smtp.enable_starttls
+    # Read a file and encode it into base64 format
+    filecontent = File.read(attachment)
+    encodedcontent = [filecontent].pack("m")   # base64
 
-    smtp.start('gmail.com', sender,'g3lat1na') do |smtp|
-      smtp.send_message message, sender, recipients
-    end
+part3 =<<EOF
+Content-Type: multipart/mixed; name=\"TopFINDer_Results.zip\"
+Content-Transfer-Encoding:base64
+Content-Disposition: attachment; filename="TopFINDer_Results.zip"
+
+#{encodedcontent}
+--#{marker}--
+EOF
+
+mailtext = part1 + part2 + part3
+
+    begin 
+      smtp = Net::SMTP.new 'smtp.gmail.com', 587
+      smtp.enable_starttls
+
+      smtp.start('gmail.com', 'topfind.clip@gmail.com','g3lat1na') do |smtp|
+        smtp.sendmail(mailtext, 'topfind.clip@gmail.com',
+        recipient)
+      end
+    rescue Exception => e  
+      print "Exception occured: " + e  
+    end  
   end
 end
