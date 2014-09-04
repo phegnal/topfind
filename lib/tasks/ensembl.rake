@@ -70,7 +70,10 @@ namespace :ensembl do
         file = Bio::FastaFormat.open("#{RAILS_ROOT}/databases/Ensembl/Mus_musculus.GRCm38.75.pep.all.fa")
         ensgCode = "ENSMUSG"
         enspCode = "ENSMUSP"
-        
+      when "Saccharomyces cerevisiae"
+        file = Bio::FastaFormat.open("#{RAILS_ROOT}/databases/Ensembl/Mus_musculus.GRCm38.75.pep.all.fa")
+        ensgCode = "ENSMUSG"
+        enspCode = "ENSMUSP"
       else
         f << "Species #{speciesName}, #{speciesId} cannot be processed \n"
         ok = false
