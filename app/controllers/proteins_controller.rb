@@ -12,6 +12,7 @@ class ProteinsController < ApplicationController
   autocomplete :name, :query_scope => [:name_contains, :ac_contains]
   auto_actions :all
   show_actions :filter
+  index_actions :multi_peptides
    
   def index
     
@@ -697,6 +698,7 @@ class ProteinsController < ApplicationController
   end  
   
   def multi_peptides
+  hobo_index
   end
 
   def multi_peptides2
