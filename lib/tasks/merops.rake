@@ -37,12 +37,14 @@ task :import_merops_cleavages do
         #don't add if protease and substrate species don't match
         next unless @p.species.present? && @s.species.present?
         next if @p.species.name != @s.species.name
-        
+
+        skip = ARGV[1]
+        if skip.present? && @added < skip.to_i         
         #if @added < 6200
-        #	print "#{@added}, "
-        #	@added = @added.next
-        #	next
-        #end		
+         	print "skipped #{@added}, "
+        	@added = @added.next
+        	next
+        end		
        
         puts "\t#{@pi}/#{@total}/#{@padded}/#{@added}-#{@ci}-#{@si}: #{@p.ac} - #{@p.name}  | #{@s.ac} - #{@s.name}"
 

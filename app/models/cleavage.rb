@@ -178,7 +178,7 @@ class Cleavage < ActiveRecord::Base
   
 
   def map_to_isoforms
-      mapping = self.substrate.isoform_crossmapping(self.pos,'centre')
+      mapping = self.substrate.isoform_crossmapping(self.pos,'centre') if self.substrate.present?
       
       if mapping.present?  
 		  #generate "inferred from isoform" evidence
@@ -196,21 +196,21 @@ class Cleavage < ActiveRecord::Base
 		  ) 	
 		  @isoevidence.evidencecodes << Evidencecode.find_or_create_by_name(:name => 'inferred from isoform by sequence similarity',																	:code => 'TopFIND:0000002')
 		  @isoevidence.save
-	  end
 	  
-      mapping.each_pair do |ac,pos|
-        matchprot = Protein.ac_is(ac).first
-        idstring = "P(#{self.protease.ac})-S(#{ac})at(#{pos})"
-        cleavage = Cleavage.find_or_create_by_idstring(
-            :idstring => idstring,
-            :protease_id => self.protease.id,
-            :substrate_id => matchprot.id,
-            :peptide => self.peptide,
-            :pos => pos
-          )
-        cleavage.evidences << @isoevidence unless cleavage.evidences.include?(@isoevidence)
-        matchprot.cleavages << cleavage unless matchprot.cleavages.include?(cleavage)
-      end
+		  mapping.each_pair do |ac,pos|
+			matchprot = Protein.ac_is(ac).first
+			idstring = "P(#{self.protease.ac})-S(#{ac})at(#{pos})"
+			cleavage = Cleavage.find_or_create_by_idstring(
+				:idstring => idstring,
+				:protease_id => self.protease.id,
+				:substrate_id => matchprot.id,
+				:peptide => self.peptide,
+				:pos => pos
+			  )
+			cleavage.evidences << @isoevidence unless cleavage.evidences.include?(@isoevidence)
+			matchprot.inverse_cleavages << cleavage unless matchprot.inverse_cleavages.include?(cleavage)
+		  end
+	   end
   end
 
   def self.generate_csv(ids)
