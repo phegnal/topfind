@@ -10,10 +10,10 @@ class ImportHints < Hobo::ViewHints
   evidence = documentations['i-evidence'].first.short
   csvfile = documentations['i-csvfile'].first.short
 
-	field_names :name => "Name <img class ='help'  src='/topcat/images/help.png' alt='?' title='#{name}'/>",
-				:description => "Description  <img class ='help'  src='/topcat/images/help.png' alt='?' title='#{description}'/>",
-				:evidence => "Evidence <img class ='help'  src='/topcat/images/help.png' alt='?' title='#{evidence}'/>",
-				:csvfile => "Excel or csv file  <img class ='help'  src='/topcat/images/help.png' alt='?' title='#{csvfile}'/>"
+	field_names :name => "Name <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{name}'/>",
+				:description => "Description  <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{description}'/>",
+				:evidence => "Evidence <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{evidence}'/>",
+				:csvfile => "Excel or csv file  <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{csvfile}'/>"
 			
 
 end

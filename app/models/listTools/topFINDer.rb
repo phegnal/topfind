@@ -31,7 +31,8 @@ class TopFINDer
     @input1.each {|i|   
       @q = {}
       @q[:acc] = i.split("\s").fetch(0)
-      @q[:pep] = i.split("\s").fetch(1).gsub(/[^[:upper:]]+/, "")
+      #@q[:pep] = i.split("\s").fetch(1).gsub(/[^[:upper:]]+/, "")
+      @q[:pep] = i.split("\s").fetch(1).gsub(/^.{1}\./,"").gsub(/\..{1}$/,"").gsub(/[^[:upper:]]+/, "")
       @q[:full_pep] = i.split("\s").fetch(1)
       @q[:protein] = if Protein.find(:first, :conditions => ["ac = ?", @q[:acc]]) != nil
         Protein.find(:first, :conditions => ["ac = ?", @q[:acc]])

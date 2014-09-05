@@ -62,8 +62,8 @@
           <a href="/topfind/license">License &amp; Disclaimer</a> |
           <a href="mailto:philipp.lange@ubc.ca">Contact</a> |
           <a href="/topfind/download">Downloads</a><br/>
-    		<a href="http://www.nature.com/nmeth/journal/v8/n9/full/nmeth.1669.html" target="_blank">Philipp F. Lange &amp; Christopher M. Overall, <b>Nature Methods</b> 8, 703&minus;704 (2011)</a> <a href="/topfind/downloads/2011-NMeth-Lange_and_Overall.pdf" target="_blank">[pdf]</a> <br/>
-        <a href="http://nar.oxfordjournals.org/content/40/D1/D351.short" target="_blank">Philipp F. Lange, Pitter F. Huesgen, Christopher M. Overall, <b>Nucleic Acids Research</b> 40 (D1), D351-D361 (2012)</a> <a href="http://nar.oxfordjournals.org/content/40/D1/D351.full-text-lowres.pdf" target="_blank">[pdf]</a>
+          <a href="http://nar.oxfordjournals.org/content/40/D1/D351.short" target="_blank">Philipp F. Lange, Pitter F. Huesgen, Christopher M. Overall, <b>Nucleic Acids Research</b> 40 (D1), D351-D361 (2012)</a> <a href="http://nar.oxfordjournals.org/content/40/D1/D351.full-text-lowres.pdf" target="_blank">[pdf]</a><br/>
+    	  <a href="http://www.nature.com/nmeth/journal/v8/n9/full/nmeth.1669.html" target="_blank">Philipp F. Lange &amp; Christopher M. Overall, <b>Nature Methods</b> 8, 703&minus;704 (2011)</a> <a href="/topfind/downloads/2011-NMeth-Lange_and_Overall.pdf" target="_blank">[pdf]</a> 
     	</div> 
     	<div class="bottom">&nbsp;</div>
 <!-- overlayed element -->
@@ -180,6 +180,8 @@
     <nav-item href="#{base_url}/ctermini">C termini</nav-item>
     <nav-item with="&Terminusmodification">Modifications</nav-item>
     <nav-item href="#{base_url}/api">API</nav-item>
+    <nav-item href="#{base_url}/proteins/multi_peptides">TopFINDer</nav-item>
+    <nav-item href="#{base_url}/proteins/multi_peptides">PathFINDer</nav-item>
     <nav-item href="#{base_url}/contribute">Contribute</nav-item>
     <nav-item href="#{base_url}/documentation">Help</nav-item>
     <li class="top-search" href="" style="border-right:0px;">    

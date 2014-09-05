@@ -1,3 +1,12 @@
+<%  
+  documentations = Documentation.all.group_by(&:name)
+  name = documentations['e_name'].first.short
+  input = documentations['e_name'].first.short
+  cols = documentations['e_name'].first.short
+  analyses = documentations['i-csvfile'].first.short
+%>
+
+
 <page>
 	<title:>
 	TopFINerD : the TopFIND Explorer
@@ -18,43 +27,53 @@
 	<br/>
 
 	<p>
-		<b> Protein Accessions and Peptide Sequences: </b> <br/>
+		<b> Protein Accessions and Peptide Sequences: </b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{input}'/><br/>
 		<%= text_area_tag(:all, "P06870 IVGGWECEQHS\nP0A8M0 SVVPVADVLQGR\nP07091 MMCNEFFEG\nP01019 VIHNESTCEQ\nP30990 KPRRPYIL\nP01042 SPFRSSRIGE")  %> <br/>
 	</p>
   
 	<br/>
 
 	<p><b>Peptide Sequence Format (select one)</b><br/>
-		<%= radio_button_tag :seq_format, "maxquant", true %> MaxQuant (ex. n[145.11]ENEVFLVPSR) <br/>
-		<!-- <%= radio_button_tag :seq_format, "mouse" %> TPP (ex. M.n[43.02]AGSSSLEAVR.R) <br/> -->
-		NOT SUPPORTED YET: TPP (ex. M.n[43.02]AGSSSLEAVR.R) <br/>
-		*Please have protein accession in the form "P06870" <br/>
+	supported: ENEVFLVPSR, n[145.11]ENEVFLVPSR , M.n[43.02]AGSSSLEAVR.R 
+		<!--<%= radio_button_tag :seq_format, "maxquant", true %> MaxQuant (ex. n[145.11]ENEVFLVPSR) <br/>
+		<%= radio_button_tag :seq_format, "mouse" %> TPP (ex. M.n[43.02]AGSSSLEAVR.R) <br/> 
+		NOT YET SUPPORTED: TPP (ex. M.n[43.02]AGSSSLEAVR.R) <br/>
+		*Please have protein accession in the form "P06870" <br/>-->
 	</p>
 
 	<br/>
+	
+	<p><b>Positional precision</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{name}'/><br/>
+		Number of Amino Acids to retrieve information for (leave blank for 0, up to 10)<br/>
+		<b>N-terminal</b>: <%= text_field_tag(:nterminal, "3")  %> <br/>
+		<b>C-Terminal</b>: <%= text_field_tag(:cterminal, "3")  %> <br/>
+	</p>	
 
-	<p><b>Information available</b><br/>
+	<br/>
+	<p><b>Annotation:</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{name}'/><br/>
 		<%= check_box_tag(:spec, "1", true)%> Species <br/>
-		<%= check_box_tag(:chromosome, "1", true)%> Chromosome and Band<br/>
-		<%= check_box_tag(:domain, "1", true)%> Domain <br/>
-		<%= check_box_tag(:evidence, "1", true)%> Evidences <br/>
-		<%= check_box_tag(:proteaseWeb, "1", true)%> Protease web analysis with 
-		protease: <%= text_field_tag(:pw_protease, "P14091")  %>
+		<%= check_box_tag(:chromosome, "1", true)%> Chromosome location<br/>
+		<%= check_box_tag(:domain, "1", true)%> Domains <br/>
+		<%= check_box_tag(:evidence, "1", true)%> Evidence <br/>
+	</p>
+
+	<br/>
+	 
+ 	<p><b>Analyses:</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{analyses}'/><br/>
+		<div class="box">
+		<%= check_box_tag(:proteaseWeb, "1", true)%> <b>Protease web</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{analyses}'/> <br/>
+		protease: <%= text_field_tag(:pw_protease, "P14091")  %> <br/>
 		max. path length <%= text_field_tag(:pw_maxPathLength, "4")  %><br/>
 		organism: 
 		<%= radio_button_tag :pw_org, "human", true %> human
 		<%= radio_button_tag :pw_org, "mouse" %> mouse
-		<br/>
+		
+		</div>
 	</p>
  
 	<br/>
 
-	<p>
-		Number of Amino Acids <b>N-terminal</b> to retrieve information for (leave blank for 0, up to 10)<br/>
-		<%= text_field_tag(:nterminal, "3")  %> <br/>
-		Number of Amino Acids <b>C-Terminal</b> to retrieve information for (leave blank for 0, up to 10)<br/>
-		<%= text_field_tag(:cterminal, "3")  %> <br/>
-	</p>
+
 	
 	<br/>
 
