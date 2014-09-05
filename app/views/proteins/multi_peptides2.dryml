@@ -1,0 +1,11 @@
+<page>
+	<title:>
+		TopFINerD : the TopFIND Explorer
+	</title:>
+<content:>
+<section class="content-body">  
+	<h2>TopFINDer</h2>
+	The results will be mailed to your email at <%= @email %> as soon as they are finished (about 15 minutes).
+</section>   
+</content:>
+</page>

@@ -8,7 +8,7 @@ class ProteinsController < ApplicationController
   
   autocomplete :name, :query_scope => [:name_contains, :ac_contains]
   auto_actions :all
-  show_actions :filter; :multi_peptides
+  show_actions :filter; :multi_peptides; :multi_peptides2
    
   def index
     

@@ -21,7 +21,6 @@ class TopFINDer
     @input1 = @all_input.split("\n") #array 
     @chromosome = params['chromosome']
     @domain = params['domain']
-    @isoform = params['isoform']
     @evidence = params['evidence']
     @proteaseWeb = params[:proteaseWeb]
     @spec = params['spec']
@@ -128,12 +127,13 @@ class TopFINDer
           @q[:shed] = !(@q[:domains_after].collect{|d| d.name}.include? "TRANSMEM")
         end
 
+        @mainarray << @q
+
       else
         p "NOT PROCESSED: #{@q[:acc]} at #{@q[:pep]}" 
       end
     
       print "."
-      @mainarray << @q
     }    
   
 
@@ -191,7 +191,7 @@ class TopFINDer
         output << (q[:isoforms].length > 0 ? "\tX" : "\t") 
         output << (q[:ensembl].length > 0 ? "\tX" : "\t")
         output << ("\t" + q[:proteases].collect{|p| p.shortname}.join(';'))
-        output << ("\t" + q[:otherEvidences].collect{|e| e.methodology}.join(";"))
+        output << ("\t" + q[:otherEvidences].collect{|e| e.methodology}.uniq.join(";"))
         output << (q[:tisdb].length > 0 ? "\tX" : "\t")
       end
 
