@@ -27,30 +27,22 @@
 	<br/>
 
 	<p>
-		<b> Protein Accessions and Peptide Sequences: </b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{input}'/><br/>
+		<b> Protein Accessions and Peptide Sequences: </b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Copy/paste tab seperated columns of UniProt protein accession (e.g. P01023) and peptide sequences (See below for supported formats).'/><br/>
 		<%= text_area_tag(:all, "P06870 IVGGWECEQHS\nP0A8M0 SVVPVADVLQGR\nP07091 MMCNEFFEG\nP01019 VIHNESTCEQ\nP30990 KPRRPYIL\nP01042 SPFRSSRIGE")  %> <br/>
+		supported peptide formats: <br/> ENEVFLVPSR <br/>n[145.11]ENEVFLVPSR <br/>M.n[43.02]AGSSSLEAVR.R <br/>
 	</p>
   
 	<br/>
 
-	<p><b>Peptide Sequence Format (select one)</b><br/>
-	supported: ENEVFLVPSR, n[145.11]ENEVFLVPSR , M.n[43.02]AGSSSLEAVR.R 
-		<!--<%= radio_button_tag :seq_format, "maxquant", true %> MaxQuant (ex. n[145.11]ENEVFLVPSR) <br/>
-		<%= radio_button_tag :seq_format, "mouse" %> TPP (ex. M.n[43.02]AGSSSLEAVR.R) <br/> 
-		NOT YET SUPPORTED: TPP (ex. M.n[43.02]AGSSSLEAVR.R) <br/>
-		*Please have protein accession in the form "P06870" <br/>-->
-	</p>
-
 	<br/>
 	
-	<p><b>Positional precision</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{name}'/><br/>
-		Number of Amino Acids to retrieve information for (leave blank for 0, up to 10)<br/>
+	<p><b>Positional precision</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='TopFINDer will look for information downstream and upstream of your terminus if you indicate it here. If you only want information at the precise precision enter 0 into both fields.'/><br/>
 		<b>N-terminal</b>: <%= text_field_tag(:nterminal, "3")  %> <br/>
 		<b>C-Terminal</b>: <%= text_field_tag(:cterminal, "3")  %> <br/>
 	</p>	
 
 	<br/>
-	<p><b>Annotation:</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{name}'/><br/>
+	<p><b>Annotation:</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Information in the TopFIND databases that can be retrieved'/><br/>
 		<%= check_box_tag(:spec, "1", true)%> Species <br/>
 		<%= check_box_tag(:chromosome, "1", true)%> Chromosome location<br/>
 		<%= check_box_tag(:domain, "1", true)%> Domains <br/>
@@ -59,9 +51,9 @@
 
 	<br/>
 	 
- 	<p><b>Analyses:</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{analyses}'/><br/>
+ 	<p><b>Analyses:</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Analyses available for your data'/><br/>
 		<div class="box">
-		<%= check_box_tag(:proteaseWeb, "1", true)%> <b>Protease web</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='#{analyses}'/> <br/>
+		<%= check_box_tag(:proteaseWeb, "1", true)%> <b>Protease web</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Will find proteolytic connections in the protease web from a protease to all your substrates. The protease should be indicated you. The maximal path length indicates the maximum number of steps.'/> <br/>
 		protease: <%= text_field_tag(:pw_protease, "P14091")  %> <br/>
 		max. path length <%= text_field_tag(:pw_maxPathLength, "4")  %><br/>
 		organism: 

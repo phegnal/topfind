@@ -26,8 +26,8 @@ class TopFINDer
     @spec = params['spec']
     @nterminal = params['nterminal'].to_i
     @cterminal = params['cterminal'].to_i
-    @tpp = params['tpp']
     @mainarray = []
+    @nterms = true
     @input1.each {|i|   
       @q = {}
       @q[:acc] = i.split("\s").fetch(0)
@@ -58,26 +58,39 @@ class TopFINDer
       @q[:sql_id] = @q[:protein].id
       @q[:all_names] = Searchname.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]]).uniq      
       @q[:short_name] = Proteinname.find(:all, :conditions => ['protein_id = ? AND recommended = ?', @q[:sql_id], 1]).collect{|x| x.full}.uniq[0]     
-      @q[:location] = if @tpp
-        @q[:sequence].index(@q[:pep]) + 1
+      
+      if @nterms
+        @q[:location_C] = @q[:sequence].index(@q[:pep])
       else
-        @q[:sequence].index(@q[:pep])
+        @q[:location_C] = @q[:sequence].index(@q[:pep]) + @q[:pep].length
       end
 
-      if not @q[:location].nil?
-        @q[:location_1] = @q[:location] + 1
-        @q[:location_range] = ((@q[:location] - @nterminal)..(@q[:location] + @cterminal)).to_a  
-        @q[:upstream] = if @q[:location] < 10
-          @q[:sequence][0, @q[:location]]
+      if not @q[:location_C].nil?
+        @q[:location_C_range] = ((@q[:location_C] - @nterminal)..(@q[:location_C] + @cterminal)).to_a  
+        @q[:location_N_range] = @q[:location_C_range].collect{|x| x + 1}
+        if @nterms
+          @q[:upstream] = if @q[:location_C] < 9 
+            @q[:sequence][0, @q[:location_C]]
+          else
+            @q[:sequence][@q[:location_C] - 10, 10]
+          end
         else
-          @q[:sequence][@q[:location] - 10, 10]
+          @q[:downstream] = if @q[:location_C] + 10 > @q[:sequence].length
+            @q[:sequence][@q[:location_C] + 1, @q[:sequence].length-@q[:location_C]]
+          else
+            @q[:sequence][@q[:location_C] + 1, 10]
+          end
         end
-      
+            
         # NTERMINI AND EVIDENCES
-        @q[:nterms] = Nterm.find(:all, :conditions => ["protein_id = ?", @q[:sql_id]]).select{|n| @q[:location_range].include? n.pos}
-        @q[:evidences] =  @q[:nterms].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b.id])}.flatten.collect{|n2e| n2e.evidence}
-        @q[:evidences] = @q[:evidences].select{|e| !e.nil?}
-      
+        if @nterms
+          @q[:termini] = Nterm.find(:all, :conditions => ["protein_id = ?", @q[:sql_id]]).select{|n| @q[:location_N_range].include? n.pos}
+          @q[:evidences] =  @q[:termini].collect {|b| Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', b.id])}.flatten.collect{|n2e| n2e.evidence}
+        else
+          @q[:termini] = Cterm.find(:all, :conditions => ["protein_id = ?", @q[:sql_id]]).select{|n| @q[:location_C_range].include? n.pos}
+          @q[:evidences] =  @q[:termini].collect {|b| Cterm2evidence.find(:all, :conditions => ['cterm_id = ?', b.id])}.flatten.collect{|n2e| n2e.evidence}
+        end
+        @q[:evidences] = @q[:evidences].select{|e| !e.nil?}      
         @q[:uniprot] =[]
         @q[:ensembl] =[]
         @q[:tisdb] =[]
@@ -103,8 +116,8 @@ class TopFINDer
         # CLEAVAGES
         @q[:cleavages] = Cleavage.find(:all, :conditions => ["substrate_id = ?", @q[:sql_id]])
         if not @q[:cleavages].nil?
-          @q[:cleavages] = @q[:cleavages].select{|c| @q[:location_range].include? c.pos}
-          @q[:proteases] = @q[:cleavages].collect {|c| c.protease}
+            @q[:cleavages] = @q[:cleavages].select{|c| @q[:location_C_range].include? c.pos + 1}
+            @q[:proteases] = @q[:cleavages].collect {|c| c.protease}
         else
           @q[:proteases] = []
         end
@@ -112,12 +125,12 @@ class TopFINDer
         # DOMAINS
         @q[:domains_all] = Ft.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]])
         @q[:domains_all] = @q[:domains_all].select{|d| !["HELIX", "STRAND", "TURN", "CONFLICT", "VARIANT", "VAR_SEQ"].include? d.name} # FILTER OUT SOME UNINFORMATIVE ONES
-        @q[:domains_before] = @q[:domains_all].select {|a| a.to.to_i < @q[:location_range].min}
+        @q[:domains_before] = @q[:domains_all].select {|a| a.to.to_i <= @q[:location_C]}
+        @q[:domains_after] = @q[:domains_all].select {|a| a.from.to_i >= @q[:location_C] + 1 }
         @q[:domains_at] = @q[:domains_all].select {|a| 
-          (a.from.to_i <= @q[:location_range].min and a.to.to_i >= @q[:location_range].min)  || 
-          (a.from.to_i <= @q[:location_range].max and a.to.to_i >= @q[:location_range].max)
+          (a.from.to_i <= @q[:location_C] and a.to.to_i >= @q[:location_C] + 1)        
         }
-        @q[:domains_after] = @q[:domains_all].select {|a| a.from.to_i > @q[:location_range].max }
+        
         if @q[:domains_all].collect{|d| d.name}.include? "SIGNAL"
           @q[:SignalLost] = !(@q[:domains_after].collect{|d| d.name}.include? "SIGNAL")
         end
@@ -138,19 +151,23 @@ class TopFINDer
     }    
   
 
-    # ICELOGO
-    seqs = @mainarray.select{|e| e[:location]>2 and e[:ensembl].length == 0 and e[:tisdb].length == 0 and e[:isoforms].length == 0}
-    IceLogo.new().terminusIcelogo(Species.find(1), seqs.collect{|e| e[:upstream]+":"+e[:pep]}, "#{fileDir}/IceLogo.svg", 4) if seqs.length > 0
-    # IceLogo.new().terminusIcelogo(Species.find(1), @mainarray.select{|e| e[:proteases].collect{|p| p.ac}.include? "P33434"}.collect{|e| e[:upstream]+":"+e[:pep]}, "#{fileDir}/IceLogo_mmp2.svg", 4)
+    # ICELOGO TODO ctermini
+    if @nterms
+      seqs = @mainarray.select{|e| e[:location_C]>1 and e[:ensembl].length == 0 and e[:tisdb].length == 0 and e[:isoforms].length == 0}
+      IceLogo.new().terminusIcelogo(Species.find(1), seqs.collect{|e| e[:upstream]+":"+e[:pep]}, "#{fileDir}/IceLogo.svg", 4) if seqs.length > 0
+    else
+      seqs = @mainarray.select{|e| e[:location_C] < 0  and e[:ensembl].length == 0 and e[:tisdb].length == 0 and e[:isoforms].length == 0}
+      IceLogo.new().terminusIcelogo(Species.find(1), seqs.collect{|e| e[:upstream]+":"+e[:pep]}, "#{fileDir}/IceLogo.svg", 4) if seqs.length > 0
+    end
   
     # VENN DIAGRAM
     Venn.new(@mainarray).vennDiagram("#{fileDir}/VennDiagram")
 
-    # PATHFINDING
+    # PATHFINDING TODO Ctermini
     if(@proteaseWeb == "1")
       if(not Protein.find_by_ac(params[:pw_protease].strip).nil? and params[:pw_maxPathLength].to_i > 0)
         finder = PathFinding.new(Graph.new(params[:pw_org],[]), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal)
-        @pw_paths = finder.find_all_paths(params[:pw_protease],  @mainarray.collect{|x|  {:id => x[:acc], :pos => x[:location]} })
+        @pw_paths = finder.find_all_paths(params[:pw_protease],  @mainarray.collect{|x|  {:id => x[:acc], :pos => x[:location_C]} })
         @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
         pdfPath = finder.make_graphviz(fileDir, @pw_gnames) # this saves the image but we need to define the path yet
       else
@@ -169,13 +186,14 @@ class TopFINDer
     end
 
 
-    # #CSV
+    # #CSV TODO ctermini
     path = "#{fileDir}/Full_Table.tsv"
     output = File.new(path, "w")
     output << "Accession\tInput Sequence\tRecommended Protein Name\tOther Names and IDs\t" +
     if @spec; "Species" end +
-    if @chromosome; "\tChromosome & Band\t" end +
-    "P10 to P10′\tP1′ Position" +
+    if @chromosome; "\tChromosome & Band" end +
+    "\tP10 to P10'" + 
+    "\tP1' Position" +
     if @evidence; "\tUniProt annotated start\tIsoform Start\tAlternative Spliced Start\tCleavingProteases\tOther terminus evidences\tAlternative Translation Start" end +
     if @proteaseWeb; "\tProtease Web Connections" end +
     if @domain; "\tN-terminal Features (Start to P1)\tFeatures At Position (P1')\tC-terminal Features (P2' to End)\tSignalpeptide lost\tPropeptide lost\tShed" end +
@@ -186,7 +204,7 @@ class TopFINDer
       output << "#{q[:acc]}\t#{q[:full_pep]}\t#{q[:short_name]}\t#{q[:all_names].collect{|s| s.name}.uniq.join(';')}" +
       if @spec; "\t#{q[:species]}" end +
       if @chromosome; "\t#{q[:chr].join('')}" end +
-      "\t#{q[:upstream]} | #{q[:pep]}\t#{q[:location_1]}"
+      "\t#{q[:upstream]} | #{q[:pep]}\t#{q[:location_C]+1}"
       if @evidence
         output << (q[:uniprot].length > 0 ? "\tX" : "\t")
         output << (q[:isoforms].length > 0 ? "\tX" : "\t") 
@@ -197,7 +215,7 @@ class TopFINDer
       end
 
       if @proteaseWeb
-        output << "\t" + @pw_paths[q[:acc] + "_"+ q[:location].to_s].collect{|path| 
+        output << "\t" + @pw_paths[q[:acc] + "_"+ (q[:location_C]+1).to_s].collect{|path| 
           path.collect{|node|
             @pw_gnames[node[:id]].to_s
           }.join("->")		

@@ -1,3 +1,13 @@
+<page>
+	<title:>
+	PathFINDer : the Protease Web Investigator
+</title:>
+<content:>
+<section class="content-body"> 
+	<h1>
+		PathFINDer
+	</h1>
+
 <% if @allPaths.values.select{|v| v.length > 0}.length == 0 %>
 	<%= "No Paths found" %>
 <% end %>
@@ -6,15 +16,15 @@
 	<%= image_tag "PathFINDer/pw_graphviz.svg" %>
 <% end %>
 
-<table border="0">
+<table>
 <% @sortet_subs.each do |target| -%>
 	<tr>
 	<td><b><%= "#{@gnames[target.split("_")[0]]}(#{target.split("_")[0]})"%></b></td>
 	</tr>
 	<tr>
-		<td> Protease </td> 
+		<td> PROTEASE </td> 
 		<% (@maxLength-1).times do |i| %>
-		 <td> interaction </td> <td> Protein </td>
+		 <td> INTERACTION </td> <td> PROTEIN </td>
 		<% end %>
 	</tr>
 	<% @allPaths[target].each do |path| %>
@@ -43,3 +53,7 @@
 	<tr><td> --- </td></tr>
 <% end %>
 </table>
+
+</section>
+</content:>
+</page>

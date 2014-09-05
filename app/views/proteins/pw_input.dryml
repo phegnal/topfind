@@ -1,6 +1,9 @@
 <page>
-<body:>	
-<section>
+	<title:>
+	PathFINDer : the Protease Web Investigator
+</title:>
+<content:>
+<section class="content-body"> 
 	<h1>
 		PathFINDer
 	</h1>
@@ -11,31 +14,46 @@
 		<%= radio_button_tag "network_org", "human", true %> human <br></br>
 		<%= radio_button_tag "network_org", "mouse" %> mouse
 	</p>
+	
+	<br/>
+	
 	<p>
 		<b> Proteins are from organism </b> <br></br>
 		<%= radio_button_tag "list_org", "human", true %> human <br></br>
 		<%= radio_button_tag "list_org", "mouse" %> mouse <br></br>
 	</p>
+	
+	<br/>
+	
 	<p>
 		<b> Protease UniProt ID </b><br></br>
 		<%= text_field_tag(:start, "P14091") %> <br></br>
 	</p>
+
+	<br/>
+	
 	<p>
 		<b> Substrate UniProt IDs and cleavage positions </b><br></br>
 		<%= text_area_tag(:targets, "P00734 314\nP17655 21\nP25774 31\nP09668 41\nP05120 122\nP10144 20\nP01019 40\nP01019 42\nQ9UBU3 50\nP05814 71\nQ9ULZ1 76\nP30990 157\nP01213 218\nP01042 387")  %> <br></br>
 	</p>
+
+	<br/>
+
 	<p>
 		<b> Maximum path length </b><br></br>
 		<%= text_field_tag(:maxLength, "4")  %> <br></br>
 	</p>
+	
+	<br/>
+	
 	<p>
 		<b> Find cleavages on substrates at the indicated position only </b><br></br>
-		<%= radio_button_tag "byPos", "yes", true %> yes with range from non-prime <%= text_field_tag(:rangeLeft, "3")  %> to prime <%= text_field_tag(:rangeRight, "3")  %> aminoacids<br></br>
+		<%= radio_button_tag "byPos", "yes", true %> yes with range <br/> from non-prime <%= text_field_tag(:rangeLeft, "3")  %> <br/> to prime <%= text_field_tag(:rangeRight, "3")  %> aminoacids<br></br>
 		<%= radio_button_tag "byPos", "no" %> no
 		<br></br>
 	</p>
-	<%= submit_tag("Process") %>
+	<%= submit_tag("Find paths") %>
 	<% end %>
 </section>
-</body:>
+</content:>
 </page>

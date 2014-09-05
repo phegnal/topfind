@@ -1,14 +1,17 @@
 class ProteinsController < ApplicationController
 
   require 'listTools/topFINDer'
+  require 'graph/pathFinding'
+  require 'graph/graph'
   
+    
   hobo_model_controller
   
   caches_page :show
   
   autocomplete :name, :query_scope => [:name_contains, :ac_contains]
   auto_actions :all
-  show_actions :filter; :multi_peptides; :multi_peptides2
+  show_actions :filter; :multi_peptides; :multi_peptides2; :pw_input; :pw_output
    
   def index
     
@@ -645,7 +648,7 @@ class ProteinsController < ApplicationController
       # CLEAN UP INPUT
       start = params["start"].strip
       targets = params["targets"].split("\n").collect{|s| {:id => s.split("\s")[0], :pos => s.split("\s")[1].to_i}}
-      maxLength = params["maxLength"].to_i
+      @maxLength = params["maxLength"].to_i
       byPos = params["byPos"] == "yes"
       rangeLeft = params["rangeLeft"] == "" ? 0 : params["rangeLeft"].to_i
       rangeRight = params["rangeRight"] == "" ? 0 : params["rangeRight"].to_i
@@ -653,7 +656,7 @@ class ProteinsController < ApplicationController
       nwOrg = params["network_org"]
       listOrg = params["list_org"]
       # FIND PATHS
-      finder = PathFinding.new(Graph.new(nwOrg), maxLength, byPos, rangeLeft, rangeRight)
+      finder = PathFinding.new(Graph.new(nwOrg, []), @maxLength, byPos, rangeLeft, rangeRight)
       if(nwOrg == "mouse" && listOrg == "human") # nw is mouse and list is human
         @allPaths = finder.find_all_paths_map2mouse(start, targets)
       elsif(nwOrg == "human" && listOrg == "mouse")  # nw is human and list is mouse
@@ -666,7 +669,6 @@ class ProteinsController < ApplicationController
       @allPaths =  finder.get_domain_info(["SIGNAL", "PROPEP", "ACT_SITE", "TRANSMEM"], nil)
       @sortet_subs = @allPaths.keys.sort{|x, y| @allPaths[y].size <=> @allPaths[x].size}      # SORT OUTPUT
       pdfPath = finder.make_graphviz("./public/images/PathFINDer", @gnames)
-      #Emailer.new().send(["NikolausFortelny@gmail.com"], nil)
     end 
   end
   
