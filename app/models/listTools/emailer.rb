@@ -12,7 +12,7 @@ class Emailer
 
 part1 = <<MESSAGE_END
 From: TopFIND <#{sender}>
-To: #{recipient}
+To: XYZ <#{recipient}>
 Subject: TopFINDer results
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary=#{marker}

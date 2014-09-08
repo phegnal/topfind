@@ -699,19 +699,12 @@ class ProteinsController < ApplicationController
 
 
   def multi_peptides2
+    # TODO add test for email!
     @email = params[:email]
     TopFINDer.new().delay(:priority => 20).analyze(params)
+    # TopFINDer.new().analyze(params)
   end
   
-
-
-
-
-
-
-
-
-
 
   def trying_featurePanel
     
