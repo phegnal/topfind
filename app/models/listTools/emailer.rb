@@ -12,7 +12,7 @@ class Emailer
 
 part1 = <<MESSAGE_END
 From: TopFIND <#{sender}>
-To: XYZ <#{recipient}>
+To: recipient <#{recipient}>
 Subject: TopFINDer results
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary=#{marker}
@@ -43,8 +43,8 @@ Content-Disposition: attachment; filename="TopFINDer_Results.zip"
 --#{marker}--
 EOF
 
-mailtext = part1 + part2 + part3
-
+	mailtext = part1 + part2 + part3
+	
     begin 
       smtp = Net::SMTP.new 'smtp.gmail.com', 587
       smtp.enable_starttls
@@ -54,7 +54,7 @@ mailtext = part1 + part2 + part3
         recipient)
       end
     rescue Exception => e  
-      print "Exception occured: " + e  
+      print "TopFIND mailer exception occured: " + e  
     end  
   end
 end

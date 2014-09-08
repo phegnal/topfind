@@ -69,11 +69,16 @@ class TopFINDer
       @q[:location_C_range] = ((@q[:location_C] - @nterminal)..(@q[:location_C] + @cterminal)).to_a  
       @q[:location_N_range] = @q[:location_C_range].collect{|x| x + 1}
       if @nterms
-        if @q[:location_C] < 9
+        if @q[:location_C] < 10
           @q[:upstream] =  @q[:sequence][0, @q[:location_C]]
         else
           @q[:upstream] =  @q[:sequence][@q[:location_C] - 10, 10]
         end
+        if (@q[:sequence].length - @q[:location_C]) < 10
+          @q[:downstream] =  @q[:sequence][@q[:location_C], @q[:sequence].length - @q[:location_C]]
+        else
+          @q[:downstream] =  @q[:sequence][@q[:location_C], 10]
+        end        
       else
         if @q[:location_C] + 10 > @q[:sequence].length
           @q[:downstream] =  @q[:sequence][@q[:location_C] + 1, @q[:sequence].length-@q[:location_C]]
@@ -86,20 +91,10 @@ class TopFINDer
         [@q[:protein].chromosome, @q[:protein].band] 
       end
     
-      @q[:species] = if @q[:protein].species_id == 1
-        "Human"
-      elsif @q[:protein].species_id == 2
-        "Mouse"
-      elsif @q[:protein].species_id == 3
-        "E. Coli"
-      elsif @q[:protein].species_id == 4
-        "Yeast"
-      elsif @q[:protein].species_id == 5
-        "Arabidopsis"
-      end
+      @q[:species] = @q[:protein].species.common_name
+      
       @q[:sql_id] = @q[:protein].id
       @q[:all_names] = Searchname.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]]).uniq      
-      @q[:short_name] = Proteinname.find(:all, :conditions => ['protein_id = ? AND recommended = ?', @q[:sql_id], 1]).collect{|x| x.full}.uniq[0]     
       
       # NTERMINI AND EVIDENCES
       if @nterms
@@ -218,25 +213,24 @@ class TopFINDer
     # #CSV TODO ctermini
     path = "#{fileDir}/Full_Table.tsv"
     output = File.new(path, "w")
-    output << "Accession\tInput Sequence\tRecommended Protein Name\tOther Names and IDs\t" +
-    if @spec; "Species" end +
-    if @chromosome; "\tChromosome & Band" end +
-    "\tP10 to P10'" + 
-    "\tP1' Position" +
-    if @evidence; "\tUniProt annotated start\tIsoform Start\tAlternative Spliced Start\tCleavingProteases\tOther terminus evidences\tAlternative Translation Start" end +
-    if @proteaseWeb; "\tProtease Web Connections" end +
-    if @domain; "\tN-terminal Features (Start to P1)\tFeatures At Position (P1')\tC-terminal Features (P2' to End)\tSignalpeptide lost\tPropeptide lost\tShed" end +
-    "\n"
+    output << "Accession\tInput Sequence\tRecommended Protein Name\tOther Names and IDs"
+    output << "\tSpecies" if @spec
+    output << "\tChromosome band" if @chromosome
+    output << "\tP10 to P10'" + "\tP1' Position"
+    output << "\tUniProt annotated start\tIsoform Start\tAlternative Spliced Start\tCleavingProteases\tOther terminus evidences\tAlternative Translation Start" if @evidence
+    output << "\tProtease Web Connections" if @proteaseWeb
+    output << "\tN-terminal Features (Start to P1)\tFeatures At Position (P1')\tC-terminal Features (P2' to End)\tSignalpeptide lost\tPropeptide lost\tShed" if @domain
+    output << "\n"
   
   
     @mainarray.each{|q|
       if !q[:found]
-        output << "#{q[:acc]}\t#{q[:full_pep]}"
+        output << "#{q[:acc]}\t#{q[:full_pep]}\n"
       else
-        output << "#{q[:acc]}\t#{q[:full_pep]}\t#{q[:short_name]}\t#{q[:all_names].collect{|s| s.name}.uniq.join(';')}"
+        output << "#{q[:acc]}\t#{q[:full_pep]}\t#{q[:protein].recname}\t#{q[:all_names].collect{|s| s.name}.uniq.join(';')}"
         output << "\t#{q[:species]}" if @spec
         output << "\t#{q[:chr].join('')}" if @chromosome
-        output << "\t#{q[:upstream]} | #{q[:pep]}\t#{q[:location_C]+1}"
+        output << "\t#{q[:upstream]} | #{q[:downstream]}\t#{q[:location_C]+1}"
         if @evidence
           output << (q[:uniprot].length > 0 ? "\tX" : "\t")
           output << (q[:isoforms].length > 0 ? "\tX" : "\t") 
