@@ -90,7 +90,7 @@ class Nterm < ActiveRecord::Base
 
   def self.generate_csv(ids)
     FasterCSV.generate({:col_sep => "\t"}) do |csv|
-      csv << ['topcat terminus id','position','sequence','protein (uniprot ac)','topcat evidence ids']
+      csv << ['topfind terminus id','position','sequence','protein (uniprot ac)','topfind evidence ids']
       ids.each do |id|
         n = Nterm.find(id)       
         csv << [n.externalid,n.pos,n.protein.sequence[n.pos-1..n.pos+9],n.protein.ac,n.evidences.*.externalid.join(':')]

@@ -38,6 +38,9 @@ class TopFINDer
         Protein.find(:first, :conditions => ["ac = ?", @q[:acc]])
       else
       end
+      
+      ## added by philipp - not quite sure if this breaks the output in terms of consistency with the input but otherwise the entire thing fails if we don't find the protein
+      next unless @q[:protein].present?
     
       @q[:chr] = if @chromosome 
         [@q[:protein].chromosome, @q[:protein].band] 

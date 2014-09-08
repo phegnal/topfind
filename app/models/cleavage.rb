@@ -148,26 +148,26 @@ class Cleavage < ActiveRecord::Base
       																	  :code => 'TopFIND:0000001')
       	   @newevidence.save
       	   
-			if pos.to_i-1 >= 2
+			if pos.to_i >= 5
 				ct_idstring = "#{substrate.ac}-#{pos}-unknown"
 				puts ct_idstring
 				cterm = self.cterm = Cterm.find_or_create_by_idstring(
 				  :idstring => ct_idstring,  
 				  :protein => self.substrate,
 				  :isoform => self.substrateisoform,
-				  :pos => pos-1,
+				  :pos => pos,
 				  :terminusmodification => Terminusmodification.find_or_create_by_name('unknown'))
 			  
 			   cterm.evidences.include?(@newevidence) ? 1 : cterm.evidences << @newevidence
 			end
 
-			if pos.to_i <= self.substrate.aalen.to_i-2
+			if pos.to_i+1 <= self.substrate.aalen.to_i-5
 				nt_idstring = "#{substrate.ac}-#{pos+1}-unknown"
 				nterm = self.nterm = Nterm.find_or_create_by_idstring(
 				  :idstring => nt_idstring,  
 				  :protein => self.substrate,
 				  :isoform => self.substrateisoform,
-				  :pos => pos,
+				  :pos => pos.to_i+1,
 				  :terminusmodification => Terminusmodification.find_or_create_by_name('unknown'))
 			  
 			   nterm.evidences.include?(@newevidence) ? 1 : nterm.evidences << @newevidence
