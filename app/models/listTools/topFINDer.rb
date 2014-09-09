@@ -31,14 +31,22 @@ class TopFINDer
     @input1.each {|i|  
       print "." 
       @q = {}
-
-      @q[:acc] = i.split("\s").fetch(0)
-      #@q[:pep] = i.split("\s").fetch(1).gsub(/[^[:upper:]]+/, "")
-      @q[:pep] = i.split("\s").fetch(1).gsub(/^.{1}\./,"").gsub(/\..{1}$/,"").gsub(/[^[:upper:]]+/, "")
-      @q[:full_pep] = i.split("\s").fetch(1)
-      @q[:protein] = if Protein.find(:first, :conditions => ["ac = ?", @q[:acc]]) != nil
-        Protein.find(:first, :conditions => ["ac = ?", @q[:acc]])
-      else
+	  iSplit = i.split("\s")
+	  if iSplit.length < 2
+	  	@q[:found] = false
+	  	@q[:acc] = i
+	  	@q[:peptide] = "incomplete row"
+        @mainarray << @q
+        next
+	  else
+		  @q[:acc] = iSplit.fetch(0)
+		  #@q[:pep] = i.split("\s").fetch(1).gsub(/[^[:upper:]]+/, "")
+		  @q[:pep] = iSplit.fetch(1).gsub(/^.{1}\./,"").gsub(/\..{1}$/,"").gsub(/[^[:upper:]]+/, "")
+		  @q[:full_pep] = iSplit.fetch(1)
+		  @q[:protein] = if Protein.find(:first, :conditions => ["ac = ?", @q[:acc]]) != nil
+			Protein.find(:first, :conditions => ["ac = ?", @q[:acc]])
+		  else
+		  end
       end
       
       # get location if protein is found

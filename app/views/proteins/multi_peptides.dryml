@@ -51,9 +51,9 @@
 
 	<br/>
 	 
- 	<p><b>Analyses:</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Analyses available for your data'/><br/>
+ 	<p><b>Analyses:</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='These analyses will be run on your submitted data.'/><br/>
 		<div class="box">
-		<%= check_box_tag(:proteaseWeb, "1", true)%> <b>Protease web</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Will find proteolytic connections in the protease web from a protease to all your substrates. The protease should be indicated you. The maximal path length indicates the maximum number of steps.'/> <br/>
+		<%= check_box_tag(:proteaseWeb, "1", true)%> <b>Protease web</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='This program find paths (multi-step connections) in the protease web from one protease to all the submitted substrates. Please indicate the protease you are interested in (UniProt accession, e.g. P01023). The maximal path length is the maximum number of steps any path can have.'/> <br/>
 		protease: <%= text_field_tag(:pw_protease, "P14091")  %> <br/>
 		max. path length <%= text_field_tag(:pw_maxPathLength, "4")  %><br/>
 		organism: 

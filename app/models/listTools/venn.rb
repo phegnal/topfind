@@ -13,7 +13,7 @@ class Venn
       @@r.void_eval("x[[#{i+1}]]=v")
     }
     @@r.void_eval("y = data.frame(do.call(rbind, x))")
-    @@r.void_eval("colnames(y) = c('UniProt', 'Isoform', 'Cleaved', 'Spliced', 'Other_Terminomics')")
+    @@r.void_eval("colnames(y) = c('UniProt', 'Isoform', 'Cleaved', 'Spliced', 'Terminomics')")
     @@r.void_eval("library(gplots)")
     @@r.void_eval("svg('#{path}.svg')")
     @@r.void_eval("venn(y)")
