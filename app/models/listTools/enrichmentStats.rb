@@ -85,7 +85,7 @@ class EnrichmentStats
     rownames = []
     keepRows.each{|i|
       matrix2 << matrix[i]
-      rownames << @@mainarray[i][:protein].shortname+"_"+@@mainarray[i][:location_1].to_s
+      rownames << @@mainarray[i][:protein].shortname+"_"+@@mainarray[i][:location_C].to_s
     }
     plotHeatmap(path, matrix2, proteases, rownames)
   end
@@ -99,23 +99,58 @@ class EnrichmentStats
     @@r.assign("psMat", matrix)
     @@r.assign("proteaseNames", proteaseNames)
     @@r.assign("substrateNames", substrateNames)
-    @@r.void_eval("psMat <- do.call(rbind, psMat)")
-    @@r.void_eval("colnames(psMat) <- proteaseNames")
-    @@r.void_eval("rownames(psMat) <- substrateNames")
-    @@r.void_eval("svg('#{path}.svg')")
-    @@r.void_eval("heatmap(psMat, scale = 'none', col=c('black', 'red'))")
-    @@r.void_eval('dev.off()')
+    @@r.void_eval("m <- do.call(rbind, psMat)")
+    @@r.void_eval("colnames(m) <- proteaseNames")
+    @@r.void_eval("rownames(m) <- substrateNames")
+    @@r.void_eval('m=m[hclust(dist(m))$order, ]')
+    @@r.void_eval('m=m[,hclust(dist(t(m)))$order]')
+    @@r.void_eval("library(ggplot2)")
+    @@r.void_eval("library(reshape2)")
+    @@r.void_eval('df = melt(m)')
+    @@r.void_eval('colnames(df) = c("Terminus", "Protease", "Cleavage")')
+    @@r.void_eval('df$Cleavage = factor(df$Cleavage == 1, levels = c("TRUE", "FALSE"))')
+    @@r.void_eval('p <- ggplot(data=df, aes(x=Protease, y=Terminus))')
+    @@r.void_eval('p <- p + geom_tile(aes(fill = Cleavage))')
+    @@r.void_eval('p <- p + scale_fill_manual(values = c("red", "black"))')
+    @@r.void_eval('p <- p + theme_bw()')
+    @@r.void_eval('p <- p + theme(axis.text.x = element_text(angle = 90, hjust = 1))')
+    @@r.void_eval("ggsave('#{path}.svg', width = 3+ length(proteaseNames)/7, height = 3+ length(substrateNames)/7, limitsize = F, plot = p)")
   end
   
+  # def plotHeatmap(path, matrix, proteaseNames, substrateNames)
+  #   @@r.assign("psMat", matrix)
+  #   @@r.assign("proteaseNames", proteaseNames)
+  #   @@r.assign("substrateNames", substrateNames)
+  #   @@r.void_eval("psMat <- do.call(rbind, psMat)")
+  #   @@r.void_eval("colnames(psMat) <- proteaseNames")
+  #   @@r.void_eval("rownames(psMat) <- substrateNames")
+  #   @@r.void_eval("svg('#{path}.svg', height = 20, width = 20)")
+  #   # , width = min(c((3 + length(proteaseNames))/7, 20)), height = min(c((3 + length(substrateNames))/7, 20)))")
+  #   # p @@r.eval("psMat")
+  #   @@r.void_eval("heatmap(psMat, scale = 'none', col=c('black', 'red'))")
+  #   @@r.void_eval('dev.off()')
+  # end
   
   def plotProteaseCounts(path)
     @@r.assign("counts", @@statsArray.collect{|x| x[:listCount]})
     @@r.assign("countsNam", @@statsArray.collect{|x| x[:protein].shortname})
-    @@r.void_eval("names(counts) <- countsNam")
-    @@r.void_eval("svg('#{path}.svg')")
-    @@r.void_eval("barplot(sort(counts, decreasing = T), las = 2, col = 'blue', ylab = 'Cleavages in the list')")
-    @@r.void_eval('dev.off()')
+    @@r.assign("significant", @@statsArray.collect{|x| x[:fetAdj] < 0.05})
+    @@r.void_eval("df <- data.frame(Protease = factor(countsNam, levels = countsNam[order(counts, decreasing = T)]), Cleavages = counts, Significant = significant)")
+    @@r.void_eval('palette <- c("black", "red")')
+    @@r.void_eval("library(ggplot2)")
+    @@r.void_eval('p <- ggplot(data = df, aes(y = Cleavages, x = Protease, fill = Significant)) + geom_bar(stat="identity") + theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +  scale_fill_manual(values=palette)')
+    @@r.void_eval("ggsave(paste0('#{path}','.svg'), width = 3+ length(counts)/7, limitsize = F, plot = p)")
+    @@r.void_eval("dev.off()")
   end
+    
+  # def plotProteaseCounts2(path)
+  #   @@r.assign("counts", @@statsArray.collect{|x| x[:listCount]})
+  #   @@r.assign("countsNam", @@statsArray.collect{|x| x[:protein].shortname})
+  #   @@r.void_eval("names(counts) <- countsNam")
+  #   @@r.void_eval("svg('#{path}.svg')")
+  #   @@r.void_eval("barplot(sort(counts, decreasing = T), las = 2, col = 'blue', ylab = 'Cleavages in the list')")
+  #   @@r.void_eval('dev.off()')
+  # end
 
   
 end

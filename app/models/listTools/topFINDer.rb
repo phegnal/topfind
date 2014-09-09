@@ -199,13 +199,13 @@ class TopFINDer
       es.printStatsArrayToFile("#{fileDir}/ProteaseStats.tsv")
       begin
         es.plotProteaseCounts("#{fileDir}/Protease_histogram")
-      rescue Exception => e  
-        print "Exception occured making Protease Histogram: " + e 
+      rescue Exception => e
+        print "Exception occured making Protease Histogram: " + e
       end
       begin
         es.plotProteaseSubstrateHeatmap("#{fileDir}/ProteaseSubstrate_matrix")
-      rescue Exception => e  
-        print "Exception occured making Protease Heatmap: " + e 
+      rescue Exception => e
+        print "Exception occured making Protease Heatmap: " + e
       end
     end
 

@@ -9,11 +9,11 @@ class Venn
   def vennDiagram(path)
     @@r.void_eval("x = list()")
     @@mainarray.each_with_index{|x, i|
-      @@r.assign("v", [x[:uniprot].length > 0, x[:isoforms].length > 0, x[:proteases].length > 0, x[:ensembl].length > 0])
+      @@r.assign("v", [x[:uniprot].length > 0, x[:isoforms].length > 0, x[:proteases].length > 0, x[:ensembl].length > 0, x[:otherEvidences].length > 0])
       @@r.void_eval("x[[#{i+1}]]=v")
     }
     @@r.void_eval("y = data.frame(do.call(rbind, x))")
-    @@r.void_eval("colnames(y) = c('Canonical', 'Isoform', 'Cleaved', 'Spliced')")
+    @@r.void_eval("colnames(y) = c('UniProt', 'Isoform', 'Cleaved', 'Spliced', 'Other_Terminomics')")
     @@r.void_eval("library(gplots)")
     @@r.void_eval("svg('#{path}.svg')")
     @@r.void_eval("venn(y)")
