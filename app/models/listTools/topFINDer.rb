@@ -11,11 +11,21 @@ class TopFINDer
     require 'listTools/venn'
     require 'listTools/emailer'
     
+    
+    date = Time.new.strftime("%Y_%m_%d")
+    if params[:label].nil?
+      label = "TopFINDer_results" 
+    else
+      label = params[:label].gsub(/\s/, '_')
+    end
+    label = date + "_" + label
+    
     nr = Dir.entries("#{RAILS_ROOT}/public/explorer").collect{|x| x.to_i}.max + 1
     dir = "#{RAILS_ROOT}/public/explorer/" + nr.to_s 
     Dir.mkdir(dir)
-    fileDir = dir + "/TopFINDer_results"
+    fileDir = dir + "/#{label}"
     Dir.mkdir(fileDir)
+    
   
     @all_input = params["all"].strip #string
     @input1 = @all_input.split("\n") #array 
@@ -27,7 +37,7 @@ class TopFINDer
     @nterminal = params['nterminal'].to_i
     @cterminal = params['cterminal'].to_i
     @mainarray = []
-    @nterms = true
+    @nterms = (params[:nterms] == "nterms")
     @input1.each {|i|  
       print "." 
       @q = {}
@@ -35,7 +45,7 @@ class TopFINDer
 	  if iSplit.length < 2
 	  	@q[:found] = false
 	  	@q[:acc] = i
-	  	@q[:peptide] = "incomplete row"
+	  	@q[:full_pep] = "incomplete row"
         @mainarray << @q
         next
 	  else
@@ -50,7 +60,7 @@ class TopFINDer
       end
       
       # get location if protein is found
-      if not @q[:protein].present?
+      if not @q[:protein].present? or @q[:pep] == ""
         @q[:found] = false
         @mainarray << @q
         next
@@ -58,8 +68,11 @@ class TopFINDer
         @q[:sequence] = @q[:protein].sequence
         if @nterms
           @q[:location_C] = @q[:sequence].index(@q[:pep])
-        else # TODO c-termini will fail I think
-          @q[:location_C] = @q[:sequence].index(@q[:pep]) + @q[:pep].length
+        else
+          @q[:location_C] = @q[:sequence].index(@q[:pep]) 
+          if not @q[:location_C].nil?
+            @q[:location_C] = @q[:location_C] + @q[:pep].length 
+          end
         end
       end
 
@@ -76,24 +89,16 @@ class TopFINDer
 
       @q[:location_C_range] = ((@q[:location_C] - @nterminal)..(@q[:location_C] + @cterminal)).to_a  
       @q[:location_N_range] = @q[:location_C_range].collect{|x| x + 1}
-      if @nterms
-        if @q[:location_C] < 10
-          @q[:upstream] =  @q[:sequence][0, @q[:location_C]]
-        else
-          @q[:upstream] =  @q[:sequence][@q[:location_C] - 10, 10]
-        end
-        if (@q[:sequence].length - @q[:location_C]) < 10
-          @q[:downstream] =  @q[:sequence][@q[:location_C], @q[:sequence].length - @q[:location_C]]
-        else
-          @q[:downstream] =  @q[:sequence][@q[:location_C], 10]
-        end        
+      if @q[:location_C] < 10
+        @q[:upstream] =  @q[:sequence][0, @q[:location_C]]
       else
-        if @q[:location_C] + 10 > @q[:sequence].length
-          @q[:downstream] =  @q[:sequence][@q[:location_C] + 1, @q[:sequence].length-@q[:location_C]]
-        else
-          @q[:downstream] =  @q[:sequence][@q[:location_C] + 1, 10]
-        end
+        @q[:upstream] =  @q[:sequence][@q[:location_C] - 10, 10]
       end
+      if (@q[:sequence].length - @q[:location_C]) < 10
+        @q[:downstream] =  @q[:sequence][@q[:location_C], @q[:sequence].length - @q[:location_C]]
+      else
+        @q[:downstream] =  @q[:sequence][@q[:location_C], 10]
+      end        
           
       @q[:chr] = if @chromosome 
         [@q[:protein].chromosome, @q[:protein].band] 
@@ -171,14 +176,14 @@ class TopFINDer
   
     @foundPeptides = @mainarray.select{|x| x[:found]}
 
-    # ICELOGO TODO ctermini
-    if @nterms
+    # ICELOGO
+    if @nterms # >1 because this is a 0 based count
       seqs = @foundPeptides.select{|e| e[:location_C]>1 and e[:ensembl].length == 0 and e[:tisdb].length == 0 and e[:isoforms].length == 0}
-      IceLogo.new().terminusIcelogo(Species.find(1), seqs.collect{|e| e[:upstream]+":"+e[:pep]}, "#{fileDir}/IceLogo.svg", 4) if seqs.length > 0
     else
-      seqs = @foundPeptides.select{|e| e[:location_C] < 0  and e[:ensembl].length == 0 and e[:tisdb].length == 0 and e[:isoforms].length == 0}
-      IceLogo.new().terminusIcelogo(Species.find(1), seqs.collect{|e| e[:upstream]+":"+e[:pep]}, "#{fileDir}/IceLogo.svg", 4) if seqs.length > 0
+      seqs = @foundPeptides.select{|e| e[:location_C] > e[:sequence].length  and e[:ensembl].length == 0 and e[:tisdb].length == 0 and e[:isoforms].length == 0}
     end
+  
+    IceLogo.new().terminusIcelogo(Species.find(1), seqs.collect{|e| e[:upstream]+":"+e[:downstream]}, "#{fileDir}/IceLogo.svg", 4) if seqs.length > 0
   
     # VENN DIAGRAM
     begin
@@ -221,24 +226,36 @@ class TopFINDer
     # #CSV TODO ctermini
     path = "#{fileDir}/Full_Table.tsv"
     output = File.new(path, "w")
-    output << "Accession\tInput Sequence\tRecommended Protein Name\tOther Names and IDs"
+    output << "Accession\tInput Sequence\tProtein found\tRecommended Protein Name\tOther Names and IDs"
     output << "\tSpecies" if @spec
     output << "\tChromosome band" if @chromosome
-    output << "\tP10 to P10'" + "\tP1' Position"
+    output << "\tP10 to P10'" + "\t"
+    if @nterms
+      output << "P1' Position"
+    else
+      output << "P1 Position"
+    end
     output << "\tUniProt annotated start\tIsoform Start\tAlternative Spliced Start\tCleavingProteases\tOther terminus evidences\tAlternative Translation Start" if @evidence
     output << "\tProtease Web Connections" if @proteaseWeb
-    output << "\tN-terminal Features (Start to P1)\tFeatures At Position (P1')\tC-terminal Features (P2' to End)\tSignalpeptide lost\tPropeptide lost\tShed" if @domain
+    output << "\tN-terminal Features (Start to P1)\tFeatures spanning terminus (P1 to P1')\tC-terminal Features (P1' to End)\tSignalpeptide lost\tPropeptide lost\tShed" if @domain
     output << "\n"
   
   
     @mainarray.each{|q|
-      if !q[:found]
-        output << "#{q[:acc]}\t#{q[:full_pep]}\n"
+      if q[:found].nil?
+        output << "#{q[:acc]}\t#{q[:full_pep]}\tno\n"
+      elsif !q[:found]
+        output << "#{q[:acc]}\t#{q[:full_pep]}\tno\n"
       else
-        output << "#{q[:acc]}\t#{q[:full_pep]}\t#{q[:protein].recname}\t#{q[:all_names].collect{|s| s.name}.uniq.join(';')}"
+        output << "#{q[:acc]}\t#{q[:full_pep]}\tYES\t#{q[:protein].recname}\t#{q[:all_names].collect{|s| s.name}.uniq.join(';')}"
         output << "\t#{q[:species]}" if @spec
         output << "\t#{q[:chr].join('')}" if @chromosome
-        output << "\t#{q[:upstream]} | #{q[:downstream]}\t#{q[:location_C]+1}"
+        output << "\t#{q[:upstream]} | #{q[:downstream]}"
+        if @nterms
+          output << "\t#{q[:location_C]+1}"
+        else
+          output << "\t#{q[:location_C]}"
+        end
         if @evidence
           output << (q[:uniprot].length > 0 ? "\tX" : "\t")
           output << (q[:isoforms].length > 0 ? "\tX" : "\t") 
@@ -272,9 +289,9 @@ class TopFINDer
     }
     output.close
 
-    x = system "cd #{dir}; zip -r TopFINDer_results TopFINDer_results"
+    x = system "cd #{dir}; zip -r #{label} #{label}"
   
-    Emailer.new().sendTopFINDer(params[:email], "#{dir}/TopFINDer_results.zip")
+    Emailer.new().sendTopFINDer(params[:email], "#{dir}/#{label}.zip", label)
 
     p "DONE"
   end

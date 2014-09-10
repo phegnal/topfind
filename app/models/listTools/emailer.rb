@@ -2,7 +2,7 @@ class Emailer
   def initialize()
   end
   
-  def sendTopFINDer(recipient, attachment)
+  def sendTopFINDer(recipient, attachment, label)
     require 'net/smtp'
 
     sender = "topfind.clip@gmail.com"
@@ -13,7 +13,7 @@ class Emailer
 part1 = <<MESSAGE_END
 From: TopFIND <#{sender}>
 To: recipient <#{recipient}>
-Subject: TopFINDer results
+Subject: TopFINDer results #{label}
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary=#{marker}
 --#{marker}
@@ -35,9 +35,9 @@ EOF
     encodedcontent = [filecontent].pack("m")   # base64
 
 part3 =<<EOF
-Content-Type: multipart/mixed; name=\"TopFINDer_Results.zip\"
+Content-Type: multipart/mixed; name=\"#{label}.zip\"
 Content-Transfer-Encoding:base64
-Content-Disposition: attachment; filename="TopFINDer_Results.zip"
+Content-Disposition: attachment; filename="#{label}.zip"
 
 #{encodedcontent}
 --#{marker}--

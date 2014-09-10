@@ -25,7 +25,22 @@
 	</p>
 
 	<br/>
+	
+	<p>
+		<b>Label</b> for your analysis <br/> (this is for your to identify your analysis):<br/> 
+		<%= text_field_tag(:label)%><br/>
+	</p>
 
+	<br/>
+
+	<p>
+		Is this a list of <b>N- or C-termini?</b><br/>
+		<%= radio_button_tag :nterms, "nterms", true %> N-termini <br/>
+		<%= radio_button_tag :nterms, "cterms" %> C-termini
+	</p>
+
+	<br/>
+	
 	<p>
 		<b> Protein Accessions and Peptide Sequences: </b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Copy/paste tab seperated columns of UniProt protein accession (e.g. P01023) and peptide sequences (See below for supported formats).'/><br/>
 		<%= text_area_tag(:all, "P06870 IVGGWECEQHS\nP0A8M0 SVVPVADVLQGR\nP07091 MMCNEFFEG\nP01019 VIHNESTCEQ\nP30990 KPRRPYIL\nP01042 SPFRSSRIGE")  %> <br/>
