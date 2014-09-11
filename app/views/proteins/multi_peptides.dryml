@@ -27,7 +27,7 @@
 	<br/>
 	
 	<p>
-		<b>Label</b> for your analysis <br/> (this is for your to identify your analysis):<br/> 
+		<b>Label</b> for your analysis <br/> (this is for you to identify your analysis):<br/> 
 		<%= text_field_tag(:label)%><br/>
 	</p>
 
