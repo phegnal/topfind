@@ -2,12 +2,14 @@ class PathFinding
 
   require 'graph/mapMouseHuman'
 
-  def initialize(graph, maxSteps, byPos, rangeLeft, rangeRight)
-    @g = graph.graph_array()
+  def initialize(graph, maxSteps, byPos, rangeLeft, rangeRight, infer_target_edges)
+    @g = graph
     @maxSteps = maxSteps
     @byPos = byPos # defines whether the target has to be hit at exactly that position
     @rangeLeft = rangeLeft
     @rangeRight = rangeRight
+    @@infer_target_edges = infer_target_edges
+    @@g2 = nil
   end
 
 
@@ -20,12 +22,14 @@ class PathFinding
   
   def find_all_paths_map2mouse(start, targets)
     mapper = MapMouseHuman.new()
-    return find_all_paths(mapper.m4h(start), targets.collect{|hash| {:id => mapper.m4h(hash[:id]), :pos => hash[:pos]}})
+    mousetargets = targets.collect{|hash| mapper.m4h(hash[:id]).collect{|mid| {:id => mid, :pos => hash[:pos]} }}.flatten
+    return find_all_paths(mapper.m4h(start)[0], mousetargets)
   end
 
   def find_all_paths_map2human(start, targets)
     mapper = MapMouseHuman.new()
-    return find_all_paths(mapper.h4m(start), targets.collect{|hash| {:id => mapper.h4m(hash[:id]), :pos => hash[:pos]}})
+    humantargets = targets.collect{|hash| mapper.h4m(hash[:id]).collect{|hid| {:id => hid, :pos => hash[:pos]} }}.flatten
+    return find_all_paths(mapper.h4m(start)[0], humantargets)
   end
 
   # find paths from start protease to one target
@@ -37,27 +41,32 @@ class PathFinding
   # find paths from start protease to all targets
   def find_all_paths(start, targets)
     @allPaths = Hash.new
+    @@g2 = @g.clone()
+    targets.each{|p| @@g2.add_edge(start, p[:id], p[:pos], "l")} if @@infer_target_edges
+    @@g2 = @@g2.graph_array()
     if not Protein.find_by_ac(start).nil?
       targets.each{|t| @allPaths[t[:id]+"_"+t[:pos].to_s] = []}
       # limit targets to those in the graph
-      graphids = (@g.keys + @g.values.collect{|s| s.collect{|x| x[:id]}}.flatten).uniq
+      graphids = (@@g2.keys + @@g2.values.collect{|s| s.collect{|x| x[:id]}}.flatten).uniq
       targets2 = targets.select{|t| graphids.include? t[:id]}
+      p "start protease not found #{start}" if not graphids.include? start
       # look for targets in the graph
-      find_all_for_targets({:id => start, :pos => -1}, targets2, [])
+      find_all_for_targets({:id => start, :pos => -1, :type => "s"}, targets2, [], start)
     else
-      targets.each{|target| @allPaths[target[:id]+"_"+target[:pos].to_s] = [{:id => "Start protease not found", :pos => 0}] }
+      targets.each{|target| @allPaths[target[:id]+"_"+target[:pos].to_s] = [{:id => "Start protease not found", :pos => 0, :type => "s"}] }
     end
     return @allPaths
   end
 
   # recursive method that goes through the graph and looks for all paths from start to targets
   # call first time with currentPath = []
-  def find_all_for_targets(current, targets, currentPath)
+  def find_all_for_targets(current, targets, currentPath, start)
     currentPath << current
     # look at successors of current
-    successors = @g[current[:id]]
+    successors = @@g2[current[:id]]
     if(successors != nil && successors.class.to_s == "Array")
       successors.each{|s|
+        next if s[:id] == start
         # find hits (targets that correspond to s)
         hits = targets.select{|t| 
           @byPos ? (s[:id] == t[:id] && ((t[:pos]-@rangeLeft..t[:pos]+@rangeRight).to_a.include? s[:pos])) : (s[:id] == t[:id])
@@ -69,12 +78,19 @@ class PathFinding
         # continue the search from this node if the node is not in the path AND the path length is smaller than the maximal steps
         if(!currentPath.include?(s) && currentPath.length < (@maxSteps-1)) 
           # recursive call
-          find_all_for_targets(s, targets, currentPath)
+          find_all_for_targets(s, targets, currentPath, start)
         end
       }
     end
     # after analyzing all successors, go back up the path one step
     currentPath.pop
+  end
+  
+  def remove_direct_paths()
+    @allPaths.each_pair{|k ,v| @allPaths[k] = v.select{|path| path.collect{|x| x[:id]}.uniq.length > 2}}
+  end
+  
+  def get_paths()
     return @allPaths
   end
 
@@ -93,6 +109,7 @@ class PathFinding
     g_result.each{|x|
       @gnames[x[0]] = x[1]
     }
+    @gnames.keys.select{|k| @gnames[k].nil?}.each{|k| @gnames[k] = k }
     return @gnames
   end
 
@@ -124,9 +141,24 @@ class PathFinding
     if not firstNode.nil?   # WRITES Graphviz only if there was any path (so there was a first element somewhere)
       nodestyles=["#{gnames[firstNode[:id]]} [style=filled fillcolor=turquoise];\n"]
       edges = []
+      pathnodes = @allPaths.values.collect{|pathset| pathset.collect{|path| path.collect{|node| node[:id]}}}.flatten.uniq
+      @allPaths.keys.each{|k| 
+        if pathnodes.include?(k.split("_")[0])
+          nodestyles << "#{gnames[k.split("_")[0]]} [style=filled fillcolor=grey];\n"  
+        end
+      }
       @allPaths.values.each{|pathset| pathset.each{|path|
-        nodestyles << "#{gnames[path[path.length-1][:id]]} [style=filled fillcolor=grey];\n"
-        (1..path.length-1).each{|i| edges << "#{gnames[path[i-1][:id]]} -> #{gnames[path[i][:id]]}" + (path[i][:pos] == 0 ? '[label=inh, arrowhead = tee]' : "[label=#{path[i][:pos]}];\n")
+        (1..path.length-1).each{|i| 
+          edgestring = "#{gnames[path[i-1][:id]]} -> #{gnames[path[i][:id]]}" 
+          if path[i][:type] == "i"
+              edgestring += '[label=inh, arrowhead = tee]' 
+            elsif path[i][:type] == "c"
+              edgestring += "[label=#{path[i][:pos]} style=bold];"
+            else
+              edgestring += "[label=#{path[i][:pos]} style=dotted];"
+            end
+          edgestring += "\n"
+                  edges << edgestring
         }}}
       outputFile = File.open("#{folder}/pw_graphviz.txt", "w")
       outputFile << "digraph G {\n"
@@ -134,14 +166,14 @@ class PathFinding
       outputFile << "edge [style=bold  color=grey labelfontname=Arial];\n"
       legend = <<EOS
       subgraph cluster_1 {
-      		query_protease
       		label = Legend;
       		color=black;
-      		query_protease [style=filled fillcolor=turquoise];		
-      		list_member [style=filled fillcolor=grey];
-      		query_protease -> inhibitor [label=cleavage];
-      		inhibitor -> protease [label=inhibition, arrowhead = tee];
-      		protease -> list_member [label=cleavage];
+      		"query\nprotease" [style=filled fillcolor=turquoise];		
+      		"list\nmember1\n(inhibitor)" [style=filled fillcolor=grey];
+      		"list\nmember2" [style=filled fillcolor=grey];
+      		"query\nprotease" -> "list\nmember1\n(inhibitor)" [label="inferred\nfrom\nlist" style=dotted];
+      		"list\nmember1\n(inhibitor)" -> protease [label=inhibition, arrowhead = tee];
+      		protease -> "list\nmember2" [label=cleavage];
       }
 EOS
       outputFile << legend
@@ -152,4 +184,6 @@ EOS
     system "dot #{folder}/pw_graphviz.txt -Tsvg -o #{folder}/pw_graphviz.svg" if File.exist?("#{folder}/pw_graphviz.txt")
     if File.exist?("#{folder}/pw_graphviz.svg") then return "#{folder}/pw_graphviz.svg" else  return nil end
   end
+  
+  
 end

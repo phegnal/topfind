@@ -3,6 +3,7 @@ class ProteinsController < ApplicationController
   require 'listTools/topFINDer'
   require 'graph/pathFinding'
   require 'graph/graph'
+  require 'graph/mapMouseHuman'
   
     
   hobo_model_controller
@@ -656,14 +657,17 @@ class ProteinsController < ApplicationController
       nwOrg = params["network_org"]
       listOrg = params["list_org"]
       # FIND PATHS
-      finder = PathFinding.new(Graph.new(nwOrg, []), @maxLength, byPos, rangeLeft, rangeRight)
+      finder = PathFinding.new(Graph.new(nwOrg, []), @maxLength, byPos, rangeLeft, rangeRight, true)
       if(nwOrg == "mouse" && listOrg == "human") # nw is mouse and list is human
-        @allPaths = finder.find_all_paths_map2mouse(start, targets)
+        finder.find_all_paths_map2mouse(start, targets)
       elsif(nwOrg == "human" && listOrg == "mouse")  # nw is human and list is mouse
-        @allPaths = finder.find_all_paths_map2human(start, targets)
+        finder.find_all_paths_map2human(start, targets)
       else
-        @allPaths = finder.find_all_paths(start, targets)
+        finder.find_all_paths(start, targets)
       end
+      finder.remove_direct_paths()
+      @allPaths = finder.get_paths()
+      @allPaths.each{|x| p x}
       @gnames = finder.paths_gene_names()                                                     # GENE NAMES FOR PROTEINS
       #      domains_descriptions = ["%protease%inhibitor%", "%proteinase%inhibitor%", "%inhibitor%"]
       @allPaths =  finder.get_domain_info(["SIGNAL", "PROPEP", "ACT_SITE", "TRANSMEM"], nil)

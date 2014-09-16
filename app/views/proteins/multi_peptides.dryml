@@ -43,7 +43,7 @@
 	
 	<p>
 		<b> Protein Accessions and Peptide Sequences: </b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Copy/paste tab seperated columns of UniProt protein accession (e.g. P01023) and peptide sequences (See below for supported formats).'/><br/>
-		<%= text_area_tag(:all, "P06870 IVGGWECEQHS\nP0A8M0 SVVPVADVLQGR\nP07091 MMCNEFFEG\nP01019 VIHNESTCEQ\nP30990 KPRRPYIL\nP01042 SPFRSSRIGE")  %> <br/>
+		<%= text_area_tag(:all, "P06870 IVGGWECEQHS\nP0A8M0 SVVPVADVLQGR\nP07091 MMCNEFFEG\nP01019 VIHNESTCEQ\nP30990 KPRRPYIL\nP01042 SPFRSSRIGE\nP07288 ILSRIVGGWE")  %> <br/>
 		supported peptide formats: <br/> ENEVFLVPSR <br/>n[145.11]ENEVFLVPSR <br/>M.n[43.02]AGSSSLEAVR.R <br/>
 	</p>
   
