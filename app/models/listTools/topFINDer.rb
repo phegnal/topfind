@@ -134,7 +134,7 @@ class TopFINDer
           @q[:ensembl] << e 
         elsif e.evidencesource.dbname == "TISdb"
           @q[:tisdb] << e 
-        elsif  e.evidencesource.dbname == "TopFIND" and e.description == "The stated informations has been inferred from an isoform by sequence similarity at the stated position."
+        elsif e.description == "The stated informations has been inferred from an isoform by sequence similarity at the stated position."
           @q[:isoforms] << e
         else
         end
@@ -263,7 +263,7 @@ class TopFINDer
           output << (q[:uniprot].length > 0 ? "\tX" : "\t")
           output << (q[:isoforms].length > 0 ? "\tX" : "\t") 
           output << (q[:ensembl].length > 0 ? "\tX" : "\t")
-          output << ("\t" + q[:proteases].collect{|p| p.shortname}.join(';'))
+          output << ("\t" + q[:proteases].collect{|p| p.shortname}.uniq.join(';'))
           output << ("\t" + q[:otherEvidences].collect{|e| e.methodology}.uniq.join(";"))
           output << (q[:tisdb].length > 0 ? "\tX" : "\t")
         end
