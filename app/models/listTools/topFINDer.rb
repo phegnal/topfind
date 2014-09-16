@@ -134,7 +134,7 @@ class TopFINDer
           @q[:ensembl] << e 
         elsif e.evidencesource.dbname == "TISdb"
           @q[:tisdb] << e 
-        elsif  e.evidencesource.dbname == "TopFIND"
+        elsif  e.evidencesource.dbname == "TopFIND" and e.description == "The stated informations has been inferred from an isoform by sequence similarity at the stated position."
           @q[:isoforms] << e
         else
         end
