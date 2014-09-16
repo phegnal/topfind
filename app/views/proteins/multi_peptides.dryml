@@ -1,10 +1,3 @@
-<%  
-  documentations = Documentation.all.group_by(&:name)
-  name = documentations['e_name'].first.short
-  input = documentations['e_name'].first.short
-  cols = documentations['e_name'].first.short
-  analyses = documentations['i-csvfile'].first.short
-%>
 
 
 <page>
@@ -14,7 +7,11 @@
 <content:>
 <section class="content-body">  
 	<h2>TopFINDer</h2>
-					
+	
+	<p><b>Description:</b></p>
+	<p>TopFINDer UniProt type protein accessions and terminal peptide sequences and .....
+	</p>
+    <br/><br/>					
 	<%= @x %>
 
 	<% form_tag(:action => "multi_peptides2", :method => "get") do %>
@@ -27,7 +24,7 @@
 	<br/>
 	
 	<p>
-		<b>Label</b> for your analysis <br/> (this is for you to identify your analysis):<br/> 
+		<b>Label</b> for your analysis <img class ='help'  src='/topfind/images/help.png' alt='?' title='this is for you to identify your analysis'/><br/> 
 		<%= text_field_tag(:label)%><br/>
 	</p>
 
@@ -43,8 +40,8 @@
 	
 	<p>
 		<b> Protein Accessions and Peptide Sequences: </b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Copy/paste tab seperated columns of UniProt protein accession (e.g. P01023) and peptide sequences (See below for supported formats).'/><br/>
-		<%= text_area_tag(:all, "P06870 IVGGWECEQHS\nP0A8M0 SVVPVADVLQGR\nP07091 MMCNEFFEG\nP01019 VIHNESTCEQ\nP30990 KPRRPYIL\nP01042 SPFRSSRIGE")  %> <br/>
-		supported peptide formats: <br/> ENEVFLVPSR <br/>n[145.11]ENEVFLVPSR <br/>M.n[43.02]AGSSSLEAVR.R <br/>
+		<%= text_area_tag(:all, "P06870 IVGGWECEQHS\nP0A8M0 SVVPVADVLQGR\nP07091 MMCNEFFEG\nP01019 VIHNESTCEQ\nP30990 KPRRPYIL\nP01042 SPFRSSRIGE", :size=> "40x20")  %> <br/>
+		supported peptide formats include: <br/> ENEVFLVPSR <br/>n[145.11]ENEVFLVPSR <br/>M.n[43.02]AGSSSLEAVR.R <br/>
 	</p>
   
 	<br/>
@@ -52,28 +49,38 @@
 	<br/>
 	
 	<p><b>Positional precision</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='TopFINDer will look for information downstream and upstream of your terminus if you indicate it here. If you only want information at the precise precision enter 0 into both fields.'/><br/>
-		<b>N-terminal</b>: <%= text_field_tag(:nterminal, "3")  %> <br/>
-		<b>C-Terminal</b>: <%= text_field_tag(:cterminal, "3")  %> <br/>
+		<div class="pathfinder_box">
+		<b>N-terminal</b>: <%= text_field_tag(:nterminal, "3", :size=>2, :maxlength=>2)  %> <br/>
+		<b>C-Terminal</b>: <%= text_field_tag(:cterminal, "3", :size=>2, :maxlength=>2)  %> <br/>
+		</div>
 	</p>	
 
 	<br/>
 	<p><b>Annotation:</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Information in the TopFIND databases that can be retrieved'/><br/>
+		<div class="pathfinder_box">
 		<%= check_box_tag(:spec, "1", true)%> Species <br/>
 		<%= check_box_tag(:chromosome, "1", true)%> Chromosome location<br/>
 		<%= check_box_tag(:domain, "1", true)%> Domains <br/>
 		<%= check_box_tag(:evidence, "1", true)%> Evidence <br/>
+		</div>
 	</p>
 
 	<br/>
 	 
  	<p><b>Analyses:</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='These analyses will be run on your submitted data.'/><br/>
-		<div class="box">
-		<%= check_box_tag(:proteaseWeb, "1", true)%> <b>Protease web</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='This program find paths (multi-step connections) in the protease web from one protease to all the submitted substrates. Please indicate the protease you are interested in (UniProt accession, e.g. P01023). The maximal path length is the maximum number of steps any path can have.'/> <br/>
-		protease: <%= text_field_tag(:pw_protease, "P14091")  %> <br/>
-		max. path length <%= text_field_tag(:pw_maxPathLength, "4")  %><br/>
-		organism: 
-		<%= radio_button_tag :pw_org, "human", true %> human
-		<%= radio_button_tag :pw_org, "mouse" %> mouse
+ 	
+
+		<div class="pathfinder_box">
+  		  <%= check_box_tag(:stats, "1", true)%> <b>Protease enrichment</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Enrichment analysis of proteases annotated to cleave at the identified positions'/> <br/>
+		</div>
+		<br/>
+		<div class="pathfinder_box">
+		  <%= check_box_tag(:proteaseWeb, "1", true)%> <b>Protease web</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='This program find paths (multi-step connections) in the protease web from one protease to all the submitted substrates. Please indicate the protease you are interested in (UniProt accession, e.g. P01023). The maximal path length is the maximum number of steps any path can have.'/> <br/>
+		  protease: <%= text_field_tag(:pw_protease, "P14091", :size=>10, :maxlength=>10)  %> <br/>
+		  max. path length <%= text_field_tag(:pw_maxPathLength, "4", :size=>2, :maxlength=>2)  %><br/>
+		  organism: 
+		  <%= radio_button_tag :pw_org, "human", true %> human
+		  <%= radio_button_tag :pw_org, "mouse" %> mouse
 		
 		</div>
 	</p>

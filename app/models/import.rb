@@ -155,7 +155,7 @@ class Import < ActiveRecord::Base
       confidence = csvrow['confidence']
       confidence_type = csvrow['confidence_type']
       
-      if protein && pos && self.evidence
+      if protein && pos && self.evidence && protein.aalen.to_i >= pos.to_i
         ct_idstring = "#{protein.ac}-#{pos}-#{mod}"
         cterm = Cterm.find_or_create_by_idstring(
           :idstring => ct_idstring,  

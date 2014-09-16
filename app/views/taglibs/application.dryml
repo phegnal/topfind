@@ -169,7 +169,7 @@
 <def tag="main-nav">
   <section class="logo">
   	<!--<div id="logo"><a href="#{base_url}/"><img src="/topfind/images/logo.png"/></a></div>-->
-	<div id="textlogo"><a href="#{base_url}/">TopFIND<sup><span style="font-size:0.5em;">2.0</span></sup></a></div>
+	<div id="textlogo"><a href="#{base_url}/">TopFIND<sup><span style="font-size:0.5em;">3.0 beta</span></sup></a></div>
   </section>
   
   <navigation class="main-nav" merge-attrs param="default">

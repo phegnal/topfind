@@ -1289,3 +1289,8 @@ font-size: 1.1em;
   border-radius: 1px;
   -moz-border-radius: 1px; 
 }
+
+.pathfinder_box {
+	margin-left:15px;
+	
+}
