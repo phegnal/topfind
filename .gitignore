@@ -79,7 +79,6 @@ Gemfile.lock, .ruby-version, .ruby-gemset
 /config/database.yml
 /databases/topfind_users*
 /source_data/*
-/databases/*
 /public/*.html
 
 # EXPLORER AND PATHFINDER FILES

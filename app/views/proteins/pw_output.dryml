@@ -19,7 +19,7 @@
 <table>
 <% @sortet_subs.each do |target| -%>
 	<tr>
-	<td><b><%= "#{@gnames[target.split("_")[0]]}(#{target.split("_")[0]})"%></b></td>
+	<td><b><%= "#{@gnames[target.split("_")[0]].to_s}(#{target.split("_")[0]})"%></b></td>
 	</tr>
 	<tr>
 		<td> PROTEASE </td> 

@@ -192,11 +192,15 @@ class TopFINDer
       print "Exception occured making Venn Diagram: " + e 
     end
 
-    # PATHFINDING TODO Ctermini
+    # PATHFINDING
     if(@proteaseWeb == "1")
       if(not Protein.find_by_ac(params[:pw_protease].strip).nil? and params[:pw_maxPathLength].to_i > 0)
-        finder = PathFinding.new(Graph.new(params[:pw_org],[]), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal)
-        @pw_paths = finder.find_all_paths(params[:pw_protease],  @foundPeptides.collect{|x|  {:id => x[:acc], :pos => x[:location_C]} })
+        g = Graph.new(params[:pw_org],[])
+        @foundPeptides.each{|p| g.add_edge(params[:pw_protease], p[:acc], p[:location_C], "l")}
+        finder = PathFinding.new(g, params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal, true)
+        finder.find_all_paths(params[:pw_protease],  @foundPeptides.collect{|x|  {:id => x[:acc], :pos => x[:location_C]} })
+        finder.remove_direct_paths()
+        @pw_paths = finder.get_paths()
         @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
         pdfPath = finder.make_graphviz(fileDir, @pw_gnames) # this saves the image but we need to define the path yet
       else
