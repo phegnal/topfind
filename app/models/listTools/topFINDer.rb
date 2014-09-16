@@ -134,7 +134,7 @@ class TopFINDer
           @q[:ensembl] << e 
         elsif e.evidencesource.dbname == "TISdb"
           @q[:tisdb] << e 
-        elsif e.description == "The stated informations has been inferred from an isoform by sequence similarity at the stated position."
+        elsif e.evidencecodes.collect{|s| s.code}.include? "TopFIND:0000002"
           @q[:isoforms] << e
         else
         end
@@ -238,7 +238,7 @@ class TopFINDer
     else
       output << "P1 Position"
     end
-    output << "\tUniProt annotated start\tIsoform Start\tAlternative Spliced Start\tCleavingProteases\tOther terminus evidences\tAlternative Translation Start" if @evidence
+    output << "\tUniProt curated start\tAlternative Spliced Start\tCleaving proteases\tOther experimental terminus evidences\tAlternative Translation Start" if @evidence
     output << "\tProtease Web Connections" if @proteaseWeb
     output << "\tN-terminal Features (Start to P1)\tFeatures spanning terminus (P1 to P1')\tC-terminal Features (P1' to End)\tSignalpeptide lost\tPropeptide lost\tShed" if @domain
     output << "\n"
@@ -261,8 +261,7 @@ class TopFINDer
         end
         if @evidence
           output << (q[:uniprot].length > 0 ? "\tX" : "\t")
-          output << (q[:isoforms].length > 0 ? "\tX" : "\t") 
-          output << (q[:ensembl].length > 0 ? "\tX" : "\t")
+          output << ((q[:isoforms].length > 0 or q[:ensembl].length > 0) ? "\tX" : "\t") 
           output << ("\t" + q[:proteases].collect{|p| p.shortname}.uniq.join(';'))
           output << ("\t" + q[:otherEvidences].collect{|e| e.methodology}.uniq.join(";"))
           output << (q[:tisdb].length > 0 ? "\tX" : "\t")
