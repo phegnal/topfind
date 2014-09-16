@@ -195,9 +195,8 @@ class TopFINDer
     # PATHFINDING
     if(@proteaseWeb == "1")
       if(not Protein.find_by_ac(params[:pw_protease].strip).nil? and params[:pw_maxPathLength].to_i > 0)
-        g = Graph.new(params[:pw_org],[])
-        @foundPeptides.each{|p| g.add_edge(params[:pw_protease], p[:acc], p[:location_C], "l")}
-        finder = PathFinding.new(g, params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal, true)
+        # @foundPeptides.each{|p| g.add_edge(params[:pw_protease], p[:acc], p[:location_C], "l")}
+        finder = PathFinding.new(Graph.new(params[:pw_org],[]), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal, true)
         finder.find_all_paths(params[:pw_protease],  @foundPeptides.collect{|x|  {:id => x[:acc], :pos => x[:location_C]} })
         finder.remove_direct_paths()
         @pw_paths = finder.get_paths()
@@ -270,11 +269,15 @@ class TopFINDer
         end
 
         if @proteaseWeb
-          output << "\t" + @pw_paths[q[:acc] + "_"+ (q[:location_C]).to_s].collect{|path| 
-            path.collect{|node|
-              @pw_gnames[node[:id]].to_s
-            }.join("->")		
-          }.join("; ")
+          if @pw_paths.nil?
+            output << "\t"
+          else
+            output << "\t" + @pw_paths[q[:acc] + "_"+ (q[:location_C]).to_s].collect{|path| 
+              path.collect{|node|
+                @pw_gnames[node[:id]].to_s
+              }.join("->")
+            }.join("; ")
+          end
         end
 
         if @domain

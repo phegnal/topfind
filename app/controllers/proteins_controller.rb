@@ -667,7 +667,6 @@ class ProteinsController < ApplicationController
       end
       finder.remove_direct_paths()
       @allPaths = finder.get_paths()
-      @allPaths.each{|x| p x}
       @gnames = finder.paths_gene_names()                                                     # GENE NAMES FOR PROTEINS
       #      domains_descriptions = ["%protease%inhibitor%", "%proteinase%inhibitor%", "%inhibitor%"]
       @allPaths =  finder.get_domain_info(["SIGNAL", "PROPEP", "ACT_SITE", "TRANSMEM"], nil)
