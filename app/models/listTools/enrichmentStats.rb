@@ -40,7 +40,7 @@ class EnrichmentStats
   
   def printStatsArrayToFile(path)
     output = File.new(path, "w")
-    output << ["protease name", "protease accession", "list count (total = #{@@listCleavageTotal})", "db count (total = #{@@dbCleavageTotal})", "fold enrichment", "fold coverage", "Fisher Exact Test", "Adjusted Fisher Exact Test"].join("\t")
+    output << ["Protease name", "Protease accession", "List count (total = #{@@listCleavageTotal})", "DB count (total = #{@@dbCleavageTotal})", "Fold enrichment", "Fold coverage", "Fisher Exact Test", "Adjusted Fisher Exact Test"].join("\t")
     output << "\n"
     @@statsArray.each{|x|
       output << x[:protein].shortname + "\t"
@@ -108,7 +108,7 @@ class EnrichmentStats
     @@r.void_eval("library(reshape2)")
     @@r.void_eval('df = melt(m)')
     @@r.void_eval('colnames(df) = c("Terminus", "Protease", "Cleavage")')
-    @@r.void_eval('df$Cleavage = factor(df$Cleavage == 1, levels = c("TRUE", "FALSE"))')
+    @@r.void_eval('df$Cleavage = factor(df$Cleavage == 1, levels = c("yes", "no"))')
     @@r.void_eval('p <- ggplot(data=df, aes(x=Protease, y=Terminus))')
     @@r.void_eval('p <- p + geom_tile(aes(fill = Cleavage))')
     @@r.void_eval('p <- p + scale_fill_manual(values = c("red", "black"))')
@@ -134,7 +134,7 @@ class EnrichmentStats
   def plotProteaseCounts(path)
     @@r.assign("counts", @@statsArray.collect{|x| x[:listCount]})
     @@r.assign("countsNam", @@statsArray.collect{|x| x[:protein].shortname})
-    @@r.assign("significant", @@statsArray.collect{|x| x[:fetAdj] < 0.05})
+    @@r.assign("significant", @@statsArray.collect{|x| x[:fetAdj] < 0.05 ? "enriched (p < 0.05)" :  "not enriched"})
     @@r.void_eval("df <- data.frame(Protease = factor(countsNam, levels = countsNam[order(counts, decreasing = T)]), Cleavages = counts, Significant = significant)")
     @@r.void_eval('palette <- c("black", "red")')
     @@r.void_eval("library(ggplot2)")
