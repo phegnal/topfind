@@ -168,12 +168,10 @@ class PathFinding
       subgraph cluster_1 {
       		label = Legend;
       		color=black;
-      		"query\nprotease" [style=filled fillcolor=turquoise];		
-      		"list\nmember1\n(inhibitor)" [style=filled fillcolor=grey];
-      		"list\nmember2" [style=filled fillcolor=grey];
-      		"query\nprotease" -> "list\nmember1\n(inhibitor)" [label="inferred\nfrom\nlist" style=dotted];
-      		"list\nmember1\n(inhibitor)" -> protease [label=inhibition, arrowhead = tee];
-      		protease -> "list\nmember2" [label=cleavage];
+      		"query protease" [style=filled fillcolor=turquoise];		
+      		"list member " [style=filled fillcolor=grey];
+      		inhibitor -> protease [label="inhibition (inh)", arrowhead = tee];
+      		protease -> substrate [label="cleavage (position indicated)"];
       }
 EOS
       outputFile << legend
