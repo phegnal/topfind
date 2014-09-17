@@ -7,16 +7,23 @@ class EnrichmentStats
     require 'rserve'
     
     @@mainarray=mainarray
+    @@uniquePeptideArray = mainarray.collect{|x| x[:pep]}.uniq.collect{|p| 
+      {
+        :pep => p,
+        :proteases => mainarray.select{|x| x[:pep] == p}.collect{|x| x[:proteases]}.flatten.uniq
+      }
+    }
+    p @@uniquePeptideArray
     @@statsArray = []
     @@r = Rserve::Connection.new
    
     if not mainarray.nil?
-      proteases = @@mainarray.collect{|h| h[:proteases].uniq}.flatten
+      proteases = @@uniquePeptideArray.collect{|h| h[:proteases].uniq}.flatten
 
       g_query = "select count(distinct c.substrate_id, c.pos) from cleavages c, proteins p, proteins s where c.protease_id = p.id and c.substrate_id = s.id and p.species_id = #{organism} and s.species_id = #{organism};"
       @@dbCleavageTotal = nil
       ActiveRecord::Base.connection.execute(g_query).each{|y| @@dbCleavageTotal = y[0].to_i};
-      @@listCleavageTotal = @@mainarray.select{|h| h[:proteases].length > 0}.length
+      @@listCleavageTotal = @@uniquePeptideArray.select{|h| h[:proteases].length > 0}.length
 
       proteases.uniq.each{|p|
         listCleavageProtease = proteases.count(p)
@@ -32,9 +39,9 @@ class EnrichmentStats
         }
       }
       @@r.assign("ps", @@statsArray.collect{|x| x[:fet]})
-      @@r.eval("p.adjust(ps, method = 'BH')").to_ruby.each_with_index{|x, i|
-        @@statsArray[i][:fetAdj] = x
-      }
+      fetAdj = @@r.eval("p.adjust(ps, method = 'BH')").to_ruby
+      fetAdj = [fetAdj] if fetAdj == Float
+      fetAdj.each_with_index{|x, i|  @@statsArray[i][:fetAdj] = x }
     end
   end
   
