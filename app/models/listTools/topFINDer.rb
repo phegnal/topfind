@@ -212,7 +212,7 @@ class TopFINDer
 
     if @foundPeptides.collect{|a| a[:proteases].length}.sum > 0 then
       es = EnrichmentStats.new(@foundPeptides, @foundPeptides[0][:protein].species_id) # TODO how to pick species?
-      es.printStatsArrayToFile("#{fileDir}/ProteaseStats.tsv")
+      es.printStatsArrayToFile("#{fileDir}/ProteaseStats.txt")
       begin
         es.plotProteaseCounts("#{fileDir}/Protease_histogram")
       rescue Exception => e
@@ -227,7 +227,7 @@ class TopFINDer
 
 
     # #CSV TODO ctermini
-    path = "#{fileDir}/Full_Table.tsv"
+    path = "#{fileDir}/Full_Table.txt"
     output = File.new(path, "w")
     output << "Accession\tInput Sequence\tProtein found\tRecommended Protein Name\tOther Names and IDs"
     output << "\tSpecies" if @spec
