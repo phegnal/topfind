@@ -7,37 +7,42 @@ class EnrichmentStats
     require 'rserve'
     
     @@mainarray=mainarray
-    @@uniquePeptideArray = mainarray.collect{|x| x[:pep]}.uniq.collect{|p|
-      {
-        :protein => p.protein,
-        :pep => p,
-        :proteases => mainarray.select{|x| x[:pep] == p}.collect{|x| x[:proteases]}.flatten.uniq
-      }
-    }
+    # REMOVED - users need to use one line per peptide
+    # @@uniquePeptideArray = mainarray.collect{|x| x[:pep]}.uniq.collect{|p|
+    #   {
+    #
+    #     :pep => p,
+    #     :proteases => mainarray.select{|x| x[:pep] == p}.collect{|x| x[:proteases]}.flatten.uniq
+    #   }
+    # }
     @@statsArray = []
     @@r = Rserve::Connection.new
    
     if not mainarray.nil?
-      proteases = @@uniquePeptideArray.collect{|h| h[:proteases].uniq}.flatten
+      proteases = @@mainarray.collect{|h| h[:proteases].uniq}.flatten
 
       # g_query = "select count(distinct c.substrate_id, c.pos) from cleavages c, proteins p, proteins s where c.protease_id = p.id and c.substrate_id = s.id and p.species_id = #{organism} and s.species_id = #{organism};"
+      substrateIDs = @@mainarray.collect{|p| p[:protein].id}
+      p substrateIDs
+      proteaseIDs = proteases.collect{|p| p.id}
+      p proteaseIDs
       g_query = "select count(distinct c.substrate_id, c.pos) 
       from cleavages c, proteins p, proteins s, cleavage2evidences c2e, evidence2evidencecodes e2code, evidencecodes code
       where c.protease_id = p.id 
       and c.substrate_id = s.id 
-      and p.species_id = #{organism} 
-      and s.species_id = #{organism}
+      and s.id in (#{substrateIDs.join(",")})
+      and p.id in (#{proteaseIDs.join(",")})
       and c.id = c2e.cleavage_id
       and c2e.evidence_id = e2code.evidence_id
       and code.id = e2code.code
       and code.code not in ('TopFIND:0000001', 'TopFIND:0000002');"
       @@dbCleavageTotal = nil
       ActiveRecord::Base.connection.execute(g_query).each{|y| @@dbCleavageTotal = y[0].to_i};
-      @@listCleavageTotal = @@uniquePeptideArray.select{|h| h[:proteases].length > 0}.length
+      @@listCleavageTotal = @@mainarray.select{|h| h[:proteases].length > 0}.length
 
       proteases.uniq.each{|p|
         listCleavageProtease = proteases.count(p)
-        dbCleavageProtease = p.cleavages.select{|c| !c.substrate.nil?}.select{|c|
+        dbCleavageProtease = p.cleavages.select{|c| !c.substrate.nil?}.select{|c| substrateIDs.include? c.substrate.id}.select{|c|
           c.evidences.collect{|e| e.evidencecodes.collect{|c| c.code}}.flatten.uniq.select{|c| !["TopFIND:0000001", "TopFIND:0000002"].include? c}.length > 0
         }.collect{|c| "#{c.substrate.name}_#{c.pos}"}.uniq.length
         fet = FishersExactTest.new().calculate(listCleavageProtease, dbCleavageProtease, @@listCleavageTotal - listCleavageProtease, @@dbCleavageTotal - dbCleavageProtease)
