@@ -9,6 +9,7 @@ class EnrichmentStats
     @@mainarray=mainarray
     @@uniquePeptideArray = mainarray.collect{|x| x[:pep]}.uniq.collect{|p|
       {
+        :protein => p.protein,
         :pep => p,
         :proteases => mainarray.select{|x| x[:pep] == p}.collect{|x| x[:proteases]}.flatten.uniq
       }
@@ -20,16 +21,16 @@ class EnrichmentStats
       proteases = @@uniquePeptideArray.collect{|h| h[:proteases].uniq}.flatten
 
       # g_query = "select count(distinct c.substrate_id, c.pos) from cleavages c, proteins p, proteins s where c.protease_id = p.id and c.substrate_id = s.id and p.species_id = #{organism} and s.species_id = #{organism};"
-      g_query = 'select count(distinct c.substrate_id, c.pos) 
+      g_query = "select count(distinct c.substrate_id, c.pos) 
       from cleavages c, proteins p, proteins s, cleavage2evidences c2e, evidence2evidencecodes e2code, evidencecodes code
       where c.protease_id = p.id 
       and c.substrate_id = s.id 
-      and p.species_id = 1 
-      and s.species_id = 1
+      and p.species_id = #{organism} 
+      and s.species_id = #{organism}
       and c.id = c2e.cleavage_id
       and c2e.evidence_id = e2code.evidence_id
       and code.id = e2code.code
-      and code.code not in ("TopFIND:0000001", "TopFIND:0000002");'
+      and code.code not in ('TopFIND:0000001', 'TopFIND:0000002');"
       @@dbCleavageTotal = nil
       ActiveRecord::Base.connection.execute(g_query).each{|y| @@dbCleavageTotal = y[0].to_i};
       @@listCleavageTotal = @@uniquePeptideArray.select{|h| h[:proteases].length > 0}.length
