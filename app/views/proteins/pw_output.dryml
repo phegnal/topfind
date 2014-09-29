@@ -37,13 +37,13 @@
 			</td>
 			<% else %>
 			<td>
-				<%= "&#8594 cleaves @#{path_node[:pos]}: [" %>
-				<%= path_node[:domains_left].join(" ") %>
-				<%= path_node[:domains_hit].join("-") %>
-				<%= "&#8595" %>
-				<%= path_node[:domains_hit].join("-") %>
-				<%= path_node[:domains_right].join(" ") %>
-				<%= "] &#8594"%>
+				<%= path_node[:domains_left].collect{|f| "#{f.from}-<b>#{@domains_name_filter[f.name]}</b>-#{f.to}"}.join("...") %>
+				...
+				<%= path_node[:domains_hit].collect{|f| "#{f.from}-<b>#{@domains_name_filter[f.name]}</b> "}.join(" ") %>
+				<%= "#{path_node[:pos]} &#8595 #{path_node[:pos]}"%>
+				<%= path_node[:domains_hit].collect{|f| " <b>#{@domains_name_filter[f.name]}</b>-#{f.to}"}.join(" ") %>
+				...
+				<%= path_node[:domains_right].collect{|f| "#{f.from}-<b>#{@domains_name_filter[f.name]}</b>-#{f.to}"}.join("...") %>
 			</td>
 			<% end %>
 			<td><%= '<a href="http://clipserve.clip.ubc.ca/topfind/proteins/' + path_node[:id] + '">' + @gnames[path_node[:id]] + '</a>' %></td>

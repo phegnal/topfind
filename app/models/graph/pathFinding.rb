@@ -113,14 +113,30 @@ class PathFinding
     return @gnames
   end
 
-  def get_domain_info(domains_names, domains_descriptions)
+  def get_domain_info(domains_names_filter, domains_descriptions_filter)
+    
+    path_proteins = @allPaths.values.collect{|path_set|
+      path_set.collect{|path|
+        path.collect{|target|
+          target[:id]
+        }
+      }
+    }.flatten.uniq
+    
+    fts_hash = {}
+    
+    path_proteins.each{|p| 
+      f = []
+      feats = Protein.find_by_ac(p).fts
+      f.concat(feats.find_all_by_name(domains_names_filter)) if not domains_names_filter.nil?
+      f.concat(feats.find(:all, :conditions => [Array.new(domains_descriptions_filter.length, "description LIKE ?").join(" OR "), domains_descriptions_filter].flatten)) if not domains_descriptions_filter.nil?
+      fts_hash[p] = f
+    }
+    
     @allPaths.each_value{|path_set|
       path_set.each{|path|
         path.each{|target|
-          f = []
-          feats = Protein.find_by_ac(target[:id]).fts
-          f.concat(feats.find_all_by_name(domains_names)) if not domains_names.nil?
-          f.concat(feats.find(:all, :conditions => [Array.new(domains_descriptions.length, "description LIKE ?").join(" OR "), domains_descriptions].flatten)) if not domains_descriptions.nil?
+          f = fts_hash[target[:id]]
           f = f.sort{|x,y| x.from.to_i <=> y.from.to_i}
           target[:domains_left] = f.select{|x| x.to.to_i < target[:pos]}
           target[:domains_hit] = f.select{|x| x.from.to_i <= target[:pos] && x.to.to_i >= target[:pos]}

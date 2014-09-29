@@ -669,7 +669,8 @@ class ProteinsController < ApplicationController
       @allPaths = finder.get_paths()
       @gnames = finder.paths_gene_names()                                                     # GENE NAMES FOR PROTEINS
       #      domains_descriptions = ["%protease%inhibitor%", "%proteinase%inhibitor%", "%inhibitor%"]
-      @allPaths =  finder.get_domain_info(["SIGNAL", "PROPEP", "ACT_SITE", "TRANSMEM"], nil)
+      @domains_name_filter = {"SIGNAL" => "signalpeptide", "PROPEP" => "propeptide", "ACT_SITE" => "active site", "TRANSMEM" => "TM domain"}
+      @allPaths =  finder.get_domain_info(@domains_name_filter.keys, nil)
       @sortet_subs = @allPaths.keys.sort{|x, y| @allPaths[y].size <=> @allPaths[x].size}      # SORT OUTPUT
       pdfPath = finder.make_graphviz("./public/images/PathFINDer", @gnames)
     end 
