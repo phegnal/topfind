@@ -671,7 +671,7 @@ class ProteinsController < ApplicationController
       #      domains_descriptions = ["%protease%inhibitor%", "%proteinase%inhibitor%", "%inhibitor%"]
       @allPaths =  finder.get_domain_info(["SIGNAL", "PROPEP", "ACT_SITE", "TRANSMEM"], nil)
       @sortet_subs = @allPaths.keys.sort{|x, y| @allPaths[y].size <=> @allPaths[x].size}      # SORT OUTPUT
-      pdfPath = finder.make_graphviz("./public/images/PathFINDer", @gnames)
+      @pdfPath = finder.make_graphviz("#{RAILS_ROOT}/public/images/PathFINDer", @gnames)
     end 
   end
   

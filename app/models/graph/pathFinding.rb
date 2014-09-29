@@ -179,8 +179,9 @@ EOS
       outputFile << "}"
       outputFile.close
     end
-    system "dot #{folder}/pw_graphviz.txt -Tsvg -o #{folder}/pw_graphviz.svg" if File.exist?("#{folder}/pw_graphviz.txt")
-    if File.exist?("#{folder}/pw_graphviz.svg") then return "#{folder}/pw_graphviz.svg" else  return nil end
+    
+    x = system "/usr/local/bin/dot #{folder}/pw_graphviz.txt -Tsvg -o #{folder}/pw_graphviz.svg 2>#{folder}/pw_errorlog.txt" 
+	return(x)
   end
   
   
