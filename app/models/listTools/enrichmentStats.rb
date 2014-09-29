@@ -23,9 +23,7 @@ class EnrichmentStats
 
       # g_query = "select count(distinct c.substrate_id, c.pos) from cleavages c, proteins p, proteins s where c.protease_id = p.id and c.substrate_id = s.id and p.species_id = #{organism} and s.species_id = #{organism};"
       substrateIDs = @@mainarray.collect{|p| p[:protein].id}
-      p substrateIDs
       proteaseIDs = proteases.collect{|p| p.id}
-      p proteaseIDs
       g_query = "select count(distinct c.substrate_id, c.pos) 
       from cleavages c, proteins p, proteins s, cleavage2evidences c2e, evidence2evidencecodes e2code, evidencecodes code
       where c.protease_id = p.id 
