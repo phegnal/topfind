@@ -33,6 +33,7 @@ class TopFINDer
     @domain = params['domain']
     @evidence = params['evidence']
     @proteaseWeb = params[:proteaseWeb]
+    @proteaseStats = params[:stats]
     @spec = params['spec']
     @nterminal = params['nterminal'].to_i
     @cterminal = params['cterminal'].to_i
@@ -210,18 +211,20 @@ class TopFINDer
 
     end
 
-    if @foundPeptides.collect{|a| a[:proteases].length}.sum > 0 then
-      es = EnrichmentStats.new(@foundPeptides, @foundPeptides[0][:protein].species_id) # TODO how to pick species?
-      es.printStatsArrayToFile("#{fileDir}/ProteaseStats.txt")
-      begin
-        es.plotProteaseCounts("#{fileDir}/Protease_histogram")
-      rescue Exception => e
-        print "Exception occured making Protease Histogram: " + e
-      end
-      begin
-        es.plotProteaseSubstrateHeatmap("#{fileDir}/ProteaseSubstrate_matrix")
-      rescue Exception => e
-        print "Exception occured making Protease Heatmap: " + e
+    if(@proteaseStats == "1")
+      if @foundPeptides.collect{|a| a[:proteases].length}.sum > 0 then
+        es = EnrichmentStats.new(@foundPeptides, @foundPeptides[0][:protein].species_id) # TODO how to pick species?
+        es.printStatsArrayToFile("#{fileDir}/ProteaseStats.txt")
+        begin
+          es.plotProteaseCounts("#{fileDir}/Protease_histogram")
+        rescue Exception => e
+          print "Exception occured making Protease Histogram: " + e
+        end
+        begin
+          es.plotProteaseSubstrateHeatmap("#{fileDir}/ProteaseSubstrate_matrix")
+        rescue Exception => e
+          print "Exception occured making Protease Heatmap: " + e
+        end
       end
     end
 

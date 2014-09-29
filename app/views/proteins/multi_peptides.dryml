@@ -9,10 +9,11 @@
 	<h2>TopFINDer</h2>
 	
 	<p><b>Description:</b></p>
-	<p>TopFINDer UniProt type protein accessions and terminal peptide sequences and .....
-	</p>
+	<p> TopFIND ExploreR retrieves general and position specific information <br/>
+		for a list of protein termini as well as protease specific analysis tools. <br/>
+		Submit a list of termini (UniProt accession and peptide sequence) and <br/>
+		TopFINDer will retrieve known evidence for the termini.  <br/> </p>
     <br/><br/>					
-	<%= @x %>
 
 	<% form_tag(:action => "multi_peptides2", :method => "get") do %>
 
@@ -24,7 +25,7 @@
 	<br/>
 	
 	<p>
-		<b>Label</b> for your analysis <img class ='help'  src='/topfind/images/help.png' alt='?' title='this is for you to identify your analysis'/><br/> 
+		<b>Label</b> for your analysis <img class ='help'  src='/topfind/images/help.png' alt='?' title='This is for you to identify your analysis'/><br/> 
 		<%= text_field_tag(:label)%><br/>
 	</p>
 
@@ -48,7 +49,7 @@
 
 	<br/>
 	
-	<p><b>Positional precision</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='TopFINDer will look for information downstream and upstream of your terminus if you indicate it here. If you only want information at the precise precision enter 0 into both fields.'/><br/>
+	<p><b>Positional precision</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='To account for small truncations of termini ("ragging"), TopFINDer will look for terminus evidences downstream and upstream of your terminus if you indicate it here. If you only want information at the precise position of the terminus then enter 0 into both fields.'/><br/>
 		<div class="pathfinder_box">
 		<b>N-terminal</b>: <%= text_field_tag(:nterminal, "3", :size=>2, :maxlength=>2)  %> <br/>
 		<b>C-Terminal</b>: <%= text_field_tag(:cterminal, "3", :size=>2, :maxlength=>2)  %> <br/>
@@ -71,11 +72,10 @@
  	
 
 		<div class="pathfinder_box">
-  		  <%= check_box_tag(:stats, "1", true)%> <b>Protease enrichment</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Enrichment analysis of proteases annotated to cleave at the identified positions'/> <br/>
+  		  <%= check_box_tag(:stats, "1", true)%> <b>Protease enrichment</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='This will report count and enrichment statistics of proteases that cleave the proteins in your list.'/> <br/>
 		</div>
-		<br/>
 		<div class="pathfinder_box">
-		  <%= check_box_tag(:proteaseWeb, "1", true)%> <b>Protease web</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='This program find paths (multi-step connections) in the protease web from one protease to all the submitted substrates. Please indicate the protease you are interested in (UniProt accession, e.g. P01023). The maximal path length is the maximum number of steps any path can have.'/> <br/>
+		  <%= check_box_tag(:proteaseWeb, "1", true)%> <b>Protease web</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='This program find paths (multi-step connections) in the protease web from a given protease to all submitted substrates. Please indicate the protease you are interested in (UniProt accession, e.g. P01023). The maximal path length is the maximum number of steps any path can have.'/> <br/>
 		  protease: <%= text_field_tag(:pw_protease, "P14091", :size=>10, :maxlength=>10)  %> <br/>
 		  max. path length <%= text_field_tag(:pw_maxPathLength, "4", :size=>2, :maxlength=>2)  %><br/>
 		  organism: 
