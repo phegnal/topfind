@@ -16,7 +16,7 @@ class TopFINDer
     if params[:label].nil?
       label = "TopFINDer_results" 
     else
-      label = params[:label].gsub(/\s/, '_')
+      label = params[:label].gsub(/\s/, '_').gsub(/\;/, '_')    
     end
     label = date + "_" + label
     
