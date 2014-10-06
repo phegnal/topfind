@@ -2,7 +2,7 @@ class TopFINDer
   def initialize()    
   end
   
-  def analyze(params)
+  def analyze(params, label)
     
     require 'graph/pathFinding'
     require 'graph/graph'
@@ -11,21 +11,11 @@ class TopFINDer
     require 'listTools/venn'
     require 'listTools/emailer'
     
-    
-    date = Time.new.strftime("%Y_%m_%d")
-    if params[:label].nil?
-      label = "TopFINDer_results" 
-    else
-      label = params[:label].gsub(/\s/, '_').gsub(/\;/, '_')    
-    end
-    label = date + "_" + label
-    
     nr = Dir.entries("#{RAILS_ROOT}/public/explorer").collect{|x| x.to_i}.max + 1
     dir = "#{RAILS_ROOT}/public/explorer/" + nr.to_s 
     Dir.mkdir(dir)
     fileDir = dir + "/#{label}"
     Dir.mkdir(fileDir)
-    
   
     @all_input = params["all"].strip #string
     @input1 = @all_input.split("\n") #array 
@@ -300,7 +290,7 @@ class TopFINDer
 
     x = system "cd #{dir}; zip -r #{label} #{label}"
   
-    Emailer.new().sendTopFINDer(params[:email], "#{dir}/#{label}.zip", label)
+    Emailer.new().sendTopFINDerResults(params[:email], "#{dir}/#{label}.zip", label)
 
     p "DONE"
   end

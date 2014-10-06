@@ -1,10 +1,11 @@
 class ProteinsController < ApplicationController
 
   require 'listTools/topFINDer'
+  require 'listTools/emailer'
+  
   require 'graph/pathFinding'
   require 'graph/graph'
   require 'graph/mapMouseHuman'
-  
     
   hobo_model_controller
   
@@ -641,10 +642,9 @@ class ProteinsController < ApplicationController
   def pw_output
     # if parameters are not well defined, return to input page
     if(params["start"] == "" ||  params["targets"] == "" || params["maxLength"] == "")
-      puts 'else'
       render :action => 'pw_input'
     elsif(Protein.find_by_ac(params["start"].strip).nil?)
-      render :text => "The start protease couldn't be found"
+      render :text => "The start protease '#{params["start"]}' could not be found, try again by clicking the BACK button."
     else
       # CLEAN UP INPUT
       start = params["start"].strip
@@ -703,10 +703,32 @@ class ProteinsController < ApplicationController
 
 
   def multi_peptides2
-    # TODO add test for email!
+    # LABEL
+    date = Time.new.strftime("%Y_%m_%d")
+    if params[:label].nil?
+      label = "TopFINDer_analysis" 
+    else
+      label = params[:label].gsub(/\s/, '_').gsub(/\;/, '_').gsub(/\#/,"_")  
+    end
+    label = date + "_" + label
+
+    # EMAIL TEST
     @email = params[:email]
-    TopFINDer.new().delay(:priority => 20).analyze(params)
-    # TopFINDer.new().analyze(params)
+    sent = false
+    begin
+      sent = Emailer.new().sendTopFINDerConfirmation(@email, label)
+    rescue Exception => e
+      p "emailing failed #{e}"
+      sent = false
+    end
+    
+    # RUN ANALYSIS
+    if sent
+      TopFINDer.new().delay(:priority => 20).analyze(params, label)
+    else
+      render :text => "#{@email} seems to not be a valid email address, please try again by clicking the BACK button."
+    end
+    
   end
   
 
