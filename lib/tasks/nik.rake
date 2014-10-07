@@ -53,7 +53,7 @@ namespace :nik do
             elsif e.evidencesource.dbname == "Ensembl"
               nterHash[p.ac][n.pos][:ensembl] = true
             elsif e.evidencecodes.collect{|s| s.code}.include? "TopFIND:0000002"
-              @q[:isoform] << e
+              nterHash[p.ac][n.pos][:isoform] = true
             end
           end
         }
