@@ -22,7 +22,7 @@ namespace :nik do
     # add signal/peptide removal?
     # domains lost?
     
-    keys = [:obs, :can, :dir, :tis, :splice, :cleaved]
+    keys = [:obs, :can, :dir, :tis, :ensembl, :cleaved, :isoform]
     
     Protein.find(:all, :conditions => ["species_id = ?", 1]).each_with_index{|p, i|
       # break if i > 20
@@ -51,7 +51,9 @@ namespace :nik do
             elsif e.evidencesource.dbname == "TISdb"
               nterHash[p.ac][n.pos][:tis] = true
             elsif e.evidencesource.dbname == "Ensembl"
-              nterHash[p.ac][n.pos][:splice] = true
+              nterHash[p.ac][n.pos][:ensembl] = true
+            elsif e.evidencecodes.collect{|s| s.code}.include? "TopFIND:0000002"
+              @q[:isoform] << e
             end
           end
         }
@@ -151,18 +153,3 @@ namespace :nik do
   end
 
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
