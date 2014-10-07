@@ -38,7 +38,7 @@ namespace :nik do
           e = n2e.evidence
           if not e.nil?
             if e.evidencesource.nil?
-              if e.name =~ /^Inferred from cleavage/
+              if e.name =~ /^Inferred from cleavage/ #tested here for the ones with e.evidencesource == nil and below for the ones where there is an evidencesource
                 nterHash[p.ac][n.pos][:cleaved] = true
               else
                 nterHash[p.ac][n.pos][:obs] = true
@@ -54,6 +54,8 @@ namespace :nik do
               nterHash[p.ac][n.pos][:ensembl] = true
             elsif e.evidencecodes.collect{|s| s.code}.include? "TopFIND:0000002"
               nterHash[p.ac][n.pos][:isoform] = true
+            elsif e.name =~ /^Inferred from cleavage/
+                nterHash[p.ac][n.pos][:cleaved] = true
             end
           end
         }
@@ -76,8 +78,6 @@ namespace :nik do
     }
     # close output
     output.close
-    
-    p "Ntermini found, now starting to merge them by position"
   end
     
     
