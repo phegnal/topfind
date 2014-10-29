@@ -1,4 +1,4 @@
-require "../controllers/proteins_controller"
+# require "../controllers/proteins_controller"
 class Protein < ActiveRecord::Base
 
   # hobo_model # Don't put anything above this
@@ -31,38 +31,38 @@ class Protein < ActiveRecord::Base
   end
       
   
-#UniProt Protein Entry related 
-  belongs_to :species 
-  has_many :acs, :dependent => :destroy, :uniq => true
-  has_many :proteinnames, :dependent => :destroy, :uniq => true
-  has_many :searchnames, :dependent => :destroy, :uniq => true
-  has_one :gn, :include => [:loci, :synonyms, :orf_names], :dependent => :destroy
-  has_and_belongs_to_many :oss,  :join_table => :oss_proteins, :uniq => true
-  has_and_belongs_to_many :ocs, :uniq => true
-  has_and_belongs_to_many :oxs, :join_table => :oxs_proteins, :uniq => true
-  has_many :refs, :include => [:rxs, :rgs, :rps, :rcs], :dependent => :destroy, :uniq => true
-  has_many :ccs, :dependent => :destroy, :uniq => true
-  has_many :drs, :dependent => :destroy, :uniq => true
-  has_and_belongs_to_many :kws, :uniq => true
-  has_many :fts, :dependent => :destroy, :uniq => true  
-  has_many :publications,  :accessible => true, :dependent => :destroy, :uniq => true
-
-#Cleavage, Substrate, Inhibition related
-  has_many :cleavages, :foreign_key => 'protease_id', :accessible => :true, :uniq => true
-  has_many :substrates, :through => :cleavages, :uniq => true
-  has_many :inverse_cleavages, :class_name => "Cleavage", :foreign_key => "substrate_id", :accessible => true
-  has_many :proteases, :through => :inverse_cleavages, :uniq => true  
- 
-  has_many :inhibitions, :foreign_key => 'inhibited_protease_id', :uniq => true
-  has_many :inhibitors, :through => :inhibitions, :uniq => true
-  has_many :inverse_inhibitions, :class_name => "Inhibition", :foreign_key => "inhibitor_id"
-  has_many :inhibited_proteases, :through => :inverse_inhibitions, :uniq => true 
-
-  has_many :chains, :uniq => true
-  has_many :cterms, :uniq => true
-  has_many :nterms, :uniq => true
-  
-  has_many :isoforms, :uniq => true
+# #UniProt Protein Entry related
+#   belongs_to :species
+#   has_many :acs, :dependent => :destroy, :uniq => true
+#   has_many :proteinnames, :dependent => :destroy, :uniq => true
+#   has_many :searchnames, :dependent => :destroy, :uniq => true
+#   has_one :gn, :include => [:loci, :synonyms, :orf_names], :dependent => :destroy
+#   has_and_belongs_to_many :oss,  :join_table => :oss_proteins, :uniq => true
+#   has_and_belongs_to_many :ocs, :uniq => true
+#   has_and_belongs_to_many :oxs, :join_table => :oxs_proteins, :uniq => true
+#   has_many :refs, :include => [:rxs, :rgs, :rps, :rcs], :dependent => :destroy, :uniq => true
+#   has_many :ccs, :dependent => :destroy, :uniq => true
+#   has_many :drs, :dependent => :destroy, :uniq => true
+#   has_and_belongs_to_many :kws, :uniq => true
+#   has_many :fts, :dependent => :destroy, :uniq => true
+#   has_many :publications,  :accessible => true, :dependent => :destroy, :uniq => true
+#
+# #Cleavage, Substrate, Inhibition related
+#   has_many :cleavages, :foreign_key => 'protease_id', :accessible => :true, :uniq => true
+#   has_many :substrates, :through => :cleavages, :uniq => true
+#   has_many :inverse_cleavages, :class_name => "Cleavage", :foreign_key => "substrate_id", :accessible => true
+#   has_many :proteases, :through => :inverse_cleavages, :uniq => true
+#
+#   has_many :inhibitions, :foreign_key => 'inhibited_protease_id', :uniq => true
+#   has_many :inhibitors, :through => :inhibitions, :uniq => true
+#   has_many :inverse_inhibitions, :class_name => "Inhibition", :foreign_key => "inhibitor_id"
+#   has_many :inhibited_proteases, :through => :inverse_inhibitions, :uniq => true
+#
+#   has_many :chains, :uniq => true
+#   has_many :cterms, :uniq => true
+#   has_many :nterms, :uniq => true
+#
+#   has_many :isoforms, :uniq => true
   
   
   
@@ -291,7 +291,7 @@ end
 
 #UniProt related classes 
 class Proteinname < ActiveRecord::Base 
-  belongs_to :protein
+  # belongs_to :protein
   
   def view_permitted?(field)
     true
@@ -299,41 +299,41 @@ class Proteinname < ActiveRecord::Base
 end
 
 class Searchname < ActiveRecord::Base
-  belongs_to :protein
+  # belongs_to :protein
 end
 
 class Ac < ActiveRecord::Base
-  belongs_to :protein
+  # belongs_to :protein
 end
 
 class De < ActiveRecord::Base
-  belongs_to :protein
+  # belongs_to :protein
 end
 
 class Gn < ActiveRecord::Base
-  has_many :synonyms,  :table_name => 'GnSynonym', :class_name => 'GnSynonym'
-  has_many :loci,      :table_name => 'GnLocus',   :class_name => 'GnLocus'
-  has_many :orf_names, :table_name => 'GnOrfName', :class_name => 'GnOrfName'
+  # has_many :synonyms,  :table_name => 'GnSynonym', :class_name => 'GnSynonym'
+#   has_many :loci,      :table_name => 'GnLocus',   :class_name => 'GnLocus'
+#   has_many :orf_names, :table_name => 'GnOrfName', :class_name => 'GnOrfName'
 end
 
 class GnSynonym < ActiveRecord::Base
-  belongs_to :gn
+  # belongs_to :gn
 end
 
 class GnLocus < ActiveRecord::Base
   set_table_name "gn_loci"
-  belongs_to :gn
+  # belongs_to :gn
 end
 
 class GnOrfName < ActiveRecord::Base
-  belongs_to :gn
+  # belongs_to :gn
 end
 
 
 
 class Os < ActiveRecord::Base
   set_table_name "oss"
-  has_and_belongs_to_many :proteins, :join_table => :oss_proteins, :uniq => true
+  # has_and_belongs_to_many :proteins, :join_table => :oss_proteins, :uniq => true
   
   def view_permitted?(field)
     true
@@ -341,8 +341,8 @@ class Os < ActiveRecord::Base
 end
 
 class Oc < ActiveRecord::Base
-  has_and_belongs_to_many :proteins
-  
+  # has_and_belongs_to_many :proteins
+ 
   def view_permitted?(field)
     true
   end  
@@ -350,7 +350,7 @@ end
 
 class Ox < ActiveRecord::Base
   set_table_name "oxs"
-  has_and_belongs_to_many :proteins, :join_table => :proteins_oxs
+  # has_and_belongs_to_many :proteins, :join_table => :proteins_oxs
   
   def view_permitted?(field)
     true
@@ -358,28 +358,28 @@ class Ox < ActiveRecord::Base
 end
 
 class Ref < ActiveRecord::Base
-  belongs_to :protein
-  has_many :rxs
-  has_many :rps
-  has_many :rcs
-  has_many :rgs
+  # belongs_to :protein
+  # has_many :rxs
+  # has_many :rps
+  # has_many :rcs
+  # has_many :rgs
 end
 
 class Rx < ActiveRecord::Base
   set_table_name 'rxs'
-  belongs_to :ref
+  # belongs_to :ref
 end
 
 class Rg < ActiveRecord::Base
-  belongs_to :ref
+  # belongs_to :ref
 end
 
 class Rp < ActiveRecord::Base
-  belongs_to :ref
+  # belongs_to :ref
 end
 
 class Rc < ActiveRecord::Base
-  belongs_to :ref
+  # belongs_to :ref
   
   def view_permitted?(field)
     true
@@ -387,15 +387,15 @@ class Rc < ActiveRecord::Base
 end
 
 class Cc < ActiveRecord::Base
-  belongs_to :protein
+  # belongs_to :protein
   
   named_scope :main, :conditions => "`topic` = 'CATALYTIC ACTIVITY' OR `topic` = 'DISEASE' OR `topic` = 'FUNCTION' OR `topic` = 'SUBCELLULAR LOCATION' = `topic` = 'TISSUE SPECIFICITY'"
   named_scope :additional, :conditions => "`topic` != 'ALLERGEN' AND `topic` != 'ALTERNATIVE PRODUCTS' AND `topic` != 'BIOPHYSICOCHEMICAL PROPERTIES' AND `topic`!= 'BIOTECHNOLOGY' AND `topic` != 'DISEASE' AND `topic` != 'INTERACTION' AND `topic` != 'FUNCTION' AND `topic` != 'MASS SPECTROMETRY' AND `topic` != 'PHARMACEUTICAL' AND `topic` != 'RNA EDITING' AND `topic` != 'SUBCELLULAR LOCATION' AND `topic` != 'TISSUE SPECIFICITY' AND `topic` != 'WEB RESOURCE'"
 end
 
 class Dr < ActiveRecord::Base
-  hobo_model # Don't put anything above this  
-  belongs_to :protein
+  # hobo_model # Don't put anything above this
+  # belongs_to :protein
   
   def view_permitted?(field)
     true
@@ -403,34 +403,34 @@ class Dr < ActiveRecord::Base
 end
 
 class Kw < ActiveRecord::Base
-  hobo_model
-  fields do
-    name           :string, :required, :unique, :index => true  
-    ac             :string, :index => true
-    description    :text
-    category     :string, :index => true
-  end
-  
-  has_and_belongs_to_many :proteins
-  has_many :terminusmodifications
-  has_many :kwsynonymes
+  # hobo_model
+  # fields do
+  #   name           :string, :required, :unique, :index => true
+  #   ac             :string, :index => true
+  #   description    :text
+  #   category     :string, :index => true
+  # end
+  #
+  # has_and_belongs_to_many :proteins
+  # has_many :terminusmodifications
+  # has_many :kwsynonymes
 end
 
 class Kwsynonyme < ActiveRecord::Base
-  hobo_model
-  fields do
-    name           :string, :required, :unique, :index => true  
-  end
-  
-  belongs_to :kw
+  # hobo_model
+  # fields do
+  #   name           :string, :required, :unique, :index => true
+  # end
+  #
+  # belongs_to :kw
 end
 
 
 class Ft < ActiveRecord::Base
-  hobo_model
-  belongs_to :protein
-  has_many :chains, :through => :protein
-  
+  # hobo_model
+  # belongs_to :protein
+  # has_many :chains, :through => :protein
+  #
   named_scope :present, lambda { |from,to|
     {:conditions => ['`from` >= ? AND `to` <= ?',from,to] }
   }

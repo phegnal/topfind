@@ -200,10 +200,10 @@ class ProteinsController < ApplicationController
       if res.first.present? && res.last == res.first
         redirect_to res.first
       else
-        hobo_index res 
+        # hobo_index res
       end 
     else #if no searchparams present
-      hobo_index Protein, :group => 'proteins.ac', :order => 'proteins.name'
+      # hobo_index Protein, :group => 'proteins.ac', :order => 'proteins.name'
     end
   end     
   
@@ -226,7 +226,7 @@ class ProteinsController < ApplicationController
      
    
     # hobo_show @protein = Protein.id_or_ac_or_name_is(id).first  
-    hobo_show @protein = Protein.find_by_ac(id)  
+    # hobo_show @protein = Protein.find_by_ac(id)
      
     @annotations_main = @protein.ccs.main
     @annotations_additional = @protein.ccs.additional
@@ -308,7 +308,7 @@ class ProteinsController < ApplicationController
     id = params[:id]
     #remove isofrom from ac
     #    id = params[:id].split('-').first
-    hobo_show @protein = Protein.id_or_ac_or_name_is(id).first  
+    # hobo_show @protein = Protein.id_or_ac_or_name_is(id).first
     ids = nil
     params[:ppi].present? ? @ppi = params[:ppi] : @ppi = false
     
