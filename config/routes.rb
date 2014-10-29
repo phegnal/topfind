@@ -44,7 +44,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'api/search/ctermini', :controller => 'cterms', :action => 'apisearch'
   map.connect 'api/search/cleavages', :controller => 'cleavages', :action => 'apisearch'
     
-  Hobo.add_routes(map)
+  # Hobo.add_routes(map)
 
   map.connect ':controller/:action/:id'
   map.connect ':controller/:action/:id.:format'

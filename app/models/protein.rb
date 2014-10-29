@@ -1,29 +1,30 @@
+require "../controllers/proteins_controller"
 class Protein < ActiveRecord::Base
 
-  hobo_model # Don't put anything above this
+  # hobo_model # Don't put anything above this
 
-  fields do
-    ac             :string, :required, :unique, :index => true
-    name           :string, :required, :unique, :index => true
-    data_class     :string
-    molecular_type :integer
-    entry_type     :string
-    dt_create      :string
-    dt_sequence    :string
-    dt_annotation  :string
-    definition     :string
-    sequence       :text
-    mw             :integer
-    crc64          :string
-    aalen          :integer
-    chromosome     :string, :index => true
-    band           :string, :index => true
-    meropsfamily   :string, :index => true
-    meropssubfamily :string, :index => true
-    meropscode     :string, :index => true
-    status         enum_string('created','pruned','updated','unknown'), :default => 'unknown'
-    timestamps
-  end
+  # fields do
+  #   ac             :string, :required, :unique, :index => true
+  #   name           :string, :required, :unique, :index => true
+  #   data_class     :string
+  #   molecular_type :integer
+  #   entry_type     :string
+  #   dt_create      :string
+  #   dt_sequence    :string
+  #   dt_annotation  :string
+  #   definition     :string
+  #   sequence       :text
+  #   mw             :integer
+  #   crc64          :string
+  #   aalen          :integer
+  #   chromosome     :string, :index => true
+  #   band           :string, :index => true
+  #   meropsfamily   :string, :index => true
+  #   meropssubfamily :string, :index => true
+  #   meropscode     :string, :index => true
+  #   status         enum_string('created','pruned','updated','unknown'), :default => 'unknown'
+  #   timestamps
+  # end
   
   def to_param
     self.ac

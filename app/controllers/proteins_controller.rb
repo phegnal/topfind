@@ -7,13 +7,13 @@ class ProteinsController < ApplicationController
   require 'graph/graph'
   require 'graph/mapMouseHuman'
     
-  hobo_model_controller
-  
-  caches_page :show
-  
-  autocomplete :name, :query_scope => [:name_contains, :ac_contains]
-  auto_actions :all
-  show_actions :filter; :multi_peptides; :multi_peptides2; :pw_input; :pw_output
+  # hobo_model_controller
+  #
+  # caches_page :show
+  #
+  # autocomplete :name, :query_scope => [:name_contains, :ac_contains]
+  # auto_actions :all
+  # show_actions :filter; :multi_peptides; :multi_peptides2; :pw_input; :pw_output
    
   def index
     

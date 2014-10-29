@@ -1,17 +1,17 @@
 class Documentation < ActiveRecord::Base
 
-  hobo_model # Don't put anything above this
+  # hobo_model # Don't put anything above this
 
-  fields do
-    name     :string
-    title    :string
-    long     :text
-    short    :text
-    category :string
-    position :integer, :default => 0
-    show     :boolean, :default => false
-    timestamps
-  end
+  # fields do
+  #   name     :string
+  #   title    :string
+  #   long     :text
+  #   short    :text
+  #   category :string
+  #   position :integer, :default => 0
+  #   show     :boolean, :default => false
+  #   timestamps
+  # end
 
 
   # --- Permissions --- #
