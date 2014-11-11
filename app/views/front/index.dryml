@@ -121,9 +121,9 @@
 				<section id="intro1" class="intros">
 					<h3>WELCOME</h3>
 					<ul>
-						<li>TopFIND is the first public knowledgebase for protein termini and protease processing</li>
+						<li>TopFIND is the first public knowledgebase and analysis resource for protein termini and protease processing</li>
 						<li><hr/></li>
-						<li>More than 170,000 N- and C-termini and more than 16,000 cleavages listed</li>
+						<li>More than 290,000 N- and C-termini and more than 33,000 cleavages listed</li>
 						<li><hr/></li>
 						<li>Covers <i>H. sapiens</i>, <i>M. musculus</i>, <i>S. cerevisiae</i>, <i>A. thaliana</i> and <i>E. coli</i></li>
 					</ul>
@@ -133,11 +133,13 @@
 				<section id="intro2" class="intros">
 					<h3>WHAT TopFIND PROVIDES</h3>
 					<ul>
-						<li>Integration of protein termini with proteolytic processing and protein features</li>
+						<li>Integration of protein termini &amp; function with proteolytic processing, alternative transcription &amp; translation</li>
 						<li><hr/></li>
 						<li>Displays proteases and substrates within their protease web including detailed evidence information</li>
 						<li><hr/></li>
-						<li>Fully supports the Human Proteome Project through search by chromosome location</li>
+						<li>TopFINDer automates analysis and functional annotation of proteomics-derived termini sets</li>
+						<li><hr/></li>
+						<li>PathFINDer identifies indirect protease-substrate connections for the evaluation of complex processes</li>
 					</ul>			
 				</section>
 			</section>
