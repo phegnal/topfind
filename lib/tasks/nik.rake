@@ -13,7 +13,7 @@ namespace :nik do
   #
   # 
   desc "Read n termini from topfind and write them to file"
-  task :nters do
+  task :nters, [:speciesID] do |t, args|
     require "#{RAILS_ROOT}/config/environment"
     
     date = Time.new.strftime("%Y_%m_%d")
@@ -24,7 +24,7 @@ namespace :nik do
     
     keys = [:obs, :can, :dir, :tis, :ensembl, :cleaved, :isoform]
     
-    Protein.find(:all, :conditions => ["species_id = ?", 1]).each_with_index{|p, i|
+    Protein.find(:all, :conditions => ["species_id = ?", args[:speciesID].to_i]).each_with_index{|p, i|
       # break if i > 20
       nterHash[p.ac] = {}
       p.nterms.each{|n|
@@ -63,7 +63,7 @@ namespace :nik do
     }
     
     # WRITE TO OUTPUT
-    output = File.new("#{date}_ntermini.txt", "w")
+    output = File.new("#{date}_ntermini_species#{args[:speciesID]}.txt", "w")
     # HEADER
     output << "ac\tpos\t"
     output << keys.join("\t")
@@ -116,32 +116,35 @@ namespace :nik do
       pos = nterHash[ac].keys.sort{|a,b| a <=> b}
       lastData = nil # initiate with first protein
       lastPos = -50 # so that first run goes into else
+      startPos = nil
       while(pos != []) do
         currentPos = pos.shift
         currentData = nterHash[ac][currentPos]
         if currentPos <= (lastPos + dist) # merge entries if they are that close
           lastData.keys.each{|k| lastData[k] = (lastData[k] or currentData[k])}
         else # make new entry
-          nTerHash2[ac][lastPos] = lastData if not lastData.nil? # the "if not" is for the first run
-          lastData = nterHash[ac][currentPos]
+          nTerHash2[ac]["#{startPos.to_s}_#{lastPos.to_s}"] = lastData if not lastData.nil? # safe old last entries the "if not" is for the first run
+          lastData = nterHash[ac][currentPos] # create first data for new entry
+          startPos = currentPos # define startPos for new entry
         end
         lastPos = currentPos
       end
-      nTerHash2[ac][lastPos] = lastData # the last left over row
+      nTerHash2[ac]["#{startPos.to_s}_#{lastPos.to_s}"] = lastData # the last left over row
     }
 
     # WRITE SECOND OUTPUT TO OUTPUT2
     date = Time.new.strftime("%Y_%m_%d")
-    output2 = File.new("#{date}_ntermini2.txt", "w")
+    output2 = File.new("#{args[:file]}_mergedBy#{args[:merge_distance]}.txt", "w")
     # HEADER
     valKeys = keys[2..(keys.length-1)]
-    output2 << "ac\tpos\t"
+    output2 << "ac\tstartPos\tendPos\t"
     output2 << valKeys.join("\t")
     output2 << "\n"
     # CONTENT
     nTerHash2.keys.each{|ac|
       nTerHash2[ac].keys.each{|pos|
-        output2 << "#{ac}\t#{pos}\t"
+        posSplit = pos.split("_")
+        output2 << "#{ac}\t#{posSplit[0]}\t#{posSplit[1]}\t"
         output2 << valKeys.collect{|k| nTerHash2[ac][pos][k]}.join("\t")
         output2 << "\n"
       }
@@ -151,5 +154,62 @@ namespace :nik do
     
     
   end
+  
+  
+  #
+  #
+  # goes through the proteins and writes a table of signal peptides positions and propeptide positions
+  #
+  #
+  #
+  #
+  desc "Get positions of signal and propeptide for all proteins"
+  task :addMaturePosition, [:file] do |t, args|
+    require "#{RAILS_ROOT}/config/environment"
 
+    date = Time.new.strftime("%Y_%m_%d")    
+      
+    # get Signal and Pro peptide coordinates
+    sHash = {}    
+    sig_query = "select p.ac as ac, f.from as fromx, f.to as tox from fts f, proteins p where f.name in ('SIGNAL', 'PROPEP') and p.id = f.protein_id;"
+    sig_result =  ActiveRecord::Base.connection.execute(sig_query);
+    sig_result.each{|x| 
+      sHash[x[0]] = [] if not sHash.has_key?(x[0])
+      sHash[x[0]] << {:from => x[1].to_i, :to => x[2].to_i}
+    }
+    
+    # return distance of termini from signal and propeptide
+    inputFile = File.new(args[:file], "r")
+    output = File.new("#{args[:file]}_SigProPeptideDist.txt", "w")
+    inputFile.each_with_index{|line, i|
+      if i == 0
+        output << "#{line.rstrip}\tmatureDistance\n"
+      else
+        l = line.rstrip.split("\t")
+        ac = l[0]
+        xRange = (l[1].to_i..l[2].to_i).to_a
+        newDistance = "NA"
+        if not sHash[ac].nil?
+          newDistance = sHash[ac].collect{|pep| (pep[:from]..pep[:to]).to_a}.select{|pepRange| pepRange.length > 0}.collect{|pepRange|
+            if xRange.collect{|x| pepRange.include?(x)}.any? # they overlap
+              0
+            elsif xRange.min() > pepRange.max()
+              xRange.min() - pepRange.max()
+            elsif pepRange.min() > xRange.max()
+              pepRange.min() - xRange.max()
+            else
+              p "ERROR"
+              p xRange
+              p pepRange
+            end
+          }.min().to_s
+        end
+        output << "#{line.rstrip}\t#{newDistance}\n"
+      end
+    }
+    inputFile.close
+    output.close
+
+  end
+  
 end
