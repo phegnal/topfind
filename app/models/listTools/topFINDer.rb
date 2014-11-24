@@ -11,6 +11,8 @@ class TopFINDer
     require 'listTools/venn'
     require 'listTools/emailer'
     
+    system("Rscript #{RAILS_ROOT}/Rserve_Startup.R")
+    
     nr = Dir.entries("#{RAILS_ROOT}/public/explorer").collect{|x| x.to_i}.max + 1
     dir = "#{RAILS_ROOT}/public/explorer/" + nr.to_s 
     Dir.mkdir(dir)

@@ -726,7 +726,7 @@ class ProteinsController < ApplicationController
     if sent
       TopFINDer.new().delay(:priority => 20).analyze(params, label)
     else
-      render :text => "#{@email} seems to not be a valid email address, please try again by clicking the BACK button."
+      render :text => "Sending email to #{@email} failed. If it is not a valid email address, then please try again by clicking the BACK button. In case of other problems please email us at topfind.clip[at]gmail.com"
     end
     
   end
