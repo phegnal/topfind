@@ -176,7 +176,11 @@ class TopFINDer
       seqs = @foundPeptides.select{|e| e[:location_C] > e[:sequence].length  and e[:ensembl].length == 0 and e[:tisdb].length == 0 and e[:isoforms].length == 0}
     end
   
-    IceLogo.new().terminusIcelogo(Species.find(1), seqs.collect{|e| e[:upstream]+":"+e[:downstream]}, "#{fileDir}/IceLogo.svg", 4) if seqs.length > 0
+    begin
+      IceLogo.new().terminusIcelogo(Species.find(1), seqs.collect{|e| e[:upstream]+":"+e[:downstream]}, "#{fileDir}/IceLogo.svg", 4) if seqs.length > 0
+    rescue Exception => e
+      print "Exception occured making Ice Logo " + e
+    end
   
     # VENN DIAGRAM
     begin

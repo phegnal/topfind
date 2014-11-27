@@ -21,7 +21,13 @@ MESSAGE_END
 part2 =<<EOF
 Content-Type: text/plain
 Content-Transfer-Encoding:8bit
-This is an automated message send to you from the TopFIND database. Your data are currently being processed and the results will be sent to you in about 15 minutes.
+Dear TopFIND user,
+
+This is an automated message confirming that your analysis in TopFINDer is running. 
+Your data are currently being processed and the results will be sent to you shortly (15 minutes to 2 hours).
+In case of questions please respond to this email!
+  
+Best regards,
 
 The TopFIND Team
 --#{marker}
@@ -60,9 +66,12 @@ MESSAGE_END
 part2 =<<EOF
 Content-Type: text/plain
 Content-Transfer-Encoding:8bit
-This is an automated message send to you from the TopFIND database. Attached are results of your TopFINDer analysis.
+Dear TopFIND user,
 
-Have a nice day!
+This is an automated message send to you from the TopFIND database. Attached you will find the results of your TopFINDer analysis.
+In case of questions, please respond to this email.
+
+Best regards,
 
 The TopFIND Team
 --#{marker}
