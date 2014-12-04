@@ -9,13 +9,15 @@
 	</h1>
 	
 	<p><b>Description:</b></p>
-	<p wwidth = ""> PathFINDer is TopFIND's protease web explorer inspired by <a href="http://www.plosbiology.org/article/info%3Adoi%2F10.1371%2Fjournal.pbio.1001869">Fortelny et al. 2014</a>. <br/>
+	<p wwidth = ""> PathFINDer is TopFIND's protease web explorer inspired by <a href="http://www.plosbiology.org/article/info%3Adoi%2F10.1371%2Fjournal.pbio.1001869">Fortelny et al, PLoS Biology, 2014</a>. <br/>
 		The protease web is a network of proteases and their inhibitors. Proteases cleave <br/>
 		other proteases and inhibitors of other proteases in vivo. Changes of the activity <br/>
 		of one protease can thereby influence the cleavage of substrates of other proteases <br/>
 		indirectly. PathFINDer uses a graph to model known protease interactions as a <br/>
 		network and finds paths in this network. These paths represent biological pathways <br/>
 		thus enabling mechanistic insights. <br/> 
+	</p>
+	<p>More information and citation: <a href="http://nar.oxfordjournals.org/content/early/2014/10/26/nar.gku1012" target="_blank">Fortelny et al, NAR, 2014</a> <a href="http://nar.oxfordjournals.org/content/early/2014/10/26/nar.gku1012.full.pdf" target="_blank">[pdf]</a> 
 	</p>
     <br/><br/>
 	
