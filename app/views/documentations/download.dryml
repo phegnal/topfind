@@ -8,7 +8,7 @@
 	    <div class="category"><h2>Download</h2></div>
 	    <div class="solidbox">
 	    	<ul>			
-					<li>A complete compressed sql dump of the TopFIND database can be downloaded [<a href ="/topfind/downloads/TopFIND-130601.sql.zip">TopFIND-130601.sql.zip</a> 205 MB].</li>
+					<li>A complete compressed sql dump of the TopFIND database can be downloaded [<a href ="/topfind/downloads/TopFIND3_20141127.sql">TopFIND-130601.sql.zip</a> 730 MB].</li>
 					<li>The initial TopFIND publication Philipp F. Lange &amp; Christopher M. Overall, <a href="http://www.nature.com/nmeth/journal/v8/n9/full/nmeth.1669.html" target="_blank"><i>Nature Methods</i> <b>8</b>, 703–704 (2011)</a> can be downloaded as well. <a href="/topfind/downloads/2011-NMeth-Lange_and_Overall.pdf" target="_blank">[pdf]</a> </li>
 					<li>License information can be found <a href="/topfind/license">here</a> and please do not forget to <a href="/topfind/about">cite us</a> if you use TopFIND or the database dump for your research</li>
 			</ul>
