@@ -25,7 +25,8 @@
 	<br/>
 	
 	<p>
-		<b>Label</b> for your analysis (please avoid special characters) <img class ='help'  src='/topfind/images/help.png' alt='?' title='This is for you to identify your analysis'/><br/> 
+		<b>Label</b> for your analysis <img class ='help'  src='/topfind/images/help.png' alt='?' title='This is for you to identify your analysis'/><br/> 
+		(please only use characters, numbers, and "_") <br/>
 		<%= text_field_tag(:label)%><br/>
 	</p>
 
