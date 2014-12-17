@@ -708,7 +708,8 @@ class ProteinsController < ApplicationController
     if params[:label].nil?
       label = "TopFINDer_analysis" 
     else
-      label = params[:label].gsub(/\s/, '_').gsub(/\;/, '_').gsub(/\#/,"_")  
+      label = params[:label].gsub(/[^\w\d\_]/, "")
+      # label = params[:label].gsub(/\s/, '_').gsub(/\;/, '_').gsub(/\#/,"_")
     end
     label = date + "_" + label
 
@@ -732,165 +733,165 @@ class ProteinsController < ApplicationController
   end
   
 
-  def trying_featurePanel
-    
-    p = Protein.find(1)
-    
-    panel = ''
-    panel << "<div class='featurepanel' >"
-    panel << "<div class='protein' style='width:#{p.aalen}px;'>&nbsp;"
-    (p.aalen/100).to_i.times do |i|
-      panel << "<div class='tickmark'>#{(i*100+100).to_s}</div>"
-    end
-    panel << "</div>"
-    
-    ## plot protein chains
-    if p.fts.name_is('CHAIN').present?      
-      panel << "<div class='track' style='width:#{p.aalen}px;'>"
-      panel << "<div class='tracklable'>Chains:</div>"
-      @prevto = 0
-      p.fts.name_is('CHAIN').each do |fts|
-        flength = fts.to.to_i - fts.from.to_i
-        if @prevto >= fts.from.to_i 
-          panel << "<br/>"
-        end
-        @prevto = fts.to.to_i 
-        panel << "<a class='chain' style='margin-left:#{fts.from}px; width:#{flength}px;' title='<bold>stable protein chain</bold><br/>position:#{fts.from}-#{fts.to}<br/>evidence: inferred from UniProtKB<br/>#{fts.description}'>&nbsp;</a>" 
-      end
-      panel << "<div class='clear'>&nbsp;</div></div>"
-    end   
-
-    ## plot nterms
-    if p.nterms.present?
-      panel << "<div class='track' style='width:#{p.aalen}px;'>"
-      panel << "<div class='tracklable'>N-termini:</div>" 
-      @prevto = 0
-      p.nterms.each do |nt|
-        if @prevto >= nt.pos.to_i-5
-          panel << "<br/>"
-        end
-        @prevto = nt.pos.to_i
-        panel << "<a class='popup nterm #{nt.terminusmodification.kw.to_s.parameterize.to_s}' style='margin-left:#{nt.pos.to_s}px;' title='<strong>N-Terminus:</strong><br/><strong>position:</strong> #{nt.pos.to_s}<br/><strong>modification:</strong> #{nt.terminusmodification.name}<br/><strong>evidence:</strong> #{nt.evidences.*.evidencecodes.*.*.*.name.flatten.join(', ')}' href='/topfind/nterms/#{nt.id}' rel='#overlay'>N</a>" 
-      end
-      panel << "<div class='clear'>&nbsp;</div></div>"
-    end   
-
-    ## plot cterms
-    if p.cterms.present?
-      panel << "<div class='track' style='width:#{p.aalen}px;'>" 
-      panel << "<div class='tracklable'>C-termini:</div>"
-      @prevto = 0
-      p.cterms.each do |ct|
-        if @prevto >= ct.pos-5 
-          panel << "<br/>"
-        end
-        @prevto = ct.pos 
-        panel << "<a class='popup cterm #{ct.terminusmodification.kw.to_s.parameterize.to_s}' style='margin-left:#{ct.pos-23}px;' title='<strong>C-Terminus:</strong><br/><strong>position:</strong> #{ct.pos.to_s}<br/><strong>modification:</strong> #{ct.terminusmodification.name}<br/><strong>evidence:</strong> #{ct.evidences.*.evidencecodes.*.*.*.name.flatten.join(', ')}' href='/topfind/cterms/#{ct.id}' rel='#overlay'>C</a>" 
-      end
-      panel << "<div class='clear'>&nbsp;</div></div>"
-    end   
-
-    ## plot cleavages
-    if p.inverse_cleavages.present?
-      panel << "<div class='track' style='width:#{p.aalen}px;'>" 
-      panel << "<div class='tracklable'>Cleavage sites:</div>"      
-      @prevto = 0      
-      p.inverse_cleavages.each do |c| 
-        if @prevto >= c.pos 
-          panel << "<br/>"
-        end
-        @prevto = c.pos  
-        panel << "<a class='popup inverse_cleavage' style='margin-left:#{c.pos.to_s}px;' title='Processed by: #{c.protease.shortname} @ AS #{c.pos}' href='/topfind/cleavages/#{c.id}' rel='#overlay'>&nbsp;</a>"       
-      end
-      panel << "<div class='clear'>&nbsp;</div></div>"
-    end
-
-    ## plot domain like features
-    unless p.domains.blank?
-      panel << "<div class='track' style='width:#{p.aalen}px;'>"
-      panel << "<div class='tracklable'>Features:</div>"
-      @prevto = 0
-      p.domains.each do |fts|
-        flength = fts.to.to_i - fts.from.to_i 
-        if @prevto >= fts.from.to_i 
-          panel << "<br/>"
-        end
-        @prevto = fts.to.to_i 
-        panel << "<a class='domain' style='margin-left:#{fts.from}px; width:#{flength}px;' title='#{fts.name}: #{fts.description} (#{fts.from}-#{fts.to})'>&nbsp;</a>"
-      end 
-      panel << "<div class='clear'>&nbsp;</div></div>"     
-    end   
-
-    ## plot active features
-    unless p.active_features.blank?
-      panel << "<div class='track' style='width:#{p.aalen}px;'>"
-      panel << "<div class='tracklable'>Binding & active sites:</div>"
-      @prevto = 0
-      p.active_features.each do |fts|
-        flength = fts.to.to_i - fts.from.to_i
-        if @prevto >= fts.from.to_i 
-          panel << "<br/>"
-        end
-        @prevto = fts.to.to_i 
-        panel << "<a class='domain' style='margin-left:#{fts.from}px; width:#{flength}px;' title='#{fts.name}: #{fts.description} (#{fts.from}-#{fts.to})'>&nbsp;</a>" 
-      end 
-      panel << "<div class='clear'>&nbsp;</div></div>"     
-    end
-
-    ## plot variants
-    unless p.var_features.blank?
-      panel << "<div class='track' style='width:#{p.aalen}px;'>"
-      panel << "<div class='tracklable'>Sequence variations:</div>"
-      @prevto = 0
-      p.var_features.each do |fts|
-        flength = fts.to.to_i - fts.from.to_i
-        if @prevto >= fts.from.to_i
-          panel << "<br/>"
-        end
-        @prevto = fts.to.to_i 
-        panel << "<a class='domain' style='margin-left:#{fts.from}px; width:#{flength}px;' title='#{fts.name}: #{fts.description} (#{fts.from}-#{fts.to})'>&nbsp;</a>" 
-      end 
-      panel << "<div class='clear'>&nbsp;</div></div>"     
-    end
-
-    ## plot topo features
-    unless p.topo_features.blank?
-      panel << "<div class='track' style='width:#{p.aalen}px;'>"
-      panel << "<div class='tracklable'>Topology:</div>"
-      @prevto = 0
-      p.topo_features.each do |fts|
-        flength = fts.to.to_i - fts.from.to_i 
-        if @prevto >= fts.from.to_i 
-          panel << "<br/>"
-        end
-        @prevto = fts.to.to_i 
-        cssclass = fts.name
-        cssclass << "_extra" if fts.description.match('Extracellular')
-        cssclass << "_intra" if fts.description.match('Cytoplasmic')
-        panel << "<a class='domain #{cssclass}' style='margin-left:#{fts.from}px; width:#{flength}px;' title='#{fts.name}: #{fts.description} (#{fts.from}-#{fts.to})'>&nbsp;</a>"
-      end 
-      panel << "<div class='clear'>&nbsp;</div></div>"     
-    end
-
-    ## plot modification like features
-    unless p.mod_features.blank?
-      panel << "<div class='track' style='width:#{p.aalen}px;'>"
-      panel << "<div class='tracklable'>Modifications:</div>"
-      @prevto = 0
-      p.mod_features.each do |fts|
-        flength = fts.to.to_i - fts.from.to_i
-        if @prevto >= fts.from.to_i 
-          panel << "<br/>"
-        end
-        @prevto = fts.to.to_i         
-        panel << "<a class='domain' style='margin-left:#{fts.from}px; width:#{flength}px;' title='#{fts.name}: #{fts.description} (#{fts.from}-#{fts.to})'>&nbsp;</a>" 
-      end 
-      panel << "<div class='clear'>&nbsp;</div></div>"     
-    end
-    
-    panel << "</div>"
-    panel << '<script>jQuery(document).ready(function() {jQuery(".featurepanel a").tooltip({offset:[-10,0]}).dynamic({ bottom: { direction: "down", bounce: true } });})</script>'
-    @panel = panel
-  end
+  # def trying_featurePanel
+  #
+  #   p = Protein.find(1)
+  #
+  #   panel = ''
+  #   panel << "<div class='featurepanel' >"
+  #   panel << "<div class='protein' style='width:#{p.aalen}px;'>&nbsp;"
+  #   (p.aalen/100).to_i.times do |i|
+  #     panel << "<div class='tickmark'>#{(i*100+100).to_s}</div>"
+  #   end
+  #   panel << "</div>"
+  #
+  #   ## plot protein chains
+  #   if p.fts.name_is('CHAIN').present?
+  #     panel << "<div class='track' style='width:#{p.aalen}px;'>"
+  #     panel << "<div class='tracklable'>Chains:</div>"
+  #     @prevto = 0
+  #     p.fts.name_is('CHAIN').each do |fts|
+  #       flength = fts.to.to_i - fts.from.to_i
+  #       if @prevto >= fts.from.to_i
+  #         panel << "<br/>"
+  #       end
+  #       @prevto = fts.to.to_i
+  #       panel << "<a class='chain' style='margin-left:#{fts.from}px; width:#{flength}px;' title='<bold>stable protein chain</bold><br/>position:#{fts.from}-#{fts.to}<br/>evidence: inferred from UniProtKB<br/>#{fts.description}'>&nbsp;</a>"
+  #     end
+  #     panel << "<div class='clear'>&nbsp;</div></div>"
+  #   end
+  #
+  #   ## plot nterms
+  #   if p.nterms.present?
+  #     panel << "<div class='track' style='width:#{p.aalen}px;'>"
+  #     panel << "<div class='tracklable'>N-termini:</div>"
+  #     @prevto = 0
+  #     p.nterms.each do |nt|
+  #       if @prevto >= nt.pos.to_i-5
+  #         panel << "<br/>"
+  #       end
+  #       @prevto = nt.pos.to_i
+  #       panel << "<a class='popup nterm #{nt.terminusmodification.kw.to_s.parameterize.to_s}' style='margin-left:#{nt.pos.to_s}px;' title='<strong>N-Terminus:</strong><br/><strong>position:</strong> #{nt.pos.to_s}<br/><strong>modification:</strong> #{nt.terminusmodification.name}<br/><strong>evidence:</strong> #{nt.evidences.*.evidencecodes.*.*.*.name.flatten.join(', ')}' href='/topfind/nterms/#{nt.id}' rel='#overlay'>N</a>"
+  #     end
+  #     panel << "<div class='clear'>&nbsp;</div></div>"
+  #   end
+  #
+  #   ## plot cterms
+  #   if p.cterms.present?
+  #     panel << "<div class='track' style='width:#{p.aalen}px;'>"
+  #     panel << "<div class='tracklable'>C-termini:</div>"
+  #     @prevto = 0
+  #     p.cterms.each do |ct|
+  #       if @prevto >= ct.pos-5
+  #         panel << "<br/>"
+  #       end
+  #       @prevto = ct.pos
+  #       panel << "<a class='popup cterm #{ct.terminusmodification.kw.to_s.parameterize.to_s}' style='margin-left:#{ct.pos-23}px;' title='<strong>C-Terminus:</strong><br/><strong>position:</strong> #{ct.pos.to_s}<br/><strong>modification:</strong> #{ct.terminusmodification.name}<br/><strong>evidence:</strong> #{ct.evidences.*.evidencecodes.*.*.*.name.flatten.join(', ')}' href='/topfind/cterms/#{ct.id}' rel='#overlay'>C</a>"
+  #     end
+  #     panel << "<div class='clear'>&nbsp;</div></div>"
+  #   end
+  #
+  #   ## plot cleavages
+  #   if p.inverse_cleavages.present?
+  #     panel << "<div class='track' style='width:#{p.aalen}px;'>"
+  #     panel << "<div class='tracklable'>Cleavage sites:</div>"
+  #     @prevto = 0
+  #     p.inverse_cleavages.each do |c|
+  #       if @prevto >= c.pos
+  #         panel << "<br/>"
+  #       end
+  #       @prevto = c.pos
+  #       panel << "<a class='popup inverse_cleavage' style='margin-left:#{c.pos.to_s}px;' title='Processed by: #{c.protease.shortname} @ AS #{c.pos}' href='/topfind/cleavages/#{c.id}' rel='#overlay'>&nbsp;</a>"
+  #     end
+  #     panel << "<div class='clear'>&nbsp;</div></div>"
+  #   end
+  #
+  #   ## plot domain like features
+  #   unless p.domains.blank?
+  #     panel << "<div class='track' style='width:#{p.aalen}px;'>"
+  #     panel << "<div class='tracklable'>Features:</div>"
+  #     @prevto = 0
+  #     p.domains.each do |fts|
+  #       flength = fts.to.to_i - fts.from.to_i
+  #       if @prevto >= fts.from.to_i
+  #         panel << "<br/>"
+  #       end
+  #       @prevto = fts.to.to_i
+  #       panel << "<a class='domain' style='margin-left:#{fts.from}px; width:#{flength}px;' title='#{fts.name}: #{fts.description} (#{fts.from}-#{fts.to})'>&nbsp;</a>"
+  #     end
+  #     panel << "<div class='clear'>&nbsp;</div></div>"
+  #   end
+  #
+  #   ## plot active features
+  #   unless p.active_features.blank?
+  #     panel << "<div class='track' style='width:#{p.aalen}px;'>"
+  #     panel << "<div class='tracklable'>Binding & active sites:</div>"
+  #     @prevto = 0
+  #     p.active_features.each do |fts|
+  #       flength = fts.to.to_i - fts.from.to_i
+  #       if @prevto >= fts.from.to_i
+  #         panel << "<br/>"
+  #       end
+  #       @prevto = fts.to.to_i
+  #       panel << "<a class='domain' style='margin-left:#{fts.from}px; width:#{flength}px;' title='#{fts.name}: #{fts.description} (#{fts.from}-#{fts.to})'>&nbsp;</a>"
+  #     end
+  #     panel << "<div class='clear'>&nbsp;</div></div>"
+  #   end
+  #
+  #   ## plot variants
+  #   unless p.var_features.blank?
+  #     panel << "<div class='track' style='width:#{p.aalen}px;'>"
+  #     panel << "<div class='tracklable'>Sequence variations:</div>"
+  #     @prevto = 0
+  #     p.var_features.each do |fts|
+  #       flength = fts.to.to_i - fts.from.to_i
+  #       if @prevto >= fts.from.to_i
+  #         panel << "<br/>"
+  #       end
+  #       @prevto = fts.to.to_i
+  #       panel << "<a class='domain' style='margin-left:#{fts.from}px; width:#{flength}px;' title='#{fts.name}: #{fts.description} (#{fts.from}-#{fts.to})'>&nbsp;</a>"
+  #     end
+  #     panel << "<div class='clear'>&nbsp;</div></div>"
+  #   end
+  #
+  #   ## plot topo features
+  #   unless p.topo_features.blank?
+  #     panel << "<div class='track' style='width:#{p.aalen}px;'>"
+  #     panel << "<div class='tracklable'>Topology:</div>"
+  #     @prevto = 0
+  #     p.topo_features.each do |fts|
+  #       flength = fts.to.to_i - fts.from.to_i
+  #       if @prevto >= fts.from.to_i
+  #         panel << "<br/>"
+  #       end
+  #       @prevto = fts.to.to_i
+  #       cssclass = fts.name
+  #       cssclass << "_extra" if fts.description.match('Extracellular')
+  #       cssclass << "_intra" if fts.description.match('Cytoplasmic')
+  #       panel << "<a class='domain #{cssclass}' style='margin-left:#{fts.from}px; width:#{flength}px;' title='#{fts.name}: #{fts.description} (#{fts.from}-#{fts.to})'>&nbsp;</a>"
+  #     end
+  #     panel << "<div class='clear'>&nbsp;</div></div>"
+  #   end
+  #
+  #   ## plot modification like features
+  #   unless p.mod_features.blank?
+  #     panel << "<div class='track' style='width:#{p.aalen}px;'>"
+  #     panel << "<div class='tracklable'>Modifications:</div>"
+  #     @prevto = 0
+  #     p.mod_features.each do |fts|
+  #       flength = fts.to.to_i - fts.from.to_i
+  #       if @prevto >= fts.from.to_i
+  #         panel << "<br/>"
+  #       end
+  #       @prevto = fts.to.to_i
+  #       panel << "<a class='domain' style='margin-left:#{fts.from}px; width:#{flength}px;' title='#{fts.name}: #{fts.description} (#{fts.from}-#{fts.to})'>&nbsp;</a>"
+  #     end
+  #     panel << "<div class='clear'>&nbsp;</div></div>"
+  #   end
+  #
+  #   panel << "</div>"
+  #   panel << '<script>jQuery(document).ready(function() {jQuery(".featurepanel a").tooltip({offset:[-10,0]}).dynamic({ bottom: { direction: "down", bounce: true } });})</script>'
+  #   @panel = panel
+  # end
 
 end

@@ -69,7 +69,8 @@ Content-Transfer-Encoding:8bit
 Dear TopFIND user,
 
 This is an automated message send to you from the TopFIND database. Attached you will find the results of your TopFINDer analysis.
-In case of questions, please respond to this email.
+For explanation of the results and citation, please see this article: http://nar.oxfordjournals.org/content/early/2014/10/26/nar.gku1012.
+In case of further questions, please respond to this email.
 
 Best regards,
 
