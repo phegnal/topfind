@@ -128,7 +128,11 @@ class TopFINDer
         elsif e.evidencesource.dbname == "TISdb"
           @q[:tisdb] << e 
         elsif e.evidencecodes.collect{|s| s.code}.include? "TopFIND:0000002"
-          @q[:isoforms] << e
+          if @nterms and @q[:location_C] > 3
+            @q[:isoforms] << e
+          elsif not @nterms and @q[:location_C] < (@q[:protein].aalen-1)
+            @q[:isoforms] << e
+          end
         else
         end
       }
@@ -148,17 +152,30 @@ class TopFINDer
       @q[:domains_before] = @q[:domains_all].select {|a| a.to.to_i <= @q[:location_C]}
       @q[:domains_after] = @q[:domains_all].select {|a| a.from.to_i >= @q[:location_C] + 1 }
       @q[:domains_at] = @q[:domains_all].select {|a| 
-        (a.from.to_i <= @q[:location_C] and a.to.to_i >= @q[:location_C] + 1)        
+        (a.from.to_i <= @q[:location_C] and a.to.to_i >= @q[:location_C] + 1)
       }
         
-      if @q[:domains_all].collect{|d| d.name}.include? "SIGNAL"
-        @q[:SignalLost] = !(@q[:domains_after].collect{|d| d.name}.include? "SIGNAL")
+      # SIGNAL, PROPEPTIDE AND SHEDDING
+      # Signal peptide
+      sigs = @q[:domains_all].select{|d| d.name == "SIGNAL"}
+      if sigs.length == 0
+        @q[:SigPDistance] = ""
+      else
+        @q[:SigPDistance] = (@q[:location_C] - sigs.collect{|d| d.to}.max().to_i).to_s
       end
-      if @q[:domains_all].collect{|d| d.name}.include? "PROPEP"
-        @q[:ProPeptideLost] = !(@q[:domains_after].collect{|d| d.name}.include? "PROPEP")
+      # Propeptide
+      prop = @q[:domains_all].select{|d| d.name == "PROPEP"}
+      if prop.length == 0
+        @q[:ProPDistance] = ""
+      else
+        @q[:ProPDistance] = (@q[:location_C] - prop.collect{|d| d.to}.max().to_i).to_s
       end
-      if @q[:domains_all].collect{|d| d.name}.include? "TRANSMEM"
-        @q[:shed] = !(@q[:domains_after].collect{|d| d.name}.include? "TRANSMEM")
+      # shedding
+      tmd = @q[:domains_all].select{|d| d.name == "TRANSMEM"}
+      if tmd.length == 0
+        @q[:ShedDistance] = ""
+      else
+        @q[:ShedDistance] = (@q[:location_C] - tmd.collect{|d| d.to}.max().to_i).to_s
       end
 
       @mainarray << @q
@@ -230,16 +247,20 @@ class TopFINDer
     output = File.new(path, "w")
     output << "Accession\tInput Sequence\tProtein found\tRecommended Protein Name\tOther Names and IDs"
     output << "\tSpecies" if @spec
+    output << "\tChromosome" if @chromosome
     output << "\tChromosome band" if @chromosome
-    output << "\tP10 to P10'" + "\t"
+    output << "\tP10 to P1"
+    output << "\tP1' to P10'"
     if @nterms
-      output << "P1' Position"
+      output << "\tP1' Position"
     else
-      output << "P1 Position"
+      output << "\tP1 Position"
     end
+    output << "\tFull protein length (aa)"
     output << "\tUniProt curated start\tAlternative Spliced Start\tCleaving proteases\tOther experimental terminus evidences\tAlternative Translation Start" if @evidence
     output << "\tProtease Web Connections" if @proteaseWeb
-    output << "\tN-terminal Features (Start to P1)\tFeatures spanning terminus (P1 to P1')\tC-terminal Features (P1' to End)\tSignalpeptide lost\tPropeptide lost\tShed" if @domain
+    output << "\tN-terminal Features (Start to P1)\tFeatures spanning terminus (P1 to P1')\tC-terminal Features (P1' to End)" if @domain
+    output << "\tDistance To signal peptide\tDistance to propeptide lost\tDistance to last transmembrane domain (shed)" if @domain and @nterms
     output << "\n"
   
   
@@ -251,13 +272,16 @@ class TopFINDer
       else
         output << "#{q[:acc]}\t#{q[:full_pep]}\tYES\t#{q[:protein].recname}\t#{q[:all_names].collect{|s| s.name}.uniq.join(';')}"
         output << "\t#{q[:species]}" if @spec
-        output << "\t#{q[:chr].join('')}" if @chromosome
-        output << "\t#{q[:upstream]} | #{q[:downstream]}"
+        output << "\t#{q[:chr][0]}" if @chromosome
+        output << "\t#{q[:chr][1]}" if @chromosome
+        output << "\t#{q[:upstream]}"
+        output << "\t#{q[:downstream]}"
         if @nterms
           output << "\t#{q[:location_C]+1}"
         else
           output << "\t#{q[:location_C]}"
         end
+        output << "\t" + q[:protein].aalen.to_s
         if @evidence
           output << (q[:uniprot].length > 0 ? "\tX" : "\t")
           output << ((q[:isoforms].length > 0 or q[:ensembl].length > 0) ? "\tX" : "\t") 
@@ -282,12 +306,11 @@ class TopFINDer
           output << "\t" + q[:domains_before].collect{|d| "#{d.name} (#{d.description})"}.uniq.join(";")
           output << "\t" + q[:domains_at].collect{|d| "#{d.name} (#{d.description})"}.uniq.join(";")
           output << "\t" + q[:domains_after].collect{|d| "#{d.name} (#{d.description})"}.uniq.join(";")
-          output << "\t"
-          output << "X" if !q[:SignalLost].nil? & q[:SignalLost]
-          output << "\t"
-          output << "X" if !q[:ProPeptideLost].nil? & q[:ProPeptideLost]
-          output << "\t"
-          output << "X" if !q[:shed].nil? & q[:shed]
+          if @nterms
+            output << "\t" + q[:SigPDistance]
+            output << "\t" + q[:ProPDistance]
+            output << "\t" + q[:ShedDistance]
+          end
         end
         output << "\n"
       end
