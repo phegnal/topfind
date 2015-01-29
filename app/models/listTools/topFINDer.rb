@@ -29,27 +29,34 @@ class TopFINDer
     @spec = params['spec']
     @nterminal = params['nterminal'].to_i
     @cterminal = params['cterminal'].to_i
-    @mainarray = []
+    @mainHash = {}
     @nterms = (params[:nterms] == "nterms")
-    @input1.each {|i|  
+
+    # create a uniquifyable list of ids
+    @orderedInput = @input1.collect {|i| i.gsub("_", "")}.collect{|x| x.gsub("\s", "_")}
+    @uniqueInput = @orderedInput.uniq
+    
+    print "Analyzing #{@uniqueInput.length} unique peptides of a list of #{@orderedInput.length}\n"
+        
+    @uniqueInput.each{|i|
       print "." 
       @q = {}
-	  iSplit = i.split("\s")
-	  if iSplit.length < 2
-	  	@q[:found] = false
-	  	@q[:acc] = i
-	  	@q[:full_pep] = "incomplete row"
+      iSplit = i.split("_")
+      if iSplit.length < 2
+        @q[:found] = false
+        @q[:acc] = i
+        @q[:full_pep] = "incomplete row"
         @mainarray << @q
         next
-	  else
-		  @q[:acc] = iSplit.fetch(0)
-		  #@q[:pep] = i.split("\s").fetch(1).gsub(/[^[:upper:]]+/, "")
-		  @q[:pep] = iSplit.fetch(1).gsub(/^.{1}\./,"").gsub(/\..{1}$/,"").gsub(/[^[:upper:]]+/, "")
-		  @q[:full_pep] = iSplit.fetch(1)
-		  @q[:protein] = if Protein.find(:first, :conditions => ["ac = ?", @q[:acc]]) != nil
-			Protein.find(:first, :conditions => ["ac = ?", @q[:acc]])
-		  else
-		  end
+      else
+        @q[:acc] = iSplit.fetch(0)
+        #@q[:pep] = i.split("\s").fetch(1).gsub(/[^[:upper:]]+/, "")
+        @q[:pep] = iSplit.fetch(1).gsub(/^.{1}\./,"").gsub(/\..{1}$/,"").gsub(/[^[:upper:]]+/, "")
+        @q[:full_pep] = iSplit.fetch(1)
+        @q[:protein] = if Protein.find(:first, :conditions => ["ac = ?", @q[:acc]]) != nil
+          Protein.find(:first, :conditions => ["ac = ?", @q[:acc]])
+        else
+        end
       end
       
       # get location if protein is found
@@ -178,13 +185,13 @@ class TopFINDer
         @q[:ShedDistance] = (@q[:location_C] - tmd.collect{|d| d.to}.max().to_i).to_s
       end
 
-      @mainarray << @q
+      @mainHash[i] = @q
     
-    }    
+    }
     
     print "\n"
   
-    @foundPeptides = @mainarray.select{|x| x[:found]}
+    @foundPeptides = @mainHash.values.select{|x| x[:found]}
 
     # ICELOGO
     if @nterms # >1 because this is a 0 based count
@@ -264,7 +271,8 @@ class TopFINDer
     output << "\n"
   
   
-    @mainarray.each{|q|
+    @orderedInput.each{|x|
+      q = @mainHash[x]
       if q[:found].nil?
         output << "#{q[:acc]}\t#{q[:full_pep]}\tno\n"
       elsif !q[:found]
