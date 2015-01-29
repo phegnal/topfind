@@ -292,7 +292,8 @@ class TopFINDer
         output << "\t" + q[:protein].aalen.to_s
         if @evidence
           output << (q[:uniprot].length > 0 ? "\tX" : "\t")
-          output << ((q[:isoforms].length > 0 or q[:ensembl].length > 0) ? "\tX" : "\t") 
+          # output << ((q[:isoforms].length > 0 or q[:ensembl].length > 0) ? "\tX" : "\t")
+          output << (q[:ensembl].length > 0 ? "\tX" : "\t")
           output << ("\t" + q[:proteases].collect{|p| p.shortname}.uniq.join(';'))
           output << ("\t" + q[:otherEvidences].collect{|e| e.methodology}.uniq.join(";"))
           output << (q[:tisdb].length > 0 ? "\tX" : "\t")

@@ -87,6 +87,7 @@ namespace :ensembl do
       g_query = "select distinct d.protein_id, d.content2, p.sequence, p.ac from drs d, proteins p where d.db_name = 'Ensembl' and p.id = d.protein_id and p.species_id = #{speciesId};"
       g_result =  ActiveRecord::Base.connection.execute(g_query);
       genes = {}
+      raise "you have to correct the ENGS - UniProt mapping for isoforms here! the table is messed up"
       g_result.each{|x|
         if not genes.has_key?(x[1])
           genes[x[1]] = []
