@@ -5,6 +5,7 @@
 <content:>
 <section class="content-body">  
 	<h2>TopFINDer analysis submitted</h2>
+	<p></p>
 	<p> TopFIND just sent a confirmation email to <%= @email %>. A second email with your results will follow shortly (15 minutes to 2 hours). </p>
 	<p> If you do not receive either of these emails, please first check that <%= @email %> is correct and then contact us at topfind.clip@gmail.com. </p>
 	<p> Thank you for using TopFINDer! </p>

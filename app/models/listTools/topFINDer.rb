@@ -213,23 +213,31 @@ class TopFINDer
       print "Exception occured making Venn Diagram: " + e 
     end
 
+	print "starting pathfinding\n"
     # PATHFINDING
     if(@proteaseWeb == "1")
+      
       if(not Protein.find_by_ac(params[:pw_protease].strip).nil? and params[:pw_maxPathLength].to_i > 0)
+   		if(params[:pw_maxPathLength].to_i > 4) 
+   			params[:pw_maxPathLength] = "4"
+   		end
         # @foundPeptides.each{|p| g.add_edge(params[:pw_protease], p[:acc], p[:location_C], "l")}
         finder = PathFinding.new(Graph.new(params[:pw_org],[]), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal, true)
         finder.find_all_paths(params[:pw_protease],  @foundPeptides.collect{|x|  {:id => x[:acc], :pos => x[:location_C]} })
+		print " found paths at maxpathlength #{params[:pw_maxPathLength]}\n"
         finder.remove_direct_paths()
         @pw_paths = finder.get_paths()
         @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
+		print " making graphviz\n"
         pdfPath = finder.make_graphviz(fileDir, @pw_gnames) # this saves the image but we need to define the path yet
+		print " graphviz done\n"
       else
         p "protease not found" if Protein.find_by_ac(params[:pw_protease].strip).nil?
         p "pathlength invalid" if params[:pw_maxPathLength].to_i <= 0
         # TODO put error message on html??
       end
-
     end
+	print "pathfinding done\n"    
 
     if(@proteaseStats == "1")
       if @foundPeptides.collect{|a| a[:proteases].length}.sum > 0 then

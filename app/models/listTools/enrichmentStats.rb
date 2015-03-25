@@ -55,7 +55,7 @@ class EnrichmentStats
       }
       @@r.assign("ps", @@statsArray.collect{|x| x[:fet]})
       fetAdj = @@r.eval("p.adjust(ps, method = 'BH')").to_ruby
-      fetAdj = [fetAdj] if fetAdj == Float
+      fetAdj = [fetAdj] if fetAdj.class == Float
       fetAdj.each_with_index{|x, i|  @@statsArray[i][:fetAdj] = x }
     end
   end
