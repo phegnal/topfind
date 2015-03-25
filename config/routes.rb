@@ -9,14 +9,13 @@ ActionController::Routing::Routes.draw do |map|
   map.connect  'download', :controller => 'documentations', :action => 'download' 
   map.connect  'api', :controller => 'documentations', :action => 'api'
   map.connect 'contribute', :controller => 'imports', :action => 'index'
-  map.connect 'proteins/pw_input', :controller => 'proteins', :action => 'pw_input'
-  map.connect 'proteins/pw_output', :controller => 'proteins', :action => 'pw_output'
-  map.connect 'proteins/trying_featurePanel', :controller => 'proteins', :action => 'trying_featurePanel'
-  map.connect 'proteins/peptide', :controller => 'proteins', :action => 'peptide_search'
-  map.connect 'proteins/peptide_search2', :controller => 'proteins', :action => 'peptide_search2'
-  map.connect 'proteins/multi_peptides', :controller => 'proteins', :action => 'multi_peptides'
-  map.connect 'proteins/multi_peptides2', :controller => 'proteins', :action => 'multi_peptides2'
-  map.connect 'proteins/multi_export', :controller => 'proteins', :action => 'multi_peptides2'
+
+  map.connect 'proteins/pw_input', :controller => 'proteins', :action => 'pathfinder'
+  map.connect 'pathfinder', :controller => 'proteins', :action => 'pathfinder'
+  map.connect 'pathfinder_output', :controller => 'proteins', :action => 'pathfinder_output'
+  map.connect 'proteins/multi_peptides', :controller => 'proteins', :action => 'topfinder'
+  map.connect 'topfinder', :controller => 'proteins', :action => 'topfinder'
+  map.connect 'topfinder_output', :controller => 'proteins', :action => 'topfinder_output'
   
   map.connect 'interactions/:id', :controller => 'cleavages', :action => 'psicquicshow'
 

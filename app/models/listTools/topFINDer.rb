@@ -33,11 +33,11 @@ class TopFINDer
     @nterms = (params[:nterms] == "nterms")
 
     # create a uniquifyable list of ids
-    @orderedInput = @input1.collect {|i| i.gsub("_", "")}.collect{|x| x.gsub("\s", "_")}
+    @orderedInput = @input1.collect {|i| i.gsub("_", "")}.collect{|x| x.gsub("\s", "_")}.collect{|x| x.gsub("\t", "_")}
     @uniqueInput = @orderedInput.uniq
     
     print "Analyzing #{@uniqueInput.length} unique peptides of a list of #{@orderedInput.length}\n"
-        
+    print @uniqueInput
     @uniqueInput.each{|i|
       print "." 
       @q = {}
@@ -46,7 +46,7 @@ class TopFINDer
         @q[:found] = false
         @q[:acc] = i
         @q[:full_pep] = "incomplete row"
-        @mainarray << @q
+        @mainHash[i] = @q
         next
       else
         @q[:acc] = iSplit.fetch(0)
@@ -62,7 +62,7 @@ class TopFINDer
       # get location if protein is found
       if not @q[:protein].present? or @q[:pep] == ""
         @q[:found] = false
-        @mainarray << @q
+        @mainHash[i] = @q
         next
       else
         @q[:sequence] = @q[:protein].sequence
@@ -79,7 +79,7 @@ class TopFINDer
       # is location found otherwise don't process
       if @q[:location_C].nil?
         @q[:found] = false
-        @mainarray << @q
+        @mainHash[i] = @q
         next
       end
 

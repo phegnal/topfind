@@ -181,8 +181,8 @@
     <nav-item href="#{base_url}/ctermini">C termini</nav-item>
     <nav-item with="&Terminusmodification">Modifications</nav-item>
     <nav-item href="#{base_url}/api">API</nav-item>
-    <nav-item href="#{base_url}/proteins/multi_peptides">TopFINDer</nav-item>
-    <nav-item href="#{base_url}/proteins/pw_input">PathFINDer</nav-item>
+    <nav-item href="#{base_url}/topfinder">TopFINDer</nav-item>
+    <nav-item href="#{base_url}/pathfinder">PathFINDer</nav-item>
     <nav-item href="#{base_url}/contribute">Contribute</nav-item>
     <nav-item href="#{base_url}/documentation">Help</nav-item>
     <li class="top-search" href="" style="border-right:0px;">    
