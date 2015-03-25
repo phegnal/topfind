@@ -11,6 +11,7 @@ doc = REXML::Document.new(contents)
 hs = {}
 mm = {}
 
+# mapping id to uniprot id
 doc.elements.each('orthoXML/species'){|s| 
   p s.attributes["name"]
   x = {}
@@ -29,6 +30,7 @@ doc.elements.each('orthoXML/species'){|s|
   end
 }
 
+# mapping mouse to human
 groupHashes = []
 doc.elements.each('orthoXML/groups/orthologGroup'){|group|
   gH = {:mm => [], :hs => []}
@@ -46,6 +48,7 @@ doc.elements.each('orthoXML/groups/orthologGroup'){|group|
 
 p groupHashes
 
+# file output
 f = File.open("paranoid_output.txt", "w")
 f << "Human\tMouse\n"
 groupHashes.each{|hash|

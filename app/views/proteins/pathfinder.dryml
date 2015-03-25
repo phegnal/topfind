@@ -1,0 +1,80 @@
+<page>
+	<title:>
+	PathFINDer : the Protease Web Investigator
+</title:>
+<content:>
+<section class="content-body"> 
+	<h1>
+		PathFINDer
+	</h1>
+	
+	<p><b>Description:</b></p>
+	<p wwidth = ""> PathFINDer is TopFIND's protease web explorer inspired by <a href="http://www.plosbiology.org/article/info%3Adoi%2F10.1371%2Fjournal.pbio.1001869">Fortelny et al, PLoS Biology, 2014</a>. <br/>
+		The protease web is a network of proteases and their inhibitors. Proteases cleave <br/>
+		other proteases and inhibitors of other proteases in vivo. Changes of the activity <br/>
+		of one protease can thereby influence the cleavage of substrates of other proteases <br/>
+		indirectly. PathFINDer uses a graph to model known protease interactions as a <br/>
+		network and finds paths in this network. These paths represent biological pathways <br/>
+		thus enabling mechanistic insights. <br/> 
+	</p>
+	<p>More information and citation: <a href="http://nar.oxfordjournals.org/content/early/2014/10/26/nar.gku1012" target="_blank">Fortelny et al, NAR, 2014</a> <a href="http://nar.oxfordjournals.org/content/early/2014/10/26/nar.gku1012.full.pdf" target="_blank">[pdf]</a> 
+	</p>
+    <br/><br/>
+	
+	<% form_tag(:action => "pathfinder_output", :method => "get") do %>
+	<p>
+		<b> Network from organism </b>  <img class ='help'  src='/topfind/images/help.png' alt='?' title='The network data will be taken from one organism. If your proteins are not from the same organism, proteins will be crossmapped using the Paranoid 8 database.'/>  
+		<br/>
+		<%= radio_button_tag "network_org", "human", true %> human <br></br>
+		<%= radio_button_tag "network_org", "mouse" %> mouse
+	</p>
+	
+	<br/>
+	
+	<p>
+		<b> Proteins are from organism </b>  <img class ='help'  src='/topfind/images/help.png' alt='?' title='Identify the organism used in your analysis (the UniProt accession codes below have to be from this organism).'/>
+		<br/>
+		<%= radio_button_tag "list_org", "human", true %> human <br></br>
+		<%= radio_button_tag "list_org", "mouse" %> mouse <br></br>
+	</p>
+	
+	<br/>
+	
+	<p>
+		<b> Protease UniProt ID </b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Supply the proteases that will be the source of the paths found. The protease must be from the same organism as the substrates'/>
+		<br></br>
+		<%= text_field_tag(:start, "P14091") %> <br></br>
+	</p>
+
+	<br/>
+	
+	<p>
+		<b> Substrate UniProt IDs and cleavage positions </b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Supply your list of substrates as UniProt accession codes with cleavage positions as shown below.'/>
+		<br></br>
+		<%= text_area_tag(:targets, "P00734 314\nP17655 21\nP25774 31\nP09668 41\nP05120 122\nP10144 20\nP01019 40\nP01019 42\nQ9UBU3 50\nP05814 71\nQ9ULZ1 76\nP30990 157\nP01213 218\nP01042 387")  %> <br></br>
+	</p>
+
+	<br/>
+
+	<p>
+		<b> Maximum path length </b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='The maximal path length is the maximum number of steps any path can have.'/>
+		<br></br>
+		<%= text_field_tag(:maxLength, "4")  %> <br></br>
+	</p>
+	
+	<br/>
+	
+	<p>
+		<b> Find cleavages on substrates at the indicated position only </b><img class ='help'  src='/topfind/images/help.png' alt='?' title='To account for small truncations of termini ("ragging"), PathFINDer can look for cleavages upstream (N-terminal, non-prime) and downstream (C-terminal, prime) of the indicated position. If "yes" is selected, the position in the list will be used with the range indicated. If "no" is selected substrate cleavage position is not used in the analysis.'/>
+		<br></br>
+		<%= radio_button_tag "byPos", "yes", true %> yes with range <br/> from non-prime <%= text_field_tag(:rangeLeft, "3")  %> <br/> to prime <%= text_field_tag(:rangeRight, "3")  %> aminoacids<br></br>
+ 	   	<%= radio_button_tag "byPos", "no" %> no
+		<br></br>
+	</p>
+	<br/>
+	<br/>
+	<%= submit_tag("Find paths") %>
+	<% end %>
+</section>
+</content:>
+</page>
