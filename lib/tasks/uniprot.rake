@@ -790,14 +790,14 @@ task :import_uniprot_names do
     when 'human' 
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot/uniprot_sprot_human.dat.gz")
       io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A9606+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
-      @mart = biomart.datasets["hsapiens_gene_ensembl"]
+      # @mart = biomart.datasets["hsapiens_gene_ensembl"]
     when 'mouse'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_rodents.dat.gz")
       io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A10090+keyword%3A1185%29+AND+reviewed%3Ayes.txt") 
-      @mart = biomart.datasets["mmusculus_gene_ensembl"] 
+      # @mart = biomart.datasets["mmusculus_gene_ensembl"] 
     when 'arabidopsis'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_plants.dat.gz")
-      io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A3702+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
+      # io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A3702+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
     when 'arabidopsis-trembl'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_trembl_plants.dat.gz")
     when 'ecoli'
@@ -806,7 +806,7 @@ task :import_uniprot_names do
     when 'yeast'
       # io = Zlib::GzipReader.open("#{RAILS_ROOT}/databases/uniprot_sprot/uniprot_sprot_fungi.dat.gz")
       io = File.open("#{RAILS_ROOT}/source_data/uniprot_2014-06/uniprot-%28organism%3A559292+keyword%3A1185%29+AND+reviewed%3Ayes.txt")
-      @mart = biomart.datasets["scerevisiae_gene_ensembl"]
+      # @mart = biomart.datasets["scerevisiae_gene_ensembl"]
   end
   puts "done"
     
@@ -864,20 +864,20 @@ task :import_uniprot_names do
         altname = Array.new
         if recnames
           recnames.each do |name|
-            name.match(/Full=.*/) ? altname.push({'full' => name.match(/Full=(.*)/)[1]})  : 1
-            name.match(/Short=(.*)/) ? altname[altname.length-1].merge!({'short' => name.match(/Short=(.*)/)[1]}) :1
+            name.match(/Full=.*/) ? altname.push({'full' => name.match(/Full=(.*)/)[1].delete(';')})  : 1
+            name.match(/Short=(.*)/) ? altname[altname.length-1].merge!({'short' => name.match(/Short=(.*)/)[1].delete(';')}) :1
           end
         end   
         if altnames
           altnames.each do |name|
-            name.match(/Full=.*/) ? altname.push({'full' => name.match(/Full=(.*)/)[1]})  : 1
-            name.match(/Short=(.*)/) ? altname[altname.length-1].merge!({'short' => name.match(/Short=(.*)/)[1]}) :1
+            name.match(/Full=.*/) ? altname.push({'full' => name.match(/Full=(.*)/)[1].delete(';')})  : 1
+            name.match(/Short=(.*)/) ? altname[altname.length-1].merge!({'short' => name.match(/Short=(.*)/)[1].delete(';')}) :1
           end
         end     
         if subnames
           subnames.each do |name|
-            name.match(/Full=.*/) ? altname.push({'full' => name.match(/Full=(.*)/)[1]})  : 1
-            name.match(/Short=(.*)/) ? altname[altname.length-1].merge!({'short' => name.match(/Short=(.*)/)[1]}) :1
+            name.match(/Full=.*/) ? altname.push({'full' => name.match(/Full=(.*)/)[1].delete(';')})  : 1
+            name.match(/Short=(.*)/) ? altname[altname.length-1].merge!({'short' => name.match(/Short=(.*)/)[1].delete(';')}) :1
           end
         end           
         

@@ -80,9 +80,13 @@
   		  <%= check_box_tag(:stats, "1", true)%> <b>Protease enrichment</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='This will report count and enrichment statistics of proteases that cleave the proteins in your list.'/> <br/>
 		</div>
 		<div class="pathfinder_box">
-		  <%= check_box_tag(:proteaseWeb, "1", true)%> <b>Protease web</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='This program find paths (multi-step connections) in the protease web from a given protease to all submitted substrates. Please indicate the protease you are interested in (UniProt accession, e.g. P01023). The maximal path length is the maximum number of steps any path can have.'/> <br/>
-		  protease: <%= text_field_tag(:pw_protease, "P14091", :size=>10, :maxlength=>10)  %> <br/>
-		  max. path length <%= text_field_tag(:pw_maxPathLength, "4", :size=>2, :maxlength=>2)  %><br/>
+		  <%= check_box_tag(:proteaseWeb, "1", false)%> <b>Protease web</b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='This program find paths (multi-step connections) in the protease web from a given protease to all submitted substrates. Please indicate the protease you are interested in (UniProt accession, e.g. P01023). The maximal path length is the maximum number of steps any path can have.'/> <br/>
+		  protease: <%= text_field_tag(:pw_protease, "P14091", :size=>10, :maxlength=>10)  %>
+		  <img class ='help'  src='/topfind/images/help.png' alt='?' title='The protease which will be the start of all identified paths.'/>
+		  <br/>
+		  maximum path length (max: 4) <%= text_field_tag(:pw_maxPathLength, "4", :size=>2, :maxlength=>2)  %> 
+		  <img class ='help'  src='/topfind/images/help.png' alt='?' title='Determines how long the paths in the web can be. Pathfinding is a computationally expensive process for long paths. Please use your TopFINDer output in the PathFINDer tool from the top menu, if you would like to experiment with pathfinding.'/>
+		  <br/>
 		  organism: 
 		  <%= radio_button_tag :pw_org, "human", true %> human
 		  <%= radio_button_tag :pw_org, "mouse" %> mouse
