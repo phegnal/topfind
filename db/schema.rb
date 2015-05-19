@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120411235911) do
+ActiveRecord::Schema.define(:version => 0) do
 
   create_table "acs", :force => true do |t|
     t.string "protein_id"
@@ -126,18 +126,6 @@ ActiveRecord::Schema.define(:version => 20120411235911) do
 
   add_index "cleavagesites", ["import_id"], :name => "index_cleavagesites_on_import_id"
 
-  create_table "crosscorrelations", :force => true do |t|
-    t.string   "name"
-    t.string   "email"
-    t.text     "desc"
-    t.text     "ntermini"
-    t.text     "ctermini"
-    t.text     "cleavagesites"
-    t.string   "ip"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "cterm2evidences", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -167,9 +155,9 @@ ActiveRecord::Schema.define(:version => 20120411235911) do
   add_index "cterms", ["terminusmodification_id"], :name => "index_cterms_on_terminusmodification_id"
 
   create_table "delayed_jobs", :force => true do |t|
-    t.integer  "priority",   :default => 0
-    t.integer  "attempts",   :default => 0
-    t.text     "handler"
+    t.integer  "priority",                       :default => 0
+    t.integer  "attempts",                       :default => 0
+    t.text     "handler",    :limit => 16777215
     t.text     "last_error"
     t.datetime "run_at"
     t.datetime "locked_at"
@@ -288,6 +276,7 @@ ActiveRecord::Schema.define(:version => 20120411235911) do
     t.float    "confidence"
     t.string   "confidence_type",               :default => "unknown"
     t.string   "method_system",                 :default => "unknown"
+    t.string   "method_perturbation",           :default => "none"
     t.string   "method_protease_source",        :default => "unknown"
     t.string   "methodology",                   :default => "unknown"
     t.string   "proteaseassignment_confidence", :default => "unknown"
@@ -297,6 +286,7 @@ ActiveRecord::Schema.define(:version => 20120411235911) do
   add_index "evidences", ["evidencesource_id"], :name => "index_evidences_on_evidencesource_id"
   add_index "evidences", ["lab"], :name => "index_evidences_on_lab"
   add_index "evidences", ["method"], :name => "index_evidences_on_method"
+  add_index "evidences", ["method_perturbation"], :name => "method_perturbation"
   add_index "evidences", ["method_protease_source"], :name => "index_evidences_on_method_protease_source"
   add_index "evidences", ["method_system"], :name => "index_evidences_on_method_system"
   add_index "evidences", ["methodology"], :name => "index_evidences_on_methodology"

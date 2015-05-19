@@ -334,9 +334,13 @@ class TopFINDer
       end
     }
     output.close
-
-    x = system "cd #{dir}; zip -r #{label} #{label}"
-  
+   # Doesn't work on windows
+   x = system "cd #{dir}; zip -r #{label} #{label}"
+   
+   # Maybe this works on windows"
+   if !x
+     x = system ("rar a #{dir}/#{label}.zip #{dir}/#{label}")
+   end
     Emailer.new().sendTopFINDerResults(params[:email], "#{dir}/#{label}.zip", label)
 
     p "DONE"

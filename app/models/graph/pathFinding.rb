@@ -197,7 +197,7 @@ EOS
     end
     
     x = nil
-    x = system "/usr/local/bin/dot #{folder}/pw_graphviz.txt -Tsvg -o #{folder}/pw_graphviz.svg 2>#{folder}/pw_errorlog.txt" if File.exist?("#{folder}/pw_graphviz.txt")
+    x = system "dot #{folder}/pw_graphviz.txt -Tsvg -o #{folder}/pw_graphviz.svg 2>#{folder}/pw_errorlog.txt" if File.exist?("#{folder}/pw_graphviz.txt")
 	return(x)
   end
   

@@ -33,10 +33,14 @@ class ProteinsController < ApplicationController
     conditionvars = Hash.new
     
     #take the shortcut when searching for a single existing accession
+    
     if params[:query].present?
       # if it matches the accession number schema
+
       match = params[:query].match(/^[A-Za-z]\w{5}(-\d)?$/).present?
+      
       protein = Protein.find_by_ac(params[:query]) if match
+      
     end
     if protein.present?
       redirect_to protein
@@ -44,8 +48,9 @@ class ProteinsController < ApplicationController
     
     
     # else do normal search
+     
     if (params.keys&['query','species','function','modification','chromosome','minntermini','minctermini']).present? && !protein.present?
-
+	
       #extract species
       if params[:query].present?
   
@@ -193,17 +198,29 @@ class ProteinsController < ApplicationController
       conditions << andqueries
       conditions << orqueries
       conditions = conditions.flatten.compact
+      File.open("log.txt", "w") { |file| file.write(conditions)}
       
-      res = Protein.scoped :joins => joins, :select => select.join(','), :conditions => conditions, :group => 'proteins.ac', :order => 'proteins.name' , :having => having if having.present?     
-      res = Protein.scoped :joins => joins, :select => select.join(','), :conditions => conditions, :group => 'proteins.ac', :order => 'proteins.name'  unless having.present?
+      #??? S.B I don't think anything is being saved here on res. I should be able to print "res" if it had worked.
+      #Having = having n or c termini
+      #joins = something to do with species?
+      #res = Protein.scoped :joins => joins, :select => select.join(','), :conditions => conditions, :group => 'proteins.ac', :order => 'proteins.name' , :having => having if having.present?     
+      #res = Protein.scoped :joins => joins, :select => select.join(','), :conditions => conditions, :group => 'proteins.ac', :order => 'proteins.name'  unless having.present?
       
-      if res.first.present? && res.last == res.first
+      res = Protein.scoped :joins => joins, :select => select.join(','), :conditions => conditions, :order => 'proteins.name' , :having => having if having.present?     
+      res = Protein.scoped :joins => joins, :select => select.join(','), :conditions => conditions, :order => 'proteins.name'  unless having.present?
+      
+      
+      #S.B This ensures that a first result is present
+      #and that the first result equals the last result
+      #which indicates that there is only one result
+      #S.B Something isn't working here...I can't print this conditional statement. It's probably res thats messing everything up
+      if res.first.present? && res.last == res.first 
         redirect_to res.first
       else
         hobo_index res 
       end 
     else #if no searchparams present
-      hobo_index Protein, :group => 'proteins.ac', :order => 'proteins.name'
+          hobo_index Protein, :order => 'proteins.name'	 
     end
   end     
   
