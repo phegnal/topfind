@@ -1,0 +1,14 @@
+add rat to topfind (email by anne Døskeland)
+text mining articles for cleavage and inhibition
+handle emailing - what about failed emails? (see google account)
+improve TISdb mapping - get more evidences from TopFIND
+PathFINDer speed with long paths / lists - improve code?
+upload more papers on terminomics -- work on submission forms
+protease cleavage prediction based on specificity profiles?
+
+1. Chromosomes read from BioMart - should get it from somewhere else but have to see about that? - NeXtProt
+2. add NextProt protein status (missing proteins) to TopFIND
+3. check again about the alternative splicing annotation vs uniprot isoforms (reduce overlaps)
+4. Learn about Methionine cleavage, how often does it happen?
+5. Get position of evidences (comma separated) in the table returned by TopFINDer
+6. update protein names (P39900)

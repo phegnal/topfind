@@ -194,8 +194,19 @@ class ProteinsController < ApplicationController
       conditions << orqueries
       conditions = conditions.flatten.compact
       
-      res = Protein.scoped :joins => joins, :select => select.join(','), :conditions => conditions, :group => 'proteins.ac', :order => 'proteins.name' , :having => having if having.present?     
-      res = Protein.scoped :joins => joins, :select => select.join(','), :conditions => conditions, :group => 'proteins.ac', :order => 'proteins.name'  unless having.present?
+      p joins
+      p select.join(",")
+      p conditions
+      p having
+      
+      
+      # res = Protein.scoped :joins => joins, :select => select.join(','), :conditions => conditions, :group => 'proteins.ac', :order => 'proteins.name' , :having => having if having.present?
+      # res = Protein.scoped :joins => joins, :select => select.join(','), :conditions => conditions, :group => 'proteins.ac', :order => 'proteins.name'  unless having.present?
+
+      res = Protein.scoped :joins => joins, :select => select.join(','), :conditions => conditions, :order => 'proteins.name' , :having => having if having.present?
+      res = Protein.scoped :joins => joins, :select => select.join(','), :conditions => conditions, :order => 'proteins.name'  unless having.present?
+      
+      p res
       
       if res.first.present? && res.last == res.first
         redirect_to res.first
@@ -203,7 +214,8 @@ class ProteinsController < ApplicationController
         hobo_index res 
       end 
     else #if no searchparams present
-      hobo_index Protein, :group => 'proteins.ac', :order => 'proteins.name'
+      # hobo_index Protein, :group => 'proteins.ac', :order => 'proteins.name'
+      hobo_index Protein, :order => 'proteins.name'
     end
   end     
   

@@ -4,6 +4,7 @@ install using rvm
 rvm install 1.8.7
 rvm --default use 1.8.7
 (or install ruby 1.8.7 directly)
+in WINDOWS - put ruby/bin to your path so that you can call it from the command line
 
 gems version 1.3.7
 rvm rubygems 1.3.7 —force
@@ -40,10 +41,17 @@ Needed brew to install mysql
 brew install -v=2.8.1 mysql
 gem install -v=2.8.1 mysql
 download mysql from: http://clipserve.clip.ubc.ca/topfind/download
+copy libmysql.dll into ruby/bin if mysql doesn’t work like that.
+Maybe you will also need to install the mysql2 gem instead of mysql and use the mysql2 adaptor in “config/database.yml”
+
+Now you need to go into the TopFIND application and find the files in 
+/config that are “_example” and configure them to your system and Save as the same name without _example.
 
 Start the server
 thin --prefix /topfind start
 http://localhost:3000/topfind
+also needs to start the delayed_jobs, that is done by “rake jobs:work” 
+	
 also needs to start the delayed_jobs, that is done by “rake jobs:work” 
 
 Other things:
