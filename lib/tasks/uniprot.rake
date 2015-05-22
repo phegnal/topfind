@@ -1033,3 +1033,61 @@ task :write_meropscodes do
   end
 
 end
+
+desc "get chromosome info from separate file - maybe can be removed when new uniprot is imported"
+task :update_chromosomes do
+  require "#{RAILS_ROOT}/config/environment"
+  
+  file = File.open("#{RAILS_ROOT}/source_data/uniprot_2015_05_chromosomes/chromosomes.tab")
+  h = 0
+  m = 0
+  a = 0
+  e = 0
+  y = 0
+  file.each{|line|
+    if !line.match(/^#/).nil? # commented line
+      next
+    end
+    l = line.strip.split("\t")
+    if l[0] == "Entry"
+      next
+    end
+    chr = "Unplaced"
+    if !l[6].nil?
+      chr = l[6].split(",").collect{|x| x.gsub(/UP\d+?:/, "").gsub(/Chromosome/, "").strip}.join("_")
+    end
+    chr = "Unplaced" if chr == "_"
+    
+    ps = Protein.find(:all, :conditions =>["ac like ?", "#{l[0]}%"])
+    
+    ps.each{|p|
+      p "proteins #{p.ac} matching #{l[0]}%" 
+      p "#{p.chromosome} set to #{chr}"
+      p.chromosome = chr
+      p.save
+      p "now is #{p.chromosome}"
+    }
+    
+    if l[4] == "Homo sapiens (Human)"
+      h = h + 1
+    end
+    if l[4] == "Mus musculus (Mouse)"
+      m = m +1
+    end      
+    if l[4] == "Arabidopsis thaliana (Mouse-ear cress)"
+      a = a + 1
+    end
+    if l[4] == "Saccharomyces cerevisiae (strain ATCC 204508 / S288c) (Baker's yeast)"
+      y = y + 1
+    end
+    if l[4] == "Escherichia coli (strain K12)"
+      e = e + 1
+    end
+  }
+  p "human #{h}"
+  p "mouse #{m}"
+  p "arabidopsis #{a}"
+  p "yeast #{y}"
+  p "ecoli #{e}"
+  file.close  
+end

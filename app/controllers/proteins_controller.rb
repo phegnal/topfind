@@ -193,7 +193,7 @@ class ProteinsController < ApplicationController
       conditions << andqueries
       conditions << orqueries
       conditions = conditions.flatten.compact
-      
+
       p joins
       p select.join(",")
       p conditions
@@ -693,6 +693,7 @@ class ProteinsController < ApplicationController
   end
   
   def topfinder_output
+
     # LABEL
     date = Time.new.strftime("%Y_%m_%d")
     if params[:label].nil?

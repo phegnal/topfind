@@ -29,6 +29,10 @@ class DocumentationsController < ApplicationController
   
   def api
     hobo_index
+  end
+  
+  def updates
+    hobo_index
   end  
 
 end

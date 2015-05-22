@@ -50,7 +50,6 @@ class TopFINDer
         next
       else
         @q[:acc] = iSplit.fetch(0)
-        #@q[:pep] = i.split("\s").fetch(1).gsub(/[^[:upper:]]+/, "")
         @q[:pep] = iSplit.fetch(1).gsub(/^.{1}\./,"").gsub(/\..{1}$/,"").gsub(/[^[:upper:]]+/, "")
         @q[:full_pep] = iSplit.fetch(1)
         @q[:protein] = if Protein.find(:first, :conditions => ["ac = ?", @q[:acc]]) != nil
@@ -66,10 +65,12 @@ class TopFINDer
         next
       else
         @q[:sequence] = @q[:protein].sequence
+        match_peptide = (params[:IleLeu].nil? ? @q[:pep] : @q[:pep].gsub(/I/, "L")) # if the IleLeu is selected (:IleLeu == "1"), then the I are gsub'd to L
+        match_sequence = (params[:IleLeu].nil? ? @q[:sequence] : @q[:sequence].gsub(/I/, "L"))
         if @nterms
-          @q[:location_C] = @q[:sequence].index(@q[:pep])
+          @q[:location_C] = match_sequence.index(match_peptide)
         else
-          @q[:location_C] = @q[:sequence].index(@q[:pep]) 
+          @q[:location_C] = match_sequence.index(match_peptide) 
           if not @q[:location_C].nil?
             @q[:location_C] = @q[:location_C] + @q[:pep].length 
           end

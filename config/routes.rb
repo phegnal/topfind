@@ -9,6 +9,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect  'download', :controller => 'documentations', :action => 'download' 
   map.connect  'api', :controller => 'documentations', :action => 'api'
   map.connect 'contribute', :controller => 'imports', :action => 'index'
+  map.connect 'updates', :controller => 'documentations', :action => 'updates'
 
   map.connect 'proteins/pw_input', :controller => 'proteins', :action => 'pathfinder'
   map.connect 'pathfinder', :controller => 'proteins', :action => 'pathfinder'
