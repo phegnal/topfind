@@ -686,9 +686,10 @@ class ProteinsController < ApplicationController
     if params[:label].nil?
       label = "TopFINDer_analysis" 
     else
-      label = params[:label].gsub(/[^\w\d\_]/, "")
+      label = params[:label].gsub(/[^\w\d\_]/, "") # removes anything that's not a word, number or "_"
       # label = params[:label].gsub(/\s/, '_').gsub(/\;/, '_').gsub(/\#/,"_")
     end
+    label = label[0..30] # this is for long labels
     label = date + "_" + label
 
     # EMAIL TEST

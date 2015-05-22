@@ -3,7 +3,7 @@ class TopFINDer
   end
   
   def analyze(params, label)
-    
+      
     require 'graph/pathFinding'
     require 'graph/graph'
     require 'listTools/enrichmentStats'
