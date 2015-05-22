@@ -248,10 +248,17 @@
 	      </tr><tr>
 	        <th>Protease ID</th>
 	        <td><view:merid/> <span if="&@protein.meropslink">(<a href="#{@protein.meropslink}" target="_blank">MEROPS</a>)</span></td>
-	      </tr><tr if="&this.chromosome.present?">
-	        <th>Chromosome location</th>
-	        <% @protein.band.present? ? @band = @protein.band : @band= '';%>
-	        <td><a href="/topfind/proteins?query=&chromosome=#{@protein.chromosome}"><view:chromosome/></a> <a href="/topfind/proteins?query=&chromosome=#{@protein.chromosome}&arm=#{@band.first}&band=#{@band.delete 'pq'}"><%=@band%></a></td>
+	      <!-- </tr><tr if="&this.chromosome.present?"> -->
+		  </tr><tr>
+			<!-- <th>Chromosome location</th>   -->
+	        <th>Chromosome</th>
+	        <!-- <% @protein.band.present? ? @band = @protein.band : @band= '';%> -->
+	        <!-- <td><a href="/topfind/proteins?query=&chromosome=#{@protein.chromosome}"><view:chromosome/></a> <a href="/topfind/proteins?query=&chromosome=#{@protein.chromosome}&arm=#{@band.first}&band=#{@band.delete 'pq'}"><%=@band%></a></td> -->
+			<% if @protein.chromosome == "" %>
+				<td>(Not Available)</td>
+			<% else %>
+				<td><a href="/topfind/proteins?query=&chromosome=#{@protein.chromosome}"><view:chromosome/></a></td>
+			<% end %>
 	      </tr>
 	    </table>
 	  </section>             

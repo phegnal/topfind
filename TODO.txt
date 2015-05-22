@@ -1,19 +1,24 @@
-add rat to topfind (email by anne Døskeland)
 
-Get position of evidences (comma separated) in the table returned by TopFINDer
-update protein names (P39900) —> don’t use search names as protein names, use what’s displayed online, rename column in Fulltable.txt
-Chromosomes read from BioMart - should get it from somewhere else but have to see about that? - NeXtProt - Get chromosomes from Uniprot (Proteome’s column)
+Get position of evidences (comma separated) in the table returned by TopFINDer 
+	--> when doing this, TopFINDer can also be optimized by doing protein.nterms instead of Nterm.find(:condition)
+	--> same for Cterms and Cleavages
 
-Isoform errors: P35398-2 doesn’t map anywhere because it’s the main isoform
+Isoform problem: P35398-2 doesn’t map anywhere because it’s the main isoform
 
 add NextProt protein status (missing proteins) to TopFIND
+
 check again about the alternative splicing annotation vs uniprot isoforms (reduce overlaps)
 
 improve TISdb mapping - get more evidences from TopFIND
 
 text mining articles for cleavage and inhibition
+
 handle emailing - what about failed emails? (see google account)
 
 PathFINDer speed with long paths / lists - improve code?
+
 upload more papers on terminomics -- work on submission forms
+
 protease cleavage prediction based on specificity profiles?
+
+add rat to topfind (email by anne Døskeland) (on 8,000 swissprot entries in rat!)

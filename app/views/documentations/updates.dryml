@@ -8,9 +8,10 @@
 	    <div class="category"><h2>TopFIND 3.0</h2></div>
 	    <div class="solidbox">
 	    	<ul>			
-					<li>05/2015 Chromosome information has been updated in TopFIND. It now corresponds to the UniProt information.</li>
+					<li>05/2015 Chromosome information has been updated in TopFIND. It now corresponds to the information in SwissProt.</li>
 					<li>05/2015 TopFINDer now has the I=L option, not distinguishing between Leu and Ile, similar to mass spectrometry analysis tools.</li>
-					<li>03/2015 Labels for TopFINDer analyses were added.
+					<li>05/2015 Protein names have been updated</li>
+					<li>02/2015 Labels for TopFINDer analyses were added.
 					<li>01/2015 TopFIND 3.0 is published with TopFINDer and PathFINDer. <a href="http://nar.oxfordjournals.org/content/43/D1/D290" target="_blank"></a></li>
 			</ul>
 		</div>		

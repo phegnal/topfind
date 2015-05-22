@@ -4,6 +4,9 @@ class TopFINDer
   
   def analyze(params, label)
       
+    ###
+    ### LOADING REQUIRED PACKAGES
+    ###
     require 'graph/pathFinding'
     require 'graph/graph'
     require 'listTools/enrichmentStats'
@@ -13,12 +16,18 @@ class TopFINDer
     
     system("Rscript #{RAILS_ROOT}/Rserve_Startup.R")
     
+    ###
+    ### Creating directories
+    ###
     nr = Dir.entries("#{RAILS_ROOT}/public/explorer").collect{|x| x.to_i}.max + 1
     dir = "#{RAILS_ROOT}/public/explorer/" + nr.to_s 
     Dir.mkdir(dir)
     fileDir = dir + "/#{label}"
     Dir.mkdir(fileDir)
   
+    ###
+    ### Parsing Parameters
+    ###
     @all_input = params["all"].strip #string
     @input1 = @all_input.split("\n") #array 
     @chromosome = params['chromosome']
@@ -36,6 +45,9 @@ class TopFINDer
     @orderedInput = @input1.collect {|i| i.gsub("_", "")}.collect{|x| x.gsub("\s", "_")}.collect{|x| x.gsub("\t", "_")}
     @uniqueInput = @orderedInput.uniq
     
+    ###
+    ### Go through input, get information, line by line
+    ###
     print "Analyzing #{@uniqueInput.length} unique peptides of a list of #{@orderedInput.length}\n"
     print @uniqueInput
     @uniqueInput.each{|i|
@@ -108,7 +120,8 @@ class TopFINDer
       @q[:species] = @q[:protein].species.common_name
       
       @q[:sql_id] = @q[:protein].id
-      @q[:all_names] = Searchname.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]]).uniq      
+      # not used any more (names are now taken from the protein)
+      # @q[:all_names] = Searchname.find(:all, :conditions => ['protein_id = ?', @q[:sql_id]]).uniq
       
       # NTERMINI AND EVIDENCES
       if @nterms
@@ -192,7 +205,10 @@ class TopFINDer
     }
     
     print "\n"
-  
+    
+    ###
+    ### ICE LOGO and R Graphics for the peptides that were identified
+    ###
     @foundPeptides = @mainHash.values.select{|x| x[:found]}
 
     # ICELOGO
@@ -259,13 +275,16 @@ class TopFINDer
     end
 
 
+    ###
+    ### Output data to Big table
+    ###
     # #CSV TODO ctermini
     path = "#{fileDir}/Full_Table.txt"
     output = File.new(path, "w")
     output << "Accession\tInput Sequence\tProtein found\tRecommended Protein Name\tOther Names and IDs"
     output << "\tSpecies" if @spec
     output << "\tChromosome" if @chromosome
-    output << "\tChromosome band" if @chromosome
+    # output << "\tChromosome band" if @chromosome # chromosome band information, removed, was shitty from BioMart
     output << "\tP10 to P1"
     output << "\tP1' to P10'"
     if @nterms
@@ -288,10 +307,11 @@ class TopFINDer
       elsif !q[:found]
         output << "#{q[:acc]}\t#{q[:full_pep]}\tno\n"
       else
-        output << "#{q[:acc]}\t#{q[:full_pep]}\tYES\t#{q[:protein].recname}\t#{q[:all_names].collect{|s| s.name}.uniq.join(';')}"
+        output << "#{q[:acc]}\t#{q[:full_pep]}\tYES"
+        output << "\t#{q[:protein].recname}\t#{q[:protein].gn.name};#{q[:protein].proteinnames.collect{|pn| pn.full}.uniq.join(';')};#{q[:protein].merid}"
         output << "\t#{q[:species]}" if @spec
         output << "\t#{q[:chr][0]}" if @chromosome
-        output << "\t#{q[:chr][1]}" if @chromosome
+        # output << "\t#{q[:chr][1]}" if @chromosome # chromosome band information, removed, was shitty from BioMart
         output << "\t#{q[:upstream]}"
         output << "\t#{q[:downstream]}"
         if @nterms
@@ -335,7 +355,11 @@ class TopFINDer
       end
     }
     output.close
-
+    
+    
+    ###
+    ### Zip and send by email
+    ###
     x = system "cd #{dir}; zip -r #{label} #{label}"
   
     Emailer.new().sendTopFINDerResults(params[:email], "#{dir}/#{label}.zip", label)

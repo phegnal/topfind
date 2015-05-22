@@ -1055,11 +1055,11 @@ namespace :uniprot do
       if l[0] == "Entry"
         next
       end
-      chr = "Unplaced"
+      chr = ""
       if !l[6].nil?
-        chr = l[6].split(",").collect{|x| x.gsub(/UP\d+?:/, "").gsub(/Chromosome/, "").strip}.join("_")
+        chr = l[6].split(",").collect{|x| x.gsub(/UP\d+?:/, "").gsub(/Chromosome/, "").gsub(/Unplaced/, "").strip}.select{|x| x != ""}.join(",")
       end
-      chr = "Unplaced" if chr == "_"
+      chr = "" if chr == ","
     
       ps = Protein.find(:all, :conditions =>["ac like ?", "#{l[0]}%"])
     
