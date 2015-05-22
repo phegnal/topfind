@@ -146,6 +146,7 @@ class TopFINDer
             
       # CLEAVAGES
       @q[:cleavages] = Cleavage.find(:all, :conditions => ["substrate_id = ?", @q[:sql_id]])
+      
       if not @q[:cleavages].nil?
         @q[:cleavages] = @q[:cleavages].select{|c| @q[:location_C_range].include? c.pos}
         @q[:proteases] = @q[:cleavages].collect {|c| c.protease}

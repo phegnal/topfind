@@ -27,40 +27,42 @@ namespace :nik do
     
     Protein.find(:all, :conditions => ["species_id = ?", args[:speciesID].to_i]).each_with_index{|p, i|
       # break if i > 20
-      nterHash[p.ac] = {}
-      p.nterms.each{|n|
-        if nterHash[p.ac][n.pos].nil?
-          nterHash[p.ac][n.pos] = {}
-          keys.each{|k| nterHash[p.ac][n.pos][k] = false}
-        end
-        Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', n.id]).each{|n2e|
-          # here i could annotated n-terminus (acetylated, signal/propetide removed, ...?)
-          # p "#{p.ac} #{n.pos}"
-          e = n2e.evidence
-          if not e.nil?
-            if e.evidencesource.nil?
-              if e.name =~ /^Inferred from cleavage/ #tested here for the ones with e.evidencesource == nil and below for the ones where there is an evidencesource
-                nterHash[p.ac][n.pos][:cleaved] = true
-              else
-                nterHash[p.ac][n.pos][:obs] = true
-                nterHash[p.ac][n.pos][:dir] = true if e.directness == "direct"            
-              end
-            elsif e.evidencesource.dbname == "MEROPS"
-              nterHash[p.ac][n.pos][:cleaved] = true
-            elsif e.evidencesource.dbname == "UniProtKB"
-              nterHash[p.ac][n.pos][:can] = true            
-            elsif e.evidencesource.dbname == "TISdb"
-              nterHash[p.ac][n.pos][:tis] = true
-            elsif e.evidencesource.dbname == "Ensembl"
-              nterHash[p.ac][n.pos][:ensembl] = true
-            elsif e.evidencecodes.collect{|s| s.code}.include? "TopFIND:0000002"
-              nterHash[p.ac][n.pos][:isoform] = true
-            elsif e.name =~ /^Inferred from cleavage/
-                nterHash[p.ac][n.pos][:cleaved] = true
-            end
+      if not p.ac.include? "-"
+        nterHash[p.ac] = {}
+        p.nterms.each{|n|
+          if nterHash[p.ac][n.pos].nil?
+            nterHash[p.ac][n.pos] = {}
+            keys.each{|k| nterHash[p.ac][n.pos][k] = false}
           end
+          Nterm2evidence.find(:all, :conditions => ['nterm_id = ?', n.id]).each{|n2e|
+            # here i could annotated n-terminus (acetylated, signal/propetide removed, ...?)
+            # p "#{p.ac} #{n.pos}"
+            e = n2e.evidence
+            if not e.nil?
+              if e.evidencesource.nil?
+                if e.name =~ /^Inferred from cleavage/ #tested here for the ones with e.evidencesource == nil and below for the ones where there is an evidencesource
+                  nterHash[p.ac][n.pos][:cleaved] = true
+                else
+                  nterHash[p.ac][n.pos][:obs] = nterHash[p.ac][n.pos][:obs].to_s + "_" + e.id.to_s
+                  nterHash[p.ac][n.pos][:dir] = true if e.directness == "direct"            
+                end
+              elsif e.evidencesource.dbname == "MEROPS"
+                nterHash[p.ac][n.pos][:cleaved] = true
+              elsif e.evidencesource.dbname == "UniProtKB"
+                nterHash[p.ac][n.pos][:can] = true            
+              elsif e.evidencesource.dbname == "TISdb"
+                nterHash[p.ac][n.pos][:tis] = true
+              elsif e.evidencesource.dbname == "Ensembl"
+                nterHash[p.ac][n.pos][:ensembl] = true
+              elsif e.evidencecodes.collect{|s| s.code}.include? "TopFIND:0000002"
+                nterHash[p.ac][n.pos][:isoform] = true
+              elsif e.name =~ /^Inferred from cleavage/
+                  nterHash[p.ac][n.pos][:cleaved] = true
+              end
+            end
+          }
         }
-      }
+      end
     }
     
     # WRITE TO OUTPUT
@@ -108,7 +110,7 @@ namespace :nik do
         nterHash[ac] = {} if nterHash[ac].nil?
         nterHash[ac][pos] = {} if nterHash[ac][pos].nil?
         l[2..(l.length-1)].each_index{|ind|
-          nterHash[ac][pos][keys[ind+2]] = (l[ind+2] == "true")
+          nterHash[ac][pos][keys[ind+2]] = (l[ind+2] != "false") # this should work for the obs too, which is now e.id for obs
         }
       end
       i += 1
