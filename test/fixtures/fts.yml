@@ -1,0 +1,44 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+A1433B_HUMAN_D:
+  id: 1
+  protein_id: 1
+  name: SIGNAL
+  from: 36
+  to: 3623
+  description: Cubulin.
+  ftid: PRO_0000415166
+  
+A1433B_HUMAN_A:
+  id: 3
+  protein_id: 1
+  name: ACT_SITE
+  from: 36
+  to: 3623
+  description: Cubulin.
+  ftid: PRO_0000415166
+
+A1433B_HUMAN_V:
+  id: 4
+  protein_id: 1
+  name: CONFLICT
+  from: 36
+  to: 3623
+  description: Cubulin.
+  ftid: PRO_0000415166
+A1433B_HUMAN_M:
+  id: 5
+  protein_id: 1
+  name: LIPID
+  from: 36
+  to: 3623
+  description: Cubulin.
+  ftid: PRO_0000415166
+A1433B_HUMAN_T:
+  id: 6
+  protein_id: 1
+  name: COILED
+  from: 36
+  to: 3623
+  description: Cubulin.
+  ftid: PRO_0000415166

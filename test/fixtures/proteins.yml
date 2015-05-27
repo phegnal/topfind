@@ -1,6 +1,128 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-one:
-  id: 1
 
-two:
+##Added 'A' to the beginning of each protein to make things easier for symbol access
+A1433B_HUMAN:
+  id: 1
+  ac: P31946
+  name: 1433B_HUMAN
+  molecular_type: NULL
+  entry_type: NULL
+  dt_create: 01-JUL-1993, integrated into UniProtKB/Swiss-Prot.
+  dt_sequence: 23-JAN-2007, sequence version 3.
+  dt_annotation: 11-JUN-2014, entry version 165.
+  definition: "RecName: Full=14-3-3 protein beta/alpha; AltName: Full=Protein 1054; AltName: Full=Protein kinase C inhibitor protein 1; Short=KCIP-1; Contains: RecName: Full=14-3-3 protein beta/alpha, N-terminally processed"
+  sequence: MTMDKSELVQKAKLAEQAERYDDMAAAMKAVTEQGHELSNEERNLLSVAYKNVVGARRSSWRVISSIEQKTERNEKKQQMGKEYREKIEAELQDICNDVLELLDKYLIPNATQPESKVFYLKMKGDYFRYLSEVASGDNKQTTVSNSQQAYQEAFEISKKEMQPTHPIRLGLALNFSVFYYEILNSPEKACSLAKTAFDEAIAELDTLNEESYKDSTLIMQLLRDNLTLWTSENQGDEGDAGEGEN 
+  mw: 28082
+  crc64: 6BE1A9BF97468017
+  aalen: 246
+  created_at: 2014-07-31 23:51:30
+  updated_at: 2014-08-01 15:24:59
+  status: updated
+  data_class: Reviewed
+  chromosome: 20
+  band: q13.12
+  species_id: 1
+  meropsfamily: NULL
+  meropssubfamily: NULL
+  meropscode: NULL
+  
+A1433B_HUMAN_one:
   id: 2
+  ac: P31946-1
+  name: 1433B_HUMAN_isoform1
+  molecular_type: NULL
+  entry_type: NULL
+  dt_create: 01-JUL-1993, integrated into UniProtKB/Swiss-Prot.
+  dt_sequence: 23-JAN-2007, sequence version 3.
+  dt_annotation: 11-JUN-2014, entry version 165.
+  definition: "RecName: Full=14-3-3 protein beta/alpha; AltName: Full=Protein 1054; AltName: Full=Protein kinase C inhibitor protein 1; Short=KCIP-1; Contains: RecName: Full=14-3-3 protein beta/alpha, N-terminally processed"
+  sequence: MTMDKSELVQKAKLAEQAERYDDMAAAMKAVTEQGHELSNEERNLLSVAYKNVVGARRSSWRVISSIEQKTERNEKKQQMGKEYREKIEAELQDICNDVLELLDKYLIPNATQPESKVFYLKMKGDYFRYLSEVASGDNKQTTVSNSQQAYQEAFEISKKEMQPTHPIRLGLALNFSVFYYEILNSPEKACSLAKTAFDEAIAELDTLNEESYKDSTLIMQLLRDNLTLWTSENQGDEGDAGEGEN 
+  mw: 28082
+  crc64: 6BE1A9BF97468017
+  aalen: 246
+  created_at: 2014-07-31 23:51:30
+  updated_at: 2014-08-01 15:24:59
+  status: updated
+  data_class: Reviewed
+  chromosome: 20
+  band: q13.12
+  species_id: 1
+  meropsfamily: NULL
+  meropssubfamily: NULL
+  meropscode: NULL
+  
+A1433B_HUMAN_two:
+  id: 3
+  ac: P31946-2
+  name: 1433B_HUMAN_isoform2
+  molecular_type: NULL
+  entry_type: NULL
+  dt_create: 01-JUL-1993, integrated into UniProtKB/Swiss-Prot.
+  dt_sequence: 23-JAN-2007, sequence version 3.
+  dt_annotation: 11-JUN-2014, entry version 165.
+  definition: "RecName: Full=14-3-3 protein beta/alpha; AltName: Full=Protein 1054; AltName: Full=Protein kinase C inhibitor protein 1; Short=KCIP-1; Contains: RecName: Full=14-3-3 protein beta/alpha, N-terminally processed"
+  sequence: MTMDKSELVQKAKLAEQAERYDDMAAAMKAVTEQGHELSNEERNLLSVAYKNVVGARRSSWRVISSIEQKTERNEKKQQMGKEYREKIEAELQDICNDVLELLDKYLIPNATQPESKVFYLKMKGDYFRYLSEVASGDNKQTTVSNSQQAYQEAFEISKKEMQPTHPIRLGLALNFSVFYYEILNSPEKACSLAKTAFDEAIAELDTLNEESYKDSTLIMQLLRDNLTLWTSENQGDEGDAGEGEN 
+  mw: 28082
+  crc64: 6BE1A9BF97468017
+  aalen: 246
+  created_at: 2014-07-31 23:51:30
+  updated_at: 2014-08-01 15:24:59
+  status: updated
+  data_class: Reviewed
+  chromosome: 20
+  band: q13.12
+  species_id: 1
+  meropsfamily: NULL
+  meropssubfamily: NULL
+  meropscode: NULL
+  
+A1433B_HUMAN_three:
+  id: 4
+  ac: P31946-3
+  name: 1433B_HUMAN_isoform3
+  molecular_type: NULL
+  entry_type: NULL
+  dt_create: 01-JUL-1993, integrated into UniProtKB/Swiss-Prot.
+  dt_sequence: 23-JAN-2007, sequence version 3.
+  dt_annotation: 11-JUN-2014, entry version 165.
+  definition: "RecName: Full=14-3-3 protein beta/alpha; AltName: Full=Protein 1054; AltName: Full=Protein kinase C inhibitor protein 1; Short=KCIP-1; Contains: RecName: Full=14-3-3 protein beta/alpha, N-terminally processed"
+  sequence: MTMDKSELVQKAKLAEQAERYDDMAAAMKAVTEQGHELSNEERNLLSVAYKNVVGARRSSWRVISSIEQKTERNEKKQQMGKEYREKIEAELQDICNDVLELLDKYLIPNATQPESKVFYLKMKGDYFRYLSEVASGDNKQTTVSNSQQAYQEAFEISKKEMQPTHPIRLGLALNFSVFYYEILNSPEKACSLAKTAFDEAIAELDTLNEESYKDSTLIMQLLRDNLTLWTSENQGDEGDAGEGEN 
+  mw: 28082
+  crc64: 6BE1A9BF97468017
+  aalen: 246
+  created_at: 2014-07-31 23:51:30
+  updated_at: 2014-08-01 15:24:59
+  status: updated
+  data_class: Reviewed
+  chromosome: 20
+  band: q13.12
+  species_id: 1
+  meropsfamily: NULL
+  meropssubfamily: NULL
+  meropscode: NULL
+  
+
+A1433E_HUMAN:
+  id: 5
+  ac: P62258
+  name: 1433E_HUMAN
+  molecular_type: NULL
+  entry_type: NULL
+  dt_create: 05-JUL-2004, integrated into UniProtKB/Swiss-Prot.
+  dt_sequence: 05-JUL-2004, sequence version 1.
+  dt_annotation: 11-JUN-2014, entry version 123.
+  definition: "RecName: Full=14-3-3 protein epsilon; Short=14-3-3E;"
+  sequence: MDDREDLVYQAKLAEQAERYDEMVESMKKVAGMDVELTVEERNLLSVAYKNVIGARRASWRIISSIEQKEENKGGEDKLKMIREYRQMVETELKLICCDILDVLDKHLIPAANTGESKVFYYKMKGDYHRYLAEFATGNDRKEAAENSLVAYKAASDIAMTELPPTHPIRLGLALNFSVFYYEILNSPDRACRLAKAAFDDAIAELDTLSEESYKDSTLIMQLLRDNLTLWTSDMQGDGEEQNKEALQDVEDENQ 
+  mw: 29174
+  crc64: 07817CCBD1F75B26
+  aalen: 255
+  created_at: 2014-07-31 23:51:32
+  updated_at: 2014-08-01 15:25:01
+  status: updated
+  data_class: Reviewed
+  chromosome: 17
+  band: p13.3
+  species_id: 1
+  meropsfamily: NULL
+  meropssubfamily: NULL
+  meropscode: NULL
