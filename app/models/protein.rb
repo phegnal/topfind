@@ -175,11 +175,14 @@ class Protein < ActiveRecord::Base
   def domains
     @domainfeatures = ['DOMAIN','MOTIF','PEPTIDE','PROPEP','REGION','SIGNAL','INIT_MET','SITE','TRANSIT'] 
     @res = Array.new
+    
     self.fts.each do |ft|
+      #puts "[#{ft}]"
       @res << ft if @domainfeatures.include?(ft.name)
     end
     @res.sort! {|x,y| x.from.to_i <=> y.from.to_i}
     @res
+    #puts @res
   end 
     
 
@@ -234,7 +237,7 @@ class Protein < ActiveRecord::Base
         from_sequence = self.sequence[pos-1-window..pos-1]
       when 'right'
         from_sequence = self.sequence[pos-1..pos-1+window]
-      when 'centre'
+      when 'centre' 
         from_sequence = self.sequence[pos-1-(window/2)..pos-1+(window/2)]
     end
 

@@ -1,8 +1,10 @@
 class ProteinsController < ApplicationController
 
+  # TopFINDer
   require 'listTools/topFINDer'
   require 'listTools/emailer'
   
+  # PathFINDer
   require 'graph/pathFinding'
   require 'graph/graph'
   require 'graph/mapMouseHuman'
@@ -243,8 +245,9 @@ class ProteinsController < ApplicationController
      
    
     # hobo_show @protein = Protein.id_or_ac_or_name_is(id).first  
+    puts "[#{Protein.find_by_ac(id)}]"
     hobo_show @protein = Protein.find_by_ac(id)  
-     
+    
     @annotations_main = @protein.ccs.main
     @annotations_additional = @protein.ccs.additional
     @documentations = Documentation.all.group_by(&:name)

@@ -1,0 +1,24 @@
+one:
+   id: 1
+   name: Homo spaiens
+   common_name: (Human)
+   
+two:
+   id: 2
+   name: Saccharomyces cerevisiae
+   common_name: (strain ATCC 204508 / S288c) (Baker's yeast)
+
+three:
+   id: 3
+   name: Mus musculus
+   common_name: (Mouse)
+ 
+four: 
+   id: 4
+   name: Arabidopsis thaliana
+   common_name: (Mouse-ear cress)
+
+five:
+   id: 5
+   name: Escherichia coli
+   common_name: (strain K12)

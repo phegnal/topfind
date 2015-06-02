@@ -1,23 +1,220 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-f-protein:
+x0:
+  name: p-info
   id: 1
-  name: f-proteins
-  title: Evidence filter
-  long:  By default, all known data is incorporated into the results page. This can be customized through a filter accessible at the top right of the page. After filtering, only data that is backed with evidence matching the given filter settings is incorporated. This will affect the termini, cleavage sites and substrates listed. Also the network view will only consider matching connections and the cleavage site preference is only built on data matching the criteria.
-  short: By default, all known data is incorporated into the results page. This can be customized through a filter accessible at the top right of the page. After filtering, only data that is backed with evidence matching the given filter settings is incorporated. This will affect the termini, cleavage sites and substrates listed. Also the network view will only consider matching connections and the cleavage site preference is only built on data matching the criteria.
-  category: Filter
-  position: 1
-  show: 1
-  created_at: 2011-03-17 16:27:17
-  updated_at: 2011-04-15 15:11:18
-p-domains:
-  id: 2
+  short: This section provides basic information retrieved from UniProtKB and MEROPS. Protein names and species and, if applicable, protease classification and isoforms are listed. The UniProtKB curated annotation is presented alongside the amino acid sequence. For further background information, links to the appropriate entries at UniProtKB and MEROPS are provided.
+x1:
   name: p-domains
-  title: Domains & features
-  long:  The linear organization of termini, cleavage sites and stable chains as well as features and domains along the primary protein sequence is graphically represented. Moving the mouse over an element will provide additional information such as exact position, type and description.
-  short:  The linear organization of termini, cleavage sites and stable chains as well as features and domains along the primary protein sequence is graphically represented. Moving the mouse over an element will provide additional information such as exact position, type and description.
-  category: Protein information
-  position: 2
-  show: 1
-  created_at: 2011-03-17 15:41:01
-  updated_at: 2011-03-17 15:41:01
+  id: 2
+  short: The linear organization of termini, cleavage sites and stable chains as well as features and domains along the primary protein sequence is graphically represented. Moving the mouse over an element will provide additional information such as exact position, type and description.
+x2:
+  name: f-protein
+  id: 3
+  short: By default, all known data is incorporated into the results page. This can be customized through a filter accessible at the top right of the page. After filtering, only data that is backed with evidence matching the given filter settings is incorporated. This will affect the termini, cleavage sites and substrates listed. Also the network view will only consider matching connections and the cleavage site preference is only built on data matching the criteria. 
+x3:
+  name: p-network
+  id: 4
+  short: Network view shows the interconnection with other proteins through cleavage, inhibition and protein protein interactions
+x4:
+  name: p-termini
+  id: 5
+  short: N- and C-termini are listed according to their position. Evidence information is given in brief tabular format and a link to full details, publications and data repository is provided. They are put into perspective by listing features and domains such as propeptides whose start or endpoint overlaps with the terminus.
+x5:
+  name: p-processing
+  id: 6
+  short: For every processing site within the protein, all proteases known to cleave at this site are listed alongside a brief table indicating the evidence that led to this observation. Detailed information is available through a link (Fig S2c). 
+x6:
+  name: p-substrates
+  id: 7
+  short: For each substrate a link to the respective entry as well as a list of cleavage sites and corresponding evidence in short tabular format is given.
+x7:
+  name: p-pref
+  id: 8
+  short: If the protein is a protease the cleavage site preference is displayed. The sequence preference is calculated based on all protein and peptide substrates that match the current filtering criteria. The information is visualized as heatmap and iceLogo. 
+x8:
+  name: s-modification
+  id: 9
+  short: Restrict the search to proteins containing a specific amino acid modification at their N- or C-terminus
+x9:
+  name: s-function
+  id: 10
+  short: Restrict the search to proteases or inhibitors of proteases
+x10:
+  name: s-chromosome
+  id: 11
+  short: Chromosome identifier (e.g. '6' for human chromosome 6)
+x11:
+  name: s-main
+  id: 12
+  short: random garbage
+x12:
+  name: p-annotation
+  id: 13
+  short: Derived in unmodified form from UniProtKB
+x13:
+  name: e_directness
+  id: 14
+  short: Indicates if the assay monitors the reported cleavage or terminus directly.
+x14:
+  name: e_physrel
+  id: 15
+  short: random garbage
+x15:
+  name: e_tissue
+  id: 16
+  short: Indicates the tissues in which the observations have been made
+x16:
+  name: e_source
+  id: 17
+  short: The external database the data is derived from
+x17:
+  name: e_method
+  id: 18
+  short: Assay or methodology used to make the identification. Please use this field to specify the method used if the 'Method' drop-down does not list your method. 
+x18:
+  name: e_lab
+  id: 19
+  short: The laboratory that performed the assays and reported the finding
+x19:
+  name: e_evidence
+  id: 20
+  short: 
+x20:
+  name: e_code
+  id: 21
+  short: Categorization according to the controlled evidencecode vocabulary
+x21:
+  name: f-modification
+  id: 22
+  short: Restricts the displayed modifications to a specific categroy (e.g. acetylation) or their presence at a specific protein terminus
+x22:
+  name: e_name
+  id: 23
+  short: The evidence name identifies a specific evidence entry. Used to limit to one ore more specific evidences
+x23:
+  name: p-boundaries
+  id: 24
+  short: Start or end of protein features like domains or mutations that fall together with the terminus or cleavage
+x24:
+  name: p-features
+  id: 25
+  short: The cleavage or terminus is located within the stated protein features
+x25:
+  name: p-cytoscape
+  id: 26
+  short: random garbage
+x26:
+  name: ne_description
+  id: 27
+  short: Please provide a brief description on how the data has been obtained
+x27:
+  name: ne_evidencefile
+  id: 28
+  short: To provide detailed or supplementary information (especially for unpublished data) a pdf file can be selected for upload and attached to the evidence information
+x28:
+  name: e_repository
+  id: 31
+  short: Link to the raw data stored in an online repository (e.g. pride or tranche)
+x29:
+  name: ne_publications
+  id: 32
+  short: Please provide one or several Pubmed IDs for published data
+x30:
+  name: i-name
+  id: 33
+  short: Please provide a unique name to identify this dataset import
+x31:
+  name: i-description
+  id: 34
+  short: Brief description of the submitted data to assist the validation of file and data integrity.
+x32:
+  name: i-evidence
+  id: 35
+  short: Please select the appropriate evidence (created in step I)
+x33:
+  name: i-csvfile
+  id: 36
+  short: Locate and select a comma separated (csv) or excel file containing the data in the described format
+x34:
+  name: s-familysubstrates
+  id: 37
+  short: These proteins are cleaved by members of the MEROPS protease family or clan provided in the search. The list is not filtered.
+x35:
+  name: s-intro
+  id: 38
+  short: 
+x36:
+  name: c-intro
+  id: 39
+  short: 
+x37:
+  name: e-intro
+  id: 40
+  short: 
+x38:
+  name: e_inhibitors
+  id: 41
+  short: Lists the protease inhibitors added during the experiment to ensure that the described effect (terminus, cleavage site, ...) is not affected by proteolytic processes during the sample handling.
+x39:
+  name: e_confidence
+  id: 42
+  short: A measure of the confidence that the identification is correct. The confidence is given as a value between 0 (low) and 1 (high). The type of confidence measure (e.g. MASCOT score or PeptideProphet probability for mass spectrometry based peptide confidence scores) is also given.
+x40:
+  name: e_proteaseassignment
+  id: 43
+  short: random garbage
+x41:
+  name: e_methodology
+  id: 44
+  short: The assay or methodology used is specified in the method field. New or rarely used methods are specified in the Method (other) section.
+x42:
+  name: e_method_system
+  id: 45
+  short: The experimental system in which the observation has been made.
+x43:
+  name: e_method_protease_source
+  id: 46
+  short: The source or modulation if the effects of a single protease are studied.
+x44:
+  name: s_advanced
+  id: 47
+  short: random garbage
+x45:
+  name: s-genomiclocation
+  id: 48
+  short: random garbage
+x46:
+  name: s-arm
+  id: 49
+  short: random garbage
+x47:
+  name: s-band
+  id: 50
+  short: random garbage
+x48:
+  name: s-numtermini
+  id: 51
+  short: Please enter the minimum number of N and/or C termini that need to be annotated for a protein to be listed.
+x49:
+  name: s-chromosomeposition
+  id: 52
+  short: random garbage
+x50:
+  name: ts-sequencestart
+  id: 53
+  short: Enter one or several amino acids (single letter notation, upper case) to search for termini that carry this sequence at their start.
+x51:
+  name: ts-sequenceend
+  id: 54
+  short: Enter one or several amino acids (single letter notation, upper case) to search for termini that carry this sequence at their end.
+x52:
+  name: ts-regexp
+  id: 55
+  short: Enter a regular expression to find termini with matching sequence patterns. See the quick reference box below for options and syntax.
+x53:
+  name: ts-pos
+  id: 56
+  short: Enter the sequence position relative to the gene encoded full length sequence and select if the termini have to start (N termini) or end (C termini) before, exactly at or after the entered position.
+x54:
+  name: e_perturbation
+  id: 57
+  short: The type of perturbation used to shift the biological system from the normal physiological condition into a specific state. E.g. chemical induction of apoptosis, gene knock out, over expression of specific genes, ...
