@@ -3,6 +3,8 @@ Get position of evidences (comma separated) in the table returned by TopFINDer
 	--> when doing this, TopFINDer can also be optimized by doing protein.nterms instead of Nterm.find(:condition)
 	--> same for Cterms and Cleavages
 
+Chromosomes from NextProt
+
 Isoform problem: P35398-2 doesn’t map anywhere because it’s the main isoform
 
 add NextProt protein status (missing proteins) to TopFIND

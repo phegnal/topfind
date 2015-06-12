@@ -13,7 +13,6 @@ class Documentation < ActiveRecord::Base
     timestamps
   end
 
-
   # --- Permissions --- #
 
   def create_permitted?

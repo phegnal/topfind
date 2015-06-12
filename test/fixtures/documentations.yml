@@ -1,6 +1,21 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 one:
   id: 1
+  name: s-modification
+  short: xzy
 
-two:
+one1:
   id: 2
+  name: s-function
+  short: xzy
+
+one2:
+  id: 3
+  name: s-chromosome
+  short: xzy
+
+one3:
+  id: 4
+  name: s-chromosomeposition
+  short: xzy
+
