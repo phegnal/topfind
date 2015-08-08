@@ -1,0 +1,82 @@
+
+
+
+GET DATA:
+
+ADD IMPORTS (EXPERIMENTAL DATASETS SUBMITTED TO TOPFIND) - take those from the old topfind
+	rake fileImport:export
+
+download uniprot (swiss prot reference proteomes) version 2014_06
+        human: http://www.uniprot.org/uniprot/?query=(organism%3a9606+keyword%3a1185)+AND+reviewed%3ayes&force=yes&format=txt
+        mouse: http://www.uniprot.org/uniprot/?query=(organism%3a10090+keyword%3a1185)+AND+reviewed%3ayes&force=yes&format=txt
+        ecoli: http://www.uniprot.org/uniprot/?query=(organism%3a83333+keyword%3a1185)+AND+reviewed%3ayes&force=yes&format=txt
+        yeast: http://www.uniprot.org/uniprot/?query=(organism%3a559292+keyword%3a1185)+AND+reviewed%3ayes&force=yes&format=txt
+        arabidopsis: http://www.uniprot.org/uniprot/?query=(organism%3a3702+keyword%3a1185)+AND+reviewed%3ayes&force=yes&format=txt
+		rat: http://www.uniprot.org/uniprot/?query=organism%3A%22Rattus+norvegicus+%28Rat%29+[10116]%22+AND+proteome%3Aup000002494&force=yes&format=txt
+
+ontologies
+        http://www.uniprot.org/docs/
+            Tissues
+            PTMs
+            Keywords
+            keep old evidence_code.obo
+
+Merops 9.10
+        create database topfind_meropsweb10
+        import data 
+        adjust max packet size in /etc/my.cnf
+        mysql --max_allowed_packet=1000M -u topfind -pt6o0p- topfind_meropsweb10 < meropsweb10.sql
+		
+TisDB
+	Download File (name e.g. "TISdb_human_v1.0.csv")
+	
+Ensembl
+	Download Files (are named e.g. "Homo_sapiens.GRCh37.75.pep.all.fa")
+	
+Paranoid
+	Download file for mapping between species (something like orthoXML)
+	Run Paranoid_readxml.rb
+
+
+
+IMPORT UNIPROT AND MEROPS DATA:
+
+	mysql --max_allowed_packet=1000M -u topfind -pt6o0p- topfind_v3_2 < db/topfind_schema_v3-140627.sql 
+	mysql --max_allowed_packet=1000M -u topfind -pt6o0p- topfind_v3_2 < db/topfind_documentations_v2-130522.sql
+	mysql --max_allowed_packet=1000M -u topfind -pt6o0p- topfind_v3_2 < source_data/topfind_users_v2-130522.sql
+	
+	RAILS_ENV=production rake uniprot:import_evidencecodes --trace
+	RAILS_ENV=production rake uniprot:import_keywlist --trace
+	RAILS_ENV=production rake uniprot:import_ptmlist --trace
+	RAILS_ENV=production rake uniprot:import_tislist --trace
+	
+	RAILS_ENV=production rake uniprot:import_uniprot human --trace
+	RAILS_ENV=production rake uniprot:import_uniprot mouse --trace
+	RAILS_ENV=production rake uniprot:import_uniprot ecoli --trace
+	RAILS_ENV=production rake uniprot:import_uniprot yeast --trace
+	RAILS_ENV=production rake uniprot:import_uniprot arabidopsis --trace
+	RAILS_ENV=production rake uniprot:import_uniprot rat --trace
+	
+	RAILS_ENV=production rake uniprot:import_isoforms source_data/uniprot_2014-06/uniprot_sprot_varsplic.fasta --trace
+	RAILS_ENV=production rake uniprot:cross_map_termini --trace
+	RAILS_ENV=production rake import_merops_cleavages --trace
+	RAILS_ENV=production rake import_merops_inhibitions --trace
+	—— backup
+	RAILS_ENV=production rake uniprot:import_uniprot_gene_names human
+	RAILS_ENV=production rake uniprot:import_uniprot_gene_names mouse
+	RAILS_ENV=production rake uniprot:import_uniprot_gene_names ecoli
+	RAILS_ENV=production rake uniprot:import_uniprot_gene_names yeast
+	RAILS_ENV=production rake uniprot:import_uniprot_gene_names arabidopsis
+	RAILS_ENV=production rake uniprot:import_uniprot_gene_names rat
+
+	RAILS_ENV=production rake write_meropscodes
+	—— backup
+	RAILS_ENV=production rake populate_searchnames
+	
+ADD IMPORTS (EXPERIMENTAL DATASETS SUBMITTED TO TOPFIND)
+	rake fileImport:load_imports[filepath]
+	rake fileImport:import_Imports
+	
+IMPORT ENSEMBL and TISDB data:
+	rake ensembl:ntermini[t] # t stands for yes, write it to the database
+	rake tisDB:ntermini[t]	# t stands for yes, write it to the database

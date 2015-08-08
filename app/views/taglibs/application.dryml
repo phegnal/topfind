@@ -791,13 +791,19 @@
           </ht>
         </h2>
 
+        <p param="count" if>
+          <ht key="nterms.collection.count" count="&this.size">
+            Currently showing <count/>
+          </ht>
+        </p>
+		
 		<p>
         <% if @count.present? %>
             Your search returned <%=@count%> N termini
         <% else%>
-            Please specify filter parameters to list matching N termini
+            Specify filter to list matching N termini
         <%end%>
-        </p>  
+        </p>
       </header>
       
       <%ids = @nterms.*.id.join(','); name= "N-termini-searchresult";  exporturl = "/topfind/nterms/export?ids=#{ids}&name=#{name}"%>
@@ -856,11 +862,19 @@
             C termini
           </ht>
         </h2>
+		
+
+        <p param="count" if>
+          <ht key="nterms.collection.count" count="&this.size">
+            Currently showing <count/>
+          </ht>
+        </p>
+		
 		<p>
         <% if @count.present? %>
             Your search returned <%=@count%> C termini
         <% else%>
-            Please specify filter parameters to list matching C termini
+            Specify filter to list matching N termini
         <%end%>
         </p>        
       </header>
