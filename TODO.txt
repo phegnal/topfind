@@ -1,4 +1,6 @@
 
+Get Update page running - why isn't it working on the server?
+
 Get position of evidences (comma separated) in the table returned by TopFINDer 
 	--> when doing this, TopFINDer can also be optimized by doing protein.nterms instead of Nterm.find(:condition)
 	--> same for Cterms and Cleavages

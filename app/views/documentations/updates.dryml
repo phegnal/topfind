@@ -8,23 +8,22 @@
 	    <div class="category"><h2>TopFIND 3.0</h2></div>
 	    <div class="solidbox">
 	    	<ul>			
-					<li>05/2015 Chromosome information has been updated in TopFIND. It now corresponds to the information in SwissProt.</li>
-					<li>05/2015 TopFINDer now has the I=L option, not distinguishing between Leu and Ile, similar to mass spectrometry analysis tools.</li>
-					<li>05/2015 Protein names have been updated</li>
-					<li>02/2015 Labels for TopFINDer analyses were added.
-					<li>01/2015 TopFIND 3.0 is published with TopFINDer and PathFINDer. <a href="http://nar.oxfordjournals.org/content/43/D1/D290" target="_blank"></a></li>
+					<li>May 2015: Chromosome information has been updated in TopFIND. It now corresponds to the information in SwissProt.</li>
+					<li>May 2015: TopFINDer now has the I=L option, not distinguishing between Leu and Ile, similar to mass spectrometry analysis tools.</li>
+					<li>May 2015: Protein names have been updated</li>
+					<li>Jan 2015: TopFIND 3.0 is published with TopFINDer and PathFINDer in <a href="http://nar.oxfordjournals.org/content/43/D1/D290" target="_blank">Nucleic Acids Research</a></li>
 			</ul>
 		</div>		
 	    <div class="category"><h2>TopFIND 2.0</h2></div>
 	    <div class="solidbox">
 	    	<ul>			
-					<li>11/2011 TopFIND 2.0 is published in <a href="http://nar.oxfordjournals.org/content/40/D1/D351.long" target="_blank">Nucleic Acids Research</a></li>
+					<li>Nov 2011: TopFIND 2.0 is published in <a href="http://nar.oxfordjournals.org/content/40/D1/D351.long" target="_blank">Nucleic Acids Research</a></li>
 			</ul>
 		</div>
 	    <div class="category"><h2>TopFIND 1.0</h2></div>
 	    <div class="solidbox">
 	    	<ul>			
-					<li>08/2011 TopFIND 1.0 is published in <a href="http://www.nature.com/nmeth/journal/v8/n9/full/nmeth.1669.html" target="_blank">Nature Methods</a></li>
+					<li>Aug 2011: TopFIND 1.0 is published in <a href="http://www.nature.com/nmeth/journal/v8/n9/full/nmeth.1669.html" target="_blank">Nature Methods</a></li>
 			</ul>
 		</div>
 	</section>   

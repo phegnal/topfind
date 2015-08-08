@@ -254,7 +254,7 @@
 	        <th>Chromosome</th>
 	        <!-- <% @protein.band.present? ? @band = @protein.band : @band= '';%> -->
 	        <!-- <td><a href="/topfind/proteins?query=&chromosome=#{@protein.chromosome}"><view:chromosome/></a> <a href="/topfind/proteins?query=&chromosome=#{@protein.chromosome}&arm=#{@band.first}&band=#{@band.delete 'pq'}"><%=@band%></a></td> -->
-			<% if @protein.chromosome == "" %>
+			<% if @protein.chromosome.nil? || @protein.chromosome == "" %>
 				<td>(Not Available)</td>
 			<% else %>
 				<td><a href="/topfind/proteins?query=&chromosome=#{@protein.chromosome}"><view:chromosome/></a></td>

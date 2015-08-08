@@ -308,7 +308,10 @@ class TopFINDer
         output << "#{q[:acc]}\t#{q[:full_pep]}\tno\n"
       else
         output << "#{q[:acc]}\t#{q[:full_pep]}\tYES"
-        output << "\t#{q[:protein].recname}\t#{q[:protein].gn.name};#{q[:protein].proteinnames.collect{|pn| pn.full}.uniq.join(';')};#{q[:protein].merid}"
+        output << "\t#{q[:protein].recname}"
+        output << "\t"
+        output << "#{q[:protein].gn.name};" if !q[:protein].gn.nil?
+        output << "#{q[:protein].proteinnames.collect{|pn| pn.full}.uniq.join(';')};#{q[:protein].merid}"
         output << "\t#{q[:species]}" if @spec
         output << "\t#{q[:chr][0]}" if @chromosome
         # output << "\t#{q[:chr][1]}" if @chromosome # chromosome band information, removed, was shitty from BioMart
