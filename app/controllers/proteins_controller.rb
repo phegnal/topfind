@@ -246,7 +246,6 @@ class ProteinsController < ApplicationController
     params[:ppi].present? ? @ppi = params[:ppi] : @ppi = false
 
 
-    
     @cleavages = Cleavage.apply_scopes(
     :protease_is => @protein)
     @cleavages = @cleavages.map {|x| x if x.substrate_id}.compact

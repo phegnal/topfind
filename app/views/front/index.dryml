@@ -56,11 +56,12 @@
 				   		<ul>
 				   			<li>Species</li>
 				   			<ul><li>
+			  		          <p class="filterlabel">Species</p>
 				   				<select name="species" id="osselect">
 							      <option></option>
-							      <% Os.all.each do |f| %>
-							        <%= "<option #{'selected' if params.key?(:species) && params[:species] == (f.name)}>#{f.name}</option>" %>
-							      <%end%>
+			  				      <% Species.all.each do |f| %>
+			  				        <%= "<option #{'selected' if params.key?(:species) && params[:species] == (f.name)}>#{f.name}</option>" %>
+			  				      <%end%>
 								</select>
 							</li></ul>
 							<li>Modification <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-modification'].first.short}"/></li>

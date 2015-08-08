@@ -5,6 +5,24 @@ class DocumentationsController < ApplicationController
   auto_actions :all
   index_actions :admin, :about, :license, :download, :api
   caches_page :index,:about,:license
+
+  # def show
+  # end
+  #
+  # def new
+  # end
+  #
+  # def create
+  # end
+  #
+  # def edit
+  # end
+  #
+  # def update
+  # end
+  #
+  # def destroy
+  # end
   
   def index
   	hobo_index Documentation.show_is(1).order_by(:position)

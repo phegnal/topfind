@@ -158,13 +158,13 @@
     <div class="box-content">    
   			<form action="/topfind/proteins" method="GET"> 			   
 				<input type="text" name="query" value="#{params[:query]}"/>
-				<p class="filterlabel">Species</p>
-			    <select name="species" id="osselect">
-			      <option></option>
-			      <% Os.all.each do |f| %>
-			        <%= "<option #{'selected' if params.key?(:species) && params[:species] == (f.name)}>#{f.name}</option>" %>
-			      <%end%>
-				</select>
+		          <p class="filterlabel">Species</p>
+		          	<select name="species" id="osselect">
+				      <option></option>
+				      <% Species.all.each do |f| %>
+				        <%= "<option #{'selected' if params.key?(:species) && params[:species] == (f.name)}>#{f.name}</option>" %>
+				      <%end%>
+					</select>
 				
 			    <p class="filterlabel">Modification <img class ="help"  src='/topfind/images/help.png' alt='?' title="#{@documentations['s-modification'].first.short}"/></p>
 			    <select name="modification" id="modselect">
@@ -266,7 +266,7 @@
           <p class="filterlabel">Species</p>
           	<select name="species" id="osselect">
 		      <option></option>
-		      <% Os.all.each do |f| %>
+		      <% Species.all.each do |f| %>
 		        <%= "<option #{'selected' if params.key?(:species) && params[:species] == (f.name)}>#{f.name}</option>" %>
 		      <%end%>
 			</select>
@@ -390,7 +390,7 @@
           <p class="filterlabel">Species</p>
           	<select name="species" id="osselect">
 		      <option></option>
-		      <% Os.all.each do |f| %>
+		      <% Species.all.each do |f| %>
 		        <%= "<option #{'selected' if params.key?(:species) && params[:species] == (f.name)}>#{f.name}</option>" %>
 		      <%end%>
 			</select>

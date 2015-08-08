@@ -229,6 +229,7 @@ namespace :ensembl do
       # MAP TO ISOFORMS
       # nter_iso_args = {:entries => nmap2isoforms, :species_id => speciesId, :file => f, :seqCutoff => seqCutoff}
       # Rake::Task["ensembl:isoform_ntermini"].execute(args=nter_iso_args)
+      # forget that I guess?
       
       if enter2db
         ###
