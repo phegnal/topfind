@@ -15,7 +15,7 @@ download uniprot (swiss prot reference proteomes) version 2014_06
 		rat: http://www.uniprot.org/uniprot/?query=organism%3A%22Rattus+norvegicus+%28Rat%29+[10116]%22+AND+proteome%3Aup000002494&force=yes&format=txt
 
 ontologies
-        http://www.uniprot.org/docs/
+        http://www.uniprot.org/docs/, now this is at http://www.uniprot.org/help/controlled_vocabulary
             Tissues
             PTMs
             Keywords

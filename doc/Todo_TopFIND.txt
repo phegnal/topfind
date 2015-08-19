@@ -5,8 +5,6 @@ Get position of evidences (comma separated) in the table returned by TopFINDer
 	--> when doing this, TopFINDer can also be optimized by doing protein.nterms instead of Nterm.find(:condition)
 	--> same for Cterms and Cleavages
 
-Chromosomes from NextProt
-
 Isoform problem: P35398-2 doesn’t map anywhere because it’s the main isoform
 
 add NextProt protein status (missing proteins) to TopFIND
@@ -25,4 +23,37 @@ upload more papers on terminomics -- work on submission forms
 
 protease cleavage prediction based on specificity profiles?
 
-add rat to topfind (email by anne Døskeland) (on 8,000 swissprot entries in rat!)
+mmpxserve:topfind backup$ RAILS_ENV=production rake uniprot:cross_map_termini --trace
+(in /Volumes/ssd/webservices/topfind)
+** Invoke uniprot:cross_map_termini (first_time)
+** Execute uniprot:cross_map_termini
+rake aborted!
+wrong argument type nil (expected Regexp)
+/Volumes/ssd/webservices/topfind/app/models/protein.rb:251:in `scan'
+/Volumes/ssd/webservices/topfind/app/models/protein.rb:251:in `isoform_crossmapping'
+/Volumes/ssd/webservices/topfind/app/models/protein.rb:245:in `each'
+/Volumes/ssd/webservices/topfind/app/models/protein.rb:245:in `isoform_crossmapping'
+/Library/Ruby/Gems/1.8/gems/activerecord-2.3.8/lib/active_record/associations/association_proxy.rb:215:in `send'
+/Library/Ruby/Gems/1.8/gems/activerecord-2.3.8/lib/active_record/associations/association_proxy.rb:215:in `method_missing'
+/Volumes/ssd/webservices/topfind/app/models/cterm.rb:64:in `map_to_isoforms'
+/Volumes/ssd/webservices/topfind/lib/tasks/uniprot_current.rake:527
+/Volumes/ssd/webservices/topfind/lib/tasks/uniprot_current.rake:526:in `each'
+/Volumes/ssd/webservices/topfind/lib/tasks/uniprot_current.rake:526
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:636:in `call'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:636:in `execute'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:631:in `each'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:631:in `execute'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:597:in `invoke_with_call_chain'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/monitor.rb:242:in `synchronize'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:590:in `invoke_with_call_chain'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:583:in `invoke'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:2051:in `invoke_task'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:2029:in `top_level'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:2029:in `each'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:2029:in `top_level'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:2068:in `standard_exception_handling'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:2023:in `top_level'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:2001:in `run'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:2068:in `standard_exception_handling'
+/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/rake.rb:1998:in `run'
+/usr/bin/rake:31

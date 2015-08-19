@@ -49,7 +49,6 @@ class TopFINDer
     ### Go through input, get information, line by line
     ###
     print "Analyzing #{@uniqueInput.length} unique peptides of a list of #{@orderedInput.length}\n"
-    print @uniqueInput
     @uniqueInput.each{|i|
       print "." 
       @q = {}
@@ -77,8 +76,20 @@ class TopFINDer
         next
       else
         @q[:sequence] = @q[:protein].sequence
-        match_peptide = (params[:IleLeu].nil? ? @q[:pep] : @q[:pep].gsub(/I/, "L")) # if the IleLeu is selected (:IleLeu == "1"), then the I are gsub'd to L
-        match_sequence = (params[:IleLeu].nil? ? @q[:sequence] : @q[:sequence].gsub(/I/, "L"))
+        match_peptide = @q[:pep]
+        match_sequence = @q[:sequence]
+        if(!params[:IleLeu].nil?)
+          match_peptide = match_peptide.gsub(/I/, "L")
+          match_sequence = match_sequence.gsub(/I/, "L")
+        end
+        if(!params[:glx].nil?)
+          match_peptide = match_peptide.gsub(/Z/, "Q")
+          match_sequence = match_sequence.gsub(/Z/, "Q")
+        end
+        if(!params[:asx].nil?)
+          match_peptide = match_peptide.gsub(/B/, "N")
+          match_sequence = match_sequence.gsub(/B/, "N") 
+        end
         if @nterms
           @q[:location_C] = match_sequence.index(match_peptide)
         else
@@ -284,7 +295,7 @@ class TopFINDer
     output << "Accession\tInput Sequence\tProtein found\tRecommended Protein Name\tOther Names and IDs"
     output << "\tSpecies" if @spec
     output << "\tChromosome" if @chromosome
-    # output << "\tChromosome band" if @chromosome # chromosome band information, removed, was shitty from BioMart
+    # output << "\tChromosome band" if @cd chromosome # chromosome band information, removed, was shitty from BioMart
     output << "\tP10 to P1"
     output << "\tP1' to P10'"
     if @nterms

@@ -47,8 +47,10 @@
 	<p>
 		<b> Protein Accessions and Peptide Sequences: </b> <img class ='help'  src='/topfind/images/help.png' alt='?' title='Copy/paste tab seperated columns of UniProt protein accession (e.g. P01023) and peptide sequences (See below for supported formats).'/><br/>
 		<%= text_area_tag(:all, "P06870 IVGGWECEQHS\nP0A8M0 SVVPVADVLQGR\nP07091 MMCNEFFEG\nP01019 VIHNESTCEQ\nP30990 KPRRPYIL\nP01042 SPFRSSRIGE\nP07288 ILSRIVGGWE")  %> <br/>
-		supported peptide formats: <br/> ENEVFLVPSR <br/>n[145.11]ENEVFLVPSR <br/>M.n[43.02]AGSSSLEAVR.R <br/>
+		supported peptide formats: <br/> ENEVFLVPSR <br/>n[145.11]ENEVFLVPSR <br/>M.n[43.02]AGSSSLEAVR.R <br/> (peptide sequence must be upper case!) <br/>
 		<%= check_box_tag(:IleLeu, "1", false)%> I=L <img class ='help'  src='/topfind/images/help.png' alt='?' title='If checked, TopFINDer does not distinguish between Ile and Leu when mapping peptide to protein sequences.'/> <br/>
+		<%= check_box_tag(:glx, "1", false)%> Z=Q <img class ='help'  src='/topfind/images/help.png' alt='?' title='If checked, TopFINDer maps all Zs (Glx) to Qs (Gln) when mapping peptide to protein sequences.'/> <br/>
+		<%= check_box_tag(:asx, "1", false)%> B=N <img class ='help'  src='/topfind/images/help.png' alt='?' title='If checked, TopFINDer maps all Bs (Asx) to Ns (Asn) when mapping peptide to protein sequences.'/> <br/>
 	</p>
   
 	<br/>
