@@ -8,19 +8,12 @@
 	    <div class="category"><h2>TopFIND 3.0</h2></div>
 	    <div class="solidbox">
 	    	<ul>			
-<<<<<<< HEAD
-					<li>May 2015: Chromosome information has been updated in TopFIND. It now corresponds to the information in SwissProt.</li>
-					<li>May 2015: TopFINDer now has the I=L option, not distinguishing between Leu and Ile, similar to mass spectrometry analysis tools.</li>
-					<li>May 2015: Protein names have been updated</li>
-					<li>Jan 2015: TopFIND 3.0 is published with TopFINDer and PathFINDer in <a href="http://nar.oxfordjournals.org/content/43/D1/D290" target="_blank">Nucleic Acids Research</a></li>
-=======
 					<li>08/2015 TopFINDer now has the Z=Q and B=N options, so it can map with Asx to Asn and Glx to Gln</li>
 					<li>05/2015 Chromosome information has been updated in TopFIND. It now corresponds to the information in SwissProt.</li>
 					<li>05/2015 TopFINDer now has the I=L option, not distinguishing between Leu and Ile, similar to mass spectrometry analysis tools.</li>
 					<li>05/2015 Protein names have been updated</li>
-					<li>02/2015 Labels for TopFINDer analyses were added.
+					<li>02/2015 Labels for TopFINDer analyses were added</li>
 					<li>01/2015 TopFIND 3.0 is published with TopFINDer and PathFINDer. <a href="http://nar.oxfordjournals.org/content/43/D1/D290" target="_blank"></a></li>
->>>>>>> 747a2fcfed0cdf454fcdc1b70a59f9d16fc304b7
 			</ul>
 		</div>		
 	    <div class="category"><h2>TopFIND 2.0</h2></div>
