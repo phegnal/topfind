@@ -69,9 +69,9 @@ IMPORT UNIPROT AND MEROPS DATA:
 	RAILS_ENV=production rake uniprot:import_uniprot_gene_names arabidopsis
 	RAILS_ENV=production rake uniprot:import_uniprot_gene_names rat
 
-	RAILS_ENV=production rake write_meropscodes
+	RAILS_ENV=production rake uniprot:write_meropscodes
 	—— backup
-	RAILS_ENV=production rake populate_searchnames
+	RAILS_ENV=production rake uniprot:populate_searchnames
 	
 ADD IMPORTS (EXPERIMENTAL DATASETS SUBMITTED TO TOPFIND)
 	rake fileImport:load_imports[filepath]
