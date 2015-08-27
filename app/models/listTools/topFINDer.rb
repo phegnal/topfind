@@ -210,6 +210,13 @@ class TopFINDer
       else
         @q[:ShedDistance] = (@q[:location_C] - tmd.collect{|d| d.to}.max().to_i).to_s
       end
+      # transit peptides
+      transit = @q[:domains_all].select{|d| d.name == "TRANSIT"}
+      if transit.length == 0
+        @q[:TransitDistance] = ""
+      else
+        @q[:TransitDistance] = (@q[:location_C] - transit.collect{|d| d.to}.max().to_i).to_s
+      end
 
       @mainHash[i] = @q
     
@@ -304,13 +311,14 @@ class TopFINDer
       output << "\tP1 Position"
     end
     output << "\tFull protein length (aa)"
-    output << "\tUniProt curated start\tAlternative Spliced Start\tCleaving proteases\tOther experimental terminus evidences\tAlternative Translation Start" if @evidence
+    output << "\tExpected start (pos 1,2, or after signal-, pro-, or transit-peptide)\tUniProt curated start\tAlternative Spliced Start\tCleaving proteases\tOther experimental terminus evidences\tAlternative Translation Start" if @evidence
     output << "\tProtease Web Connections" if @proteaseWeb
     output << "\tN-terminal Features (Start to P1)\tFeatures spanning terminus (P1 to P1')\tC-terminal Features (P1' to End)" if @domain
-    output << "\tDistance To signal peptide\tDistance to propeptide lost\tDistance to last transmembrane domain (shed)" if @domain and @nterms
+    output << "\tDistance To signal peptide\tDistance to propeptide lost\tDistance to last transmembrane domain (shed)\tDistance to transit peptide (mitochondria)" if @domain and @nterms
     output << "\n"
   
-  
+    inprecisionRange = (@nterminal..@cterminal).to_a
+    
     @orderedInput.each{|x|
       q = @mainHash[x]
       if q[:found].nil?
@@ -335,6 +343,13 @@ class TopFINDer
         end
         output << "\t" + q[:protein].aalen.to_s
         if @evidence
+          range = (@nterminal..@cterminal).to_a
+          output << ((q[:uniprot].length > 0 or 
+            q[:location_C]+1 == 1 or 
+            q[:location_C]+1 == 2 or 
+            inprecisionRange.include?(q[:SigPDistance].to_i) or  
+            inprecisionRange.include?(q[:ProPDistance].to_i) or 
+            inprecisionRange.include?(q[:TransitDistance].to_i)) ? "\tX" : "\t")
           output << (q[:uniprot].length > 0 ? "\tX" : "\t")
           # output << ((q[:isoforms].length > 0 or q[:ensembl].length > 0) ? "\tX" : "\t")
           output << (q[:ensembl].length > 0 ? "\tX" : "\t")
@@ -363,6 +378,7 @@ class TopFINDer
             output << "\t" + q[:SigPDistance]
             output << "\t" + q[:ProPDistance]
             output << "\t" + q[:ShedDistance]
+            output << "\t" + q[:TransitDistance]
           end
         end
         output << "\n"

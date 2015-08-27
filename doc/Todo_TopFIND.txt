@@ -1,3 +1,6 @@
+Transit peptide distance, like signal or propeptide distance
+Interesting and non-interesting start sites (pos 1,2, right after signal, transit or propeptide)
+
 
 Get Update page running - why isn't it working on the server?
 
