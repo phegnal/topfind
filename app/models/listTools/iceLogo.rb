@@ -21,7 +21,7 @@ class IceLogo
   def icelogo(filter, species, seqs, filepath)
     require 'soap/wsdlDriver'
     # get icelogo and print it
-    wsdl = 'http://iomics.ugent.be/icelogoserver/IceLogo.wsdl'
+    wsdl = 'http://iomics.ugent.be/icelogoserver/resources/IceLogo.wsdl'
     @dbfetchSrv = SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver
     resp =  @dbfetchSrv.getStaticIceLogo({'lExperimentalSet' => seqs,'lSpecies' => species,'lScoringType' => 'percentage', 'lYaxis' => 30,'lStartPosition'=>"-#{seqs[0].length/2}",'lPvalue' => 0.05,'lHeight'=>450,'lWidth'=>450})
         open(filepath, "w") do |file|

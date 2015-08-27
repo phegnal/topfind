@@ -343,13 +343,14 @@ class TopFINDer
         end
         output << "\t" + q[:protein].aalen.to_s
         if @evidence
-          range = (@nterminal..@cterminal).to_a
-          output << ((q[:uniprot].length > 0 or 
+          output << ((
+            q[:uniprot].length > 0 or 
             q[:location_C]+1 == 1 or 
             q[:location_C]+1 == 2 or 
             inprecisionRange.include?(q[:SigPDistance].to_i) or  
             inprecisionRange.include?(q[:ProPDistance].to_i) or 
-            inprecisionRange.include?(q[:TransitDistance].to_i)) ? "\tX" : "\t")
+            inprecisionRange.include?(q[:TransitDistance].to_i)
+            ) ? "\tX" : "\t")
           output << (q[:uniprot].length > 0 ? "\tX" : "\t")
           # output << ((q[:isoforms].length > 0 or q[:ensembl].length > 0) ? "\tX" : "\t")
           output << (q[:ensembl].length > 0 ? "\tX" : "\t")

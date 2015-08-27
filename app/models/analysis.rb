@@ -421,7 +421,7 @@ class Analysis
     require 'soap/wsdlDriver'
 
     # URL for the service WSDL
-    wsdl = 'http://iomics.ugent.be/icelogoserver/IceLogo.wsdl'
+    wsdl = "http://iomics.ugent.be/icelogoserver/resources/IceLogo.wsdl"
   
     # Get the object from the WSDL
     @dbfetchSrv = SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver
