@@ -23,7 +23,9 @@ class IceLogo
     # get icelogo and print it
     wsdl = 'http://iomics.ugent.be/icelogoserver/resources/IceLogo.wsdl'
     @dbfetchSrv = SOAP::WSDLDriverFactory.new(wsdl).create_rpc_driver
-    resp =  @dbfetchSrv.getStaticIceLogo({'lExperimentalSet' => seqs,'lSpecies' => species,'lScoringType' => 'percentage', 'lYaxis' => 30,'lStartPosition'=>"-#{seqs[0].length/2}",'lPvalue' => 0.05,'lHeight'=>450,'lWidth'=>450})
+    resp =  @dbfetchSrv.getStaticIceLogo({'lExperimentalSet' => seqs,'lSpecies' => species.to_s,'lScoringType' => 'percentage', 'lYaxis' => 30,'lStartPosition'=>"-#{seqs[0].length/2}",'lPvalue' => 0.05,'lHeight'=>450,'lWidth'=>450})
+    resp =  @dbfetchSrv.getStaticIceLogo({'lExperimentalSet' => seqs,'lSpecies' => species.to_s,'lScoringType' => 'percentage', 'lYaxis' => 30,'lStartPosition'=>"-#{seqs[0].length/2}",'lPvalue' => 0.05,'lHeight'=>450,'lWidth'=>450})
+    
         open(filepath, "w") do |file|
           file.write(resp.getStaticIceLogoReturn)
         end

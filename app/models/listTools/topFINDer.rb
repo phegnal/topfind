@@ -194,28 +194,28 @@ class TopFINDer
       if sigs.length == 0
         @q[:SigPDistance] = ""
       else
-        @q[:SigPDistance] = (@q[:location_C] - sigs.collect{|d| d.to}.max().to_i).to_s
+        @q[:SigPDistance] = (@q[:location_C] - sigs.collect{|d| d.to}.max().to_i)
       end
       # Propeptide
       prop = @q[:domains_all].select{|d| d.name == "PROPEP"}
       if prop.length == 0
         @q[:ProPDistance] = ""
       else
-        @q[:ProPDistance] = (@q[:location_C] - prop.collect{|d| d.to}.max().to_i).to_s
+        @q[:ProPDistance] = (@q[:location_C] - prop.collect{|d| d.to}.max().to_i)
       end
       # shedding
       tmd = @q[:domains_all].select{|d| d.name == "TRANSMEM"}
       if tmd.length == 0
         @q[:ShedDistance] = ""
       else
-        @q[:ShedDistance] = (@q[:location_C] - tmd.collect{|d| d.to}.max().to_i).to_s
+        @q[:ShedDistance] = (@q[:location_C] - tmd.collect{|d| d.to}.max().to_i)
       end
       # transit peptides
       transit = @q[:domains_all].select{|d| d.name == "TRANSIT"}
       if transit.length == 0
         @q[:TransitDistance] = ""
       else
-        @q[:TransitDistance] = (@q[:location_C] - transit.collect{|d| d.to}.max().to_i).to_s
+        @q[:TransitDistance] = (@q[:location_C] - transit.collect{|d| d.to}.max().to_i)
       end
 
       @mainHash[i] = @q
@@ -344,12 +344,11 @@ class TopFINDer
         output << "\t" + q[:protein].aalen.to_s
         if @evidence
           output << ((
-            q[:uniprot].length > 0 or 
             q[:location_C]+1 == 1 or 
             q[:location_C]+1 == 2 or 
-            inprecisionRange.include?(q[:SigPDistance].to_i) or  
-            inprecisionRange.include?(q[:ProPDistance].to_i) or 
-            inprecisionRange.include?(q[:TransitDistance].to_i)
+            inprecisionRange.include?(q[:SigPDistance]) or  
+            inprecisionRange.include?(q[:ProPDistance]) or 
+            inprecisionRange.include?(q[:TransitDistance])
             ) ? "\tX" : "\t")
           output << (q[:uniprot].length > 0 ? "\tX" : "\t")
           # output << ((q[:isoforms].length > 0 or q[:ensembl].length > 0) ? "\tX" : "\t")
@@ -376,10 +375,10 @@ class TopFINDer
           output << "\t" + q[:domains_at].collect{|d| "#{d.name} (#{d.description})"}.uniq.join(";")
           output << "\t" + q[:domains_after].collect{|d| "#{d.name} (#{d.description})"}.uniq.join(";")
           if @nterms
-            output << "\t" + q[:SigPDistance]
-            output << "\t" + q[:ProPDistance]
-            output << "\t" + q[:ShedDistance]
-            output << "\t" + q[:TransitDistance]
+            output << "\t" + q[:SigPDistance].to_s
+            output << "\t" + q[:ProPDistance].to_s
+            output << "\t" + q[:ShedDistance].to_s
+            output << "\t" + q[:TransitDistance].to_s
           end
         end
         output << "\n"
