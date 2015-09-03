@@ -286,10 +286,10 @@ class ProteinsController < ApplicationController
     @ppi)
     @network = analysis.graph
     @simplepanel = analysis.simplepanel
-    if @protein.isprotease && !@cleavagesites.nil?
-      @icelogopath = analysis.icelogo      
-      @heatmap = Heatmap.new(@cleavagesites)
-    end
+    # if @protein.isprotease && !@cleavagesites.nil?
+    #   @icelogopath = analysis.icelogo
+    #   @heatmap = Heatmap.new(@cleavagesites)
+    # end
     
     
     @params = params
