@@ -8,6 +8,9 @@
 	    <div class="category"><h2>TopFIND 3.0</h2></div>
 	    <div class="solidbox">
 	    	<ul>			
+					<li>08/2015 Rat data was added to TopFIND, adding ~40,000 new proteins</li>	
+	    			<li>08/2015 TopFINDer output file has an additional column, indicating whether an N-terminus could be expected</li>
+	    			<li>08/2015 TopFINDer now also shows the distance of N-termini to transit peptides</li>
 					<li>08/2015 TopFINDer now has the Z=Q and B=N options, so it can map with Asx to Asn and Glx to Gln</li>
 					<li>05/2015 Chromosome information has been updated in TopFIND. It now corresponds to the information in SwissProt.</li>
 					<li>05/2015 TopFINDer now has the I=L option, not distinguishing between Leu and Ile, similar to mass spectrometry analysis tools.</li>
