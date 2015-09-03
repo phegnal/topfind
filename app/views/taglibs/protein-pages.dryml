@@ -77,7 +77,7 @@
                   <repeat with="&@inverse_cleavages.group_by(&:pos)">
                     <% pos=this_key %>
                     <div class="solidbox"> 
-                      <div class="position"><span class='boxlabel'> <%="<span class='shortseq'>#{@protein.sequence[pos-3..pos-1]}.(#{pos-1})|(#{pos}).#{@protein.sequence[pos..pos+2]})</span>"%> </span><br/><span class='bulletgraph' ><%=pos%>,<%=@protein.aalen%></span></div> 
+						<div class="position"><span class='boxlabel'> <%="<span class='shortseq'>(#{@protein.sequence[pos-5..pos-1]}(#{pos-1})|(#{pos})#{@protein.sequence[pos..pos+4]})</span>"%> </span><br/><span class='bulletgraph' ><%=pos%>,<%=@protein.aalen%></span></div> 
   					  <section class="rightinfo">
 	                      <div class="details">
 	                        <repeat><inverse-cleavage/></repeat>
