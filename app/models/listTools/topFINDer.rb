@@ -317,7 +317,7 @@ class TopFINDer
     output << "\tDistance To signal peptide\tDistance to propeptide lost\tDistance to last transmembrane domain (shed)\tDistance to transit peptide (mitochondria)" if @domain and @nterms
     output << "\n"
   
-    inprecisionRange = (@nterminal..@cterminal).to_a
+    inprecisionRange = (-@nterminal..@cterminal).to_a
     
     @orderedInput.each{|x|
       q = @mainHash[x]
