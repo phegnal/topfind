@@ -14,8 +14,8 @@ class UserMailer < ActionMailer::Base
   def new_submission(user,import)
     @subject    = "TopFIND -- new data submitted"
     @body       = { :user => user, :import => import }
-    @recipients = 'lange.philipp@gmail.com'
-    @from       = "plange@interchange.ubc.ca"
+    @recipients = 'topfind.clip@gmail.com'
+    @from       = "topfind.clip@gmail.com"
     @sent_on    = Time.now
     @headers    = {}
   end
@@ -24,7 +24,7 @@ class UserMailer < ActionMailer::Base
     @subject    = "TopFIND -- new data submitted"
     @body       = { :user => user, :import => import }
     @recipients = user.email_address
-    @from       = "plange@interchange.ubc.ca"
+    @from       = "topfind.clip@gmail.com"
     @sent_on    = Time.now
     @headers    = {}
   end 

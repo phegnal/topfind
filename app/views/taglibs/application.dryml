@@ -60,7 +60,7 @@
     	<div id="publication">
         &copy; 2010-<%= Time.now.year.to_s%> | <a href="/topfind/about">About</a> |
           <a href="/topfind/license">License &amp; Disclaimer</a> |
-          <a href="mailto:philipp.lange@ubc.ca">Contact</a> |
+          <a href="mailto:topfind.clip@gmail.com">Contact</a> |
           <a href="/topfind/download">Downloads</a><br/>
           <a href="http://nar.oxfordjournals.org/content/43/D1/D290.full" target="_blank">Nikolaus Fortelny, Sharon Yang, Paul Pavlidis, Philipp F. Lange*, Christopher M. Overall*, <b>Nucleic Acids Research</b> 43 (D1), D290-D297 (2014)</a> <a href="http://nar.oxfordjournals.org/content/43/D1/D290.full.pdf+html" target="_blank">[pdf]</a><br/>
           <a href="http://nar.oxfordjournals.org/content/40/D1/D351.full" target="_blank">Philipp F. Lange, Pitter F. Huesgen, Christopher M. Overall, <b>Nucleic Acids Research</b> 40 (D1), D351-D361 (2012)</a> <a href="https://www.researchgate.net/profile/Philipp_Lange/publication/51816705_TopFIND_2.0--linking_protein_termini_with_proteolytic_processing_and_modifications_altering_protein_function/links/0fcfd50574d434aac9000000?ev=pub_int_doc_dl&origin=publication_detail&inViewer=true" target="_blank">[pdf]</a><br/>
