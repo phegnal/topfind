@@ -53,7 +53,7 @@ class TopFINDer
       print "." 
       @q = {}
       iSplit = i.split("_")
-      if iSplit.length < 2
+      if iSplit.length < 2 or iSplit.fetch(0) == ""
         @q[:found] = false
         @q[:acc] = i
         @q[:full_pep] = "incomplete row"
