@@ -1,8 +1,10 @@
-Transit peptide distance, like signal or propeptide distance
-Interesting and non-interesting start sites (pos 1,2, right after signal, transit or propeptide)
+http://clipserve.clip.ubc.ca/topfind/protein/P55095/filter?ppi=true --> there are cleavages annotated as "Features". We should add those as cleavages!
 
+Histogram for where the termini are!
 
 Get Update page running - why isn't it working on the server?
+
+C-terminal peptides
 
 Get position of evidences (comma separated) in the table returned by TopFINDer 
 	--> when doing this, TopFINDer can also be optimized by doing protein.nterms instead of Nterm.find(:condition)

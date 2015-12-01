@@ -87,6 +87,7 @@ class PathFinding
   end
   
   def remove_direct_paths()
+    # for each target (k) we get the pathset (v). In this pathset, we select each path (path) that has more than 2 distinct nodes (unique ids of x)
     @allPaths.each_pair{|k ,v| @allPaths[k] = v.select{|path| path.collect{|x| x[:id]}.uniq.length > 2}}
   end
   

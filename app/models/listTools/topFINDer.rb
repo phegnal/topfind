@@ -220,60 +220,65 @@ class TopFINDer
 
       @mainHash[i] = @q
     
-    }
+  }
     
-    print "\n"
+  print "\n"
     
-    ###
-    ### ICE LOGO and R Graphics for the peptides that were identified
-    ###
-    @foundPeptides = @mainHash.values.select{|x| x[:found]}
+  ###
+  ### ICE LOGO and R Graphics for the peptides that were identified
+  ###
+  @foundPeptides = @mainHash.values.select{|x| x[:found]}
 
-    # ICELOGO
-    if @nterms # >1 because this is a 0 based count
-      seqs = @foundPeptides.select{|e| e[:location_C]>1 and e[:ensembl].length == 0 and e[:tisdb].length == 0 and e[:isoforms].length == 0}
-    else
-      seqs = @foundPeptides.select{|e| e[:location_C] > e[:sequence].length  and e[:ensembl].length == 0 and e[:tisdb].length == 0 and e[:isoforms].length == 0}
-    end
-  
-    begin
-      IceLogo.new().terminusIcelogo(Species.find(1), seqs.collect{|e| e[:upstream]+":"+e[:downstream]}, "#{fileDir}/IceLogo.svg", 4) if seqs.length > 0
-    rescue Exception => e
-      print "Exception occured making Ice Logo " + e
-    end
-  
-    # VENN DIAGRAM
-    begin
-      Venn.new(@foundPeptides).vennDiagram("#{fileDir}/VennDiagram")
-    rescue Exception => e  
-      print "Exception occured making Venn Diagram: " + e 
-    end
+  # ICELOGO
+  if @nterms # >1 because this is a 0 based count
+    seqs = @foundPeptides.select{|e| e[:location_C]>1 and e[:ensembl].length == 0 and e[:tisdb].length == 0 and e[:isoforms].length == 0}
+  else
+    seqs = @foundPeptides.select{|e| e[:location_C] > e[:sequence].length  and e[:ensembl].length == 0 and e[:tisdb].length == 0 and e[:isoforms].length == 0}
+  end
 
-	print "starting pathfinding\n"
-    # PATHFINDING
-    if(@proteaseWeb == "1")
-      
+  begin
+    IceLogo.new().terminusIcelogo(Species.find(1), seqs.collect{|e| e[:upstream]+":"+e[:downstream]}, "#{fileDir}/IceLogo.svg", 4) if seqs.length > 0
+  rescue Exception => e
+    print "Exception occured making Ice Logo " + e
+  end
+
+  # VENN DIAGRAM
+  begin
+    Venn.new(@foundPeptides).vennDiagram("#{fileDir}/VennDiagram")
+  rescue Exception => e  
+    print "Exception occured making Venn Diagram: " + e 
+  end
+
+  # PATHFINDING
+  if(@proteaseWeb == "1")
+  	print "starting pathfinding\n"
+    begin
+      puts params[:pw_protease]
+      puts params[:pw_maxPathLength]
       if(not Protein.find_by_ac(params[:pw_protease].strip).nil? and params[:pw_maxPathLength].to_i > 0)
-   		if(params[:pw_maxPathLength].to_i > 4) 
-   			params[:pw_maxPathLength] = "4"
-   		end
+     		if(params[:pw_maxPathLength].to_i > 4) 
+     			params[:pw_maxPathLength] = "4"
+     		end
         # @foundPeptides.each{|p| g.add_edge(params[:pw_protease], p[:acc], p[:location_C], "l")}
         finder = PathFinding.new(Graph.new(params[:pw_org],[]), params[:pw_maxPathLength].to_i, true, @nterminal, @cterminal, true)
         finder.find_all_paths(params[:pw_protease],  @foundPeptides.collect{|x|  {:id => x[:acc], :pos => x[:location_C]} })
-		print " found paths at maxpathlength #{params[:pw_maxPathLength]}\n"
+  		  print " found paths at maxpathlength #{params[:pw_maxPathLength]}\n"
         finder.remove_direct_paths()
         @pw_paths = finder.get_paths()
         @pw_gnames = finder.paths_gene_names()  # GENE NAMES FOR PROTEINS FROM PATHS
-		print " making graphviz\n"
+  		  print " making graphviz\n"
         pdfPath = finder.make_graphviz(fileDir, @pw_gnames) # this saves the image but we need to define the path yet
-		print " graphviz done\n"
+  		  print " graphviz done\n"
       else
         p "protease not found" if Protein.find_by_ac(params[:pw_protease].strip).nil?
         p "pathlength invalid" if params[:pw_maxPathLength].to_i <= 0
         # TODO put error message on html??
       end
+    	print "pathfinding done\n"    
+    rescue Exception => e  
+      print "Exception occured in PathFINDING: " + e 
     end
-	print "pathfinding done\n"    
+  end
 
     if(@proteaseStats == "1")
       if @foundPeptides.collect{|a| a[:proteases].length}.sum > 0 then
